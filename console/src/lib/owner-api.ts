@@ -172,3 +172,39 @@ export async function postOwnerFleetDeprovisionApi(
     body: opts,
   });
 }
+
+// ─── New customer (OWN-NC) ────────────────────────────────────────────────────
+
+export interface SlugCheckResponse {
+  ok: boolean;
+  available: boolean;
+  error?: string;
+}
+
+export interface NewCustomerRequest {
+  email: string;
+  slug: string;
+  plan: "starter" | "growth";
+  companyName?: string;
+}
+
+export interface NewCustomerResponse {
+  ok: boolean;
+  checkoutUrl: string;
+  intentId: string;
+}
+
+export async function getOwnerSlugCheckApi(
+  slug: string
+): Promise<SlugCheckResponse> {
+  return apiFetch<SlugCheckResponse>(`/api/v1/owner/slug-check/${encodeURIComponent(slug)}`);
+}
+
+export async function postOwnerNewCustomerApi(
+  body: NewCustomerRequest
+): Promise<NewCustomerResponse> {
+  return apiFetch<NewCustomerResponse>("/api/v1/owner/new-customer", {
+    method: "POST",
+    body,
+  });
+}
