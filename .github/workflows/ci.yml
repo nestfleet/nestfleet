@@ -120,7 +120,7 @@ jobs:
             echo "Auth smoke passed"
 
             # 3. Authenticated /auth/me — proves full DB CRUD round-trip
-            TOKEN=$(echo "$LOGIN" | jq -r '.data.token')
+            TOKEN=$(echo "$LOGIN" | jq -r '.token')
             ME=$(curl --fail --silent https://nestfleet.dev/api/v1/auth/me \
               -H "Authorization: Bearer $TOKEN")
             echo "$ME" | grep -q '"email"' || (echo "/auth/me failed: $ME" && exit 1)
