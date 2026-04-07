@@ -70,14 +70,20 @@
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
 | UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | Not Started | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. No backend changes needed for MVP; backend `?q=` param upgrade later. |
-| UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | Not Started | Button visible even when limit is hit; confusing for single-product tier users. |
+| UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
+
+### SaaS Provisioning: Docker Registry (OPS-IMAGE-01)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| OPS-IMAGE-01 | Publish Docker images to GHCR and update cloud-init to use `image:` refs | S | P0 | Not Started | Smoke test revealed: cloud-init embeds docker-compose.prod.yml which has `build: context: .` directives — but customer VPSes have no source code. VPS spins up but containers fail to start. Fix: build API + console images in CI (GitHub Actions), push to `ghcr.io/nestfleet/api:latest` + `ghcr.io/nestfleet/console:latest`, and update docker-compose.prod.yml to use `image:` instead of `build:`. Also fix server type: cx21→cx23 (cx21 deprecated). |
 
 ### Landing Page & Legal
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| LP-01 | `/terms` and `/privacy` pages — create real content (or placeholder with correct structure) | S | P1 | Not Started | Signup form links to `/terms` and `/privacy` — both return 404. Blocks signup flow trust. |
-| LP-02 | Landing page audit + copy/routing polish | S | P2 | Not Started | Hero CTAs, pricing section links, AGPL copy, "Deploy from source" → GitHub repo, overall routing consistency. |
+| LP-01 | `/terms` and `/privacy` pages — create real content (or placeholder with correct structure) | S | P1 | ✅ Done | GDPR-structured placeholder pages with amber draft banner, mutual links, and E2E tests. |
+| LP-02 | Landing page audit + copy/routing polish | S | P2 | ✅ Done | Footer now has Terms + Privacy links; middleware bypass for /terms, /privacy, /signup. |
 
 ### Beta Testing
 

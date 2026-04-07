@@ -33,6 +33,11 @@ COPY --from=builder /app/dist ./dist
 # Copy migrations so runMigrations() can find them at runtime
 COPY migrations ./migrations
 
+# Copy provisioning assets used by cloud-init generator at runtime
+COPY docker-compose.customer.yml ./docker-compose.customer.yml
+COPY docker/Caddyfile.prod       ./docker/Caddyfile.prod
+COPY scripts/backup.sh           ./scripts/backup.sh
+
 RUN chown -R nestfleet:nestfleet /app
 USER nestfleet
 

@@ -24,7 +24,7 @@ export class HetznerApiError extends Error {
 
 export interface CreateServerOpts {
   name:       string       // nestfleet-{slug}
-  serverType: string       // cx21
+  serverType: string       // cx23
   image:      string       // ubuntu-22.04
   location:   string       // nbg1
   userData:   string       // cloud-init YAML

@@ -18,6 +18,7 @@ import {
 import type { ChangeRequest } from "@/lib/types";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
 import { usePendingNotificationRefs } from "@/lib/usePendingNotificationRefs";
+import { SearchInput } from "@/components/SearchInput";
 
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -64,6 +65,18 @@ export default function ApprovalsPage() {
 
   const requests: ChangeRequest[] = data?.data ?? [];
   const pendingRefs = usePendingNotificationRefs(productId);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const q = searchQuery.trim().toLowerCase();
+  const visibleRequests = q
+    ? requests.filter((cr) =>
+        cr.title.toLowerCase().includes(q) ||
+        cr.change_request_id.toLowerCase().includes(q) ||
+        cr.case_id.toLowerCase().includes(q) ||
+        (cr.impact_summary ?? "").toLowerCase().includes(q)
+      )
+    : requests;
 
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [note,        setNote]        = useState("");
@@ -130,20 +143,26 @@ export default function ApprovalsPage() {
             <p className="text-sm text-gray-500">
               {isLoading
                 ? "Loading…"
-                : `${requests.length} change request${requests.length !== 1 ? "s" : ""} awaiting review`}
+                : `${visibleRequests.length} change request${visibleRequests.length !== 1 ? "s" : ""} awaiting review`}
             </p>
           </div>
-          {!isLoading && requests.length > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg ring-1 ring-amber-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
-              {requests.length} awaiting approval
-            </span>
-          )}
+          <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center">
+            {!isLoading && requests.length > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg ring-1 ring-amber-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                {requests.length} awaiting approval
+              </span>
+            )}
+            {/* Search */}
+            <div className="mt-2 sm:mt-0">
+              <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search approvals…" />
+            </div>
+          </div>
         </div>
 
         {/* Table card */}
         <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
-          {isLoading && requests.length === 0 ? (
+          {isLoading && visibleRequests.length === 0 ? (
             <div className="flex items-center justify-center py-14">
               <div className="flex flex-col items-center gap-3">
                 <div className="h-6 w-6 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
@@ -160,7 +179,7 @@ export default function ApprovalsPage() {
               <p className="text-sm font-medium text-gray-900">Failed to load approvals</p>
               <p className="mt-1 text-xs text-gray-500">{(error as Error).message}</p>
             </div>
-          ) : requests.length === 0 ? (
+          ) : visibleRequests.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center">
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-green-50">
                 <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -193,7 +212,7 @@ export default function ApprovalsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {requests.map((cr) => (
+                  {visibleRequests.map((cr) => (
                     <ApprovalRow
                       key={cr.change_request_id}
                       cr={cr}
@@ -212,7 +231,7 @@ export default function ApprovalsPage() {
           )}
         </div>
 
-        {!isLoading && !error && requests.length > 0 && (
+        {!isLoading && !error && visibleRequests.length > 0 && (
           <p className="text-xs text-gray-400 text-right">Auto-refreshes every 30s</p>
         )}
       </div>

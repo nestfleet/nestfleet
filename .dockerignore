@@ -19,6 +19,7 @@ console/
 # Docs and config not needed at runtime
 docs/
 scripts/
+!scripts/backup.sh
 *.md
 .gitignore
 .gitleaks.toml
@@ -31,6 +32,6 @@ backups/
 *.pgdump
 *.log
 
-# Docker files themselves
-docker-compose*.yml
+# Docker files themselves (keep prod assets for provisioning cloud-init)
+docker-compose.yml
 Dockerfile*

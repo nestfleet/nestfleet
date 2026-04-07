@@ -10,6 +10,8 @@ import { getPrDraftedChangeRequestsApi } from "@/lib/api";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
 import { usePendingNotificationRefs } from "@/lib/usePendingNotificationRefs";
 import type { ChangeRequest } from "@/lib/types";
+import { useState } from "react";
+import { SearchInput } from "@/components/SearchInput";
 
 
 function shortId(id: string) {
@@ -45,10 +47,21 @@ export default function PrDraftsPage() {
     { refreshInterval: 30_000, revalidateOnFocus: true }
   );
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   const changeRequests: ChangeRequest[] = data?.data ?? [];
   const ready  = changeRequests.filter((cr) => cr.status === "pr-drafted");
   const inPrep = changeRequests.filter((cr) => cr.status === "implementation-prep");
   const pendingRefs = usePendingNotificationRefs(productId);
+
+  const q = searchQuery.trim().toLowerCase();
+  const matchCr = (cr: ChangeRequest) =>
+    !q ||
+    cr.title.toLowerCase().includes(q) ||
+    cr.change_request_id.toLowerCase().includes(q) ||
+    cr.case_id.toLowerCase().includes(q);
+  const visibleReady = ready.filter(matchCr);
+  const visibleInPrep = inPrep.filter(matchCr);
 
   if (!productId) {
     return (
@@ -82,12 +95,15 @@ export default function PrDraftsPage() {
                 : `${ready.length} ready for review${inPrep.length > 0 ? `, ${inPrep.length} preparing` : ""}`}
             </p>
           </div>
-          {!isLoading && ready.length > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg ring-1 ring-emerald-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              {ready.length} ready for review
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search PR drafts…" />
+            {!isLoading && ready.length > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg ring-1 ring-emerald-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                {ready.length} ready for review
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Workflow hint — shown only when ready PRs exist */}
@@ -107,7 +123,7 @@ export default function PrDraftsPage() {
 
         {/* Table card */}
         <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
-          {isLoading && changeRequests.length === 0 ? (
+          {isLoading && visibleReady.length === 0 && visibleInPrep.length === 0 ? (
             <div className="flex items-center justify-center py-16">
               <div className="flex flex-col items-center gap-3">
                 <div className="h-7 w-7 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
@@ -124,7 +140,7 @@ export default function PrDraftsPage() {
               <p className="text-sm font-medium text-gray-900">Failed to load PR drafts</p>
               <p className="mt-1 text-xs text-gray-500">{(error as Error).message}</p>
             </div>
-          ) : changeRequests.length === 0 ? (
+          ) : visibleReady.length === 0 && visibleInPrep.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50">
                 <svg className="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -132,7 +148,9 @@ export default function PrDraftsPage() {
                 </svg>
               </div>
               <p className="text-sm font-medium text-gray-900">No PR drafts</p>
-              <p className="mt-1 text-xs text-gray-500">Approved change requests will appear here once the agent prepares them.</p>
+              <p className="mt-1 text-xs text-gray-500">
+                {searchQuery ? "Try clearing the search." : "Approved change requests will appear here once the agent prepares them."}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -147,7 +165,7 @@ export default function PrDraftsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {changeRequests.map((cr) => (
+                  {[...visibleReady, ...visibleInPrep].map((cr) => (
                     <PrDraftRow
                       key={cr.change_request_id}
                       cr={cr}
@@ -161,7 +179,7 @@ export default function PrDraftsPage() {
           )}
         </div>
 
-        {!isLoading && !error && changeRequests.length > 0 && (
+        {!isLoading && !error && (visibleReady.length > 0 || visibleInPrep.length > 0) && (
           <p className="text-xs text-gray-400 text-right">Auto-refreshes every 30s</p>
         )}
       </div>
