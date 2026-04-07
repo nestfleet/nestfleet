@@ -80,18 +80,22 @@ jobs:
     needs: [api, console, secrets]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HETZNER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.HETZNER_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: root
-          key: ${{ secrets.HETZNER_SSH_KEY }}
-          script: |
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.HETZNER_HOST }} '
             set -e
             cd /opt/nestfleet
             git pull origin main
-            docker compose -f docker-compose.prod.yml build --no-cache api console
+            docker compose -f docker-compose.prod.yml build api console
             docker compose -f docker-compose.prod.yml up -d --no-deps api console
+          '
 
       - name: Smoke test
         run: |
