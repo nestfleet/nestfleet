@@ -128,6 +128,7 @@ export type LineageNodeType =
   | "auto_reply"
   | "escalated"
   | "resolved"
+  | "chat_thread"
   | "notification_sent"
   | "system_event";
 
