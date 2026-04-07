@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/AppLayout";
 import {
   getSettingsApi,
   updateSettingsApi,
+  getProductsApi,
   updateProductApi,
   testLlmApi,
   testSlackApi,
@@ -262,7 +263,12 @@ function ProductSection() {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [copied,    setCopied]    = useState(false);
 
-  const product = productCtx?.product;
+  // When outside ProductProvider (no /p/[slug] route), load via API fallback
+  const { data: productsData } = useSWR(
+    productCtx ? null : "products-fallback",
+    () => getProductsApi(),
+  );
+  const product = productCtx?.product ?? productsData?.products?.[0];
 
   const [name,        setName]        = useState(product?.name        ?? "");
   const [stage,       setStage]       = useState(product?.stage       ?? "production");
