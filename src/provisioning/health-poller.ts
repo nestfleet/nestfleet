@@ -8,7 +8,7 @@
  * Timing:
  *   - 60s initial delay (DNS TTL propagation before Cloudflare serves the record)
  *   - 15s between attempts
- *   - 30 max attempts → 7.5 min total polling window
+ *   - 50 max attempts → ~12.5 min total polling window (accounts for Docker CE install time)
  *   - Caddy ACME adds ~30–60s on the first HTTPS request — covered by initial delay
  */
 
@@ -35,7 +35,7 @@ export async function pollUntilHealthy(opts: PollOpts): Promise<PollResult> {
     provisioningId,
     slug,
     baseDomain,
-    maxAttempts    = 30,
+    maxAttempts    = 50,
     intervalMs     = 15_000,
     initialDelayMs = 60_000,
   } = opts
