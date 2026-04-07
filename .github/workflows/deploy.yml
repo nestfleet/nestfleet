@@ -1,0 +1,31 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy — main VPS
+    runs-on: ubuntu-latest
+    needs: [api, console]   # wait for CI to pass
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: root
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/nestfleet
+            git pull origin main
+            docker compose -f docker-compose.prod.yml build --no-cache api console
+            docker compose -f docker-compose.prod.yml up -d --no-deps api console
+            docker compose -f docker-compose.prod.yml exec -T api node -e "process.exit(0)" || true
+
+      - name: Smoke test
+        run: |
+          sleep 30
+          curl --fail --silent https://nestfleet.dev/api/v1/health | grep -q '"status"'
+          echo "Health check passed"
