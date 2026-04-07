@@ -12,19 +12,19 @@ Domain · Email · GitHub Org · GitHub App · Prod Infra · Deploy Pipeline
 | Item | Status |
 |------|--------|
 | `nestfleet.dev` domain registered + Cloudflare zone | ✅ Done |
-| `nestfleet.io` cybersquatter protection | ❓ Unknown — check |
-| Hetzner project `nestfleet`, firewall 10804246, SSH key | ✅ Done |
-| Google Workspace Starter — `nestfleet.dev` configured | ✅ Done |
-| DNS: MX records for `nestfleet.dev` in Cloudflare | ✅ Done |
-| SPF / DKIM / DMARC DNS records | ✅ Done |
-| Email mailboxes (`info@`, `ops@`, `alerts@`, etc.) | ✅ Done via Google Workspace |
-| Resend API key — transactional outbound | ✅ Done — needs `FROM` updated to `noreply@nestfleet.dev` |
-| `nestfleet` GitHub org | ❌ Not done |
-| `nestfleet/nestfleet` public repo | ❌ Not done (README references it) |
-| GitHub App for PR drafting (under nestfleet org) | ❌ Not done — using personal PAT only |
-| Hetzner main VPS (Phase B) | ❌ Not done |
-| `nestfleet.dev` A record → main VPS IP | ❌ Not done (VPS IP not yet known) |
-| GitHub Actions deploy workflow | ❌ Not done |
+| `nestfleet.io` cybersquatter protection | — Deferred |
+| Hetzner project `nestfleet`, firewall 10804246, SSH key `nestfleet-ops` | ✅ Done |
+| Google Workspace Starter — MX, SPF, DKIM, DMARC, mailboxes | ✅ Done |
+| Transactional email — Google SMTP, `noreply@nestfleet.dev`, app password | ✅ Done |
+| `nestfleet` GitHub org + private repo `nestfleet/nestfleet` | ✅ Done — private until v0.1.0 |
+| GitHub deploy token (read-only, scoped to repo) | ✅ Done — stored in `.env` |
+| GitHub App `NestFleet` (App ID 3297524, under nestfleet org) | ✅ Done |
+| Personal PAT removed, App ID + private key + webhook secret in `.env` | ✅ Done |
+| Hetzner main VPS `nestfleet-main` CX23 | 🔄 Being provisioned |
+| `nestfleet.dev` A record → main VPS IP | ❌ Pending VPS IP |
+| Initial code push to private repo | ❌ Pending (do before VPS deploy) |
+| First deploy on VPS | ❌ Pending |
+| GitHub Actions deploy workflow | ❌ Pending |
 
 ---
 
@@ -419,21 +419,23 @@ STRIPE_PRICE_STARTER_MONTHLY=price_live_...
 - [x] Confirmed email arrives in inbox from `noreply@nestfleet.dev`
 
 ### Step 5 — GitHub Org + Repo
-- [ ] `nestfleet` GitHub org created at github.com/nestfleet
-- [ ] Org profile filled: display name, website (`https://nestfleet.dev`), description, email
-- [ ] `nestfleet/nestfleet` public repo created
-- [ ] Local repo pushed to `github.com/nestfleet/nestfleet`
-- [ ] Repo topics added: `ai`, `typescript`, `support-operations`, `product-ops`, `self-hosted`, `agpl`
-- [ ] Branch protection on `main`: require PR + status check `CI / API`
+- [x] `nestfleet` GitHub org created at github.com/nestfleet
+- [x] Org profile filled: display name `NestFleet`, website `https://nestfleet.dev`, description, email
+- [x] `nestfleet/nestfleet` repo created — **private** until v0.1.0 launch
+- [x] Fine-grained deploy token created (read-only, Contents + Metadata, expires 2027-04-07)
+- [ ] Local repo pushed to `github.com/nestfleet/nestfleet` — deferred to Phase B
+- [ ] Repo topics + homepage set — deferred to public flip
+- [ ] Branch protection on `main` — deferred to after first push
 
 ### Step 6 — GitHub App
-- [ ] GitHub App `NestFleet` created under `nestfleet` org
-- [ ] Permissions set: Contents R/W, Pull requests R/W, Metadata R-only, Checks R-only, Deployments R-only
-- [ ] Webhook events subscribed: `pull_request`, `check_suite`, `deployment_status`, `issues`
-- [ ] Private key generated + downloaded
-- [ ] `.env` updated: `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`
-- [ ] Personal PAT (`GITHUB_TOKEN`) removed from `.env`
-- [ ] Install URL documented in console Settings → GitHub Integration
+- [x] GitHub App `NestFleet` created under `nestfleet` org (App ID: 3297524)
+- [x] Permissions set: Contents R/W, Pull requests R/W, Metadata R-only, Checks R-only, Deployments R-only
+- [x] Webhook events subscribed: `pull_request`, `check_suite`, `deployment_status`
+- [x] Private key generated + stored at `AI Projects/docs/nestfleet.2026-04-06.private-key.pem`
+- [x] `.env` updated: `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET`
+- [x] Personal PAT (`GITHUB_TOKEN`) removed from `.env`
+- [ ] Webhook URL updated to production URL once main VPS is live (Phase B)
+- [ ] Install URL added to console Settings → GitHub Integration page
 
 ### Step 8 — Prod Infra (Phase B)
 - [ ] Hetzner CX21 VPS `nestfleet-main` provisioned (Ubuntu 22.04)
