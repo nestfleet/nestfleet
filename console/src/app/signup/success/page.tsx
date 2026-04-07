@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 type ProvisioningStatus =
@@ -27,6 +27,14 @@ const STATUS_MESSAGES: Record<ProvisioningStatus, string> = {
 };
 
 export default function SignupSuccessPage() {
+  return (
+    <Suspense>
+      <SignupSuccessContent />
+    </Suspense>
+  );
+}
+
+function SignupSuccessContent() {
   const params    = useSearchParams();
   const intentId  = params.get("intent");
   const [status, setStatus]   = useState<ProvisioningStatus>("pending_payment");
