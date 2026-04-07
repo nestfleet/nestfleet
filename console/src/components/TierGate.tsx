@@ -6,6 +6,7 @@
  */
 
 import { type ProductTier, tierAtLeast } from "@/lib/useLicense";
+import { useProductBasePath } from "@/lib/product-context";
 
 const TIER_LABEL: Record<ProductTier, string> = {
   community: "Community",
@@ -23,6 +24,8 @@ interface TierGateProps {
 }
 
 export function TierGate({ currentTier, requiredTier, featureName, children }: TierGateProps) {
+  const basePath = useProductBasePath();
+
   if (tierAtLeast(currentTier, requiredTier)) {
     return <>{children}</>;
   }
@@ -60,7 +63,7 @@ export function TierGate({ currentTier, requiredTier, featureName, children }: T
       </p>
 
       <a
-        href="/settings?section=plan"
+        href={`${basePath}/settings?section=plan`}
         className="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
       >
         View plans →

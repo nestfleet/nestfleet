@@ -52,12 +52,27 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // --- /cases redirect (DEFERRED-21) ---
-  // Send users who land on the legacy /cases path to their last product.
-  if (pathname === "/cases") {
+  // --- Legacy route redirects (DEFERRED-21) ---
+  // Redirect all legacy top-level app routes to their /p/[slug] equivalents
+  // using the nf_last_product cookie. Without this, users who land on legacy
+  // URLs (bookmarks, direct navigation) get no ProductProvider context and
+  // the sidebar stays in legacy mode.
+  const LEGACY_APP_ROUTES = [
+    "/cases", "/queue", "/approvals", "/pr-drafts",
+    "/analytics", "/notifications", "/knowledge",
+    "/compliance", "/dashboard", "/settings",
+  ];
+  const legacyBase = LEGACY_APP_ROUTES.find(
+    (r) => pathname === r || pathname.startsWith(r + "/") || pathname.startsWith(r + "?"),
+  );
+  if (legacyBase) {
     const lastSlug = request.cookies.get("nf_last_product")?.value;
     if (lastSlug && /^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(lastSlug)) {
-      return NextResponse.redirect(new URL(`/p/${lastSlug}/cases`, request.url));
+      const rest = pathname.slice(legacyBase.length); // preserves sub-paths like /approvals/crId
+      const search = request.nextUrl.search;          // preserves ?section=plan etc.
+      return NextResponse.redirect(
+        new URL(`/p/${lastSlug}${legacyBase}${rest}${search}`, request.url),
+      );
     }
   }
 

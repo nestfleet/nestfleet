@@ -473,7 +473,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
         {/* Upgrade nudge for non-paid tiers (W6-01) */}
         {tier !== null && tier !== "starter" && tier !== "growth" && tier !== "scale" && (
           <a
-            href="/settings?section=plan"
+            href={`${basePath}/settings?section=plan`}
             className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
