@@ -75,8 +75,8 @@ test("PD-04: POST /auth/login then GET /auth/me returns user profile", async ({ 
   })
   expect(loginRes.status()).toBe(200)
 
-  const loginBody = await loginRes.json() as { ok: boolean; data: { token: string } }
-  const token = loginBody.data?.token
+  const loginBody = await loginRes.json() as { token: string }
+  const token = loginBody.token
   expect(token).toBeTruthy()
 
   // Authenticated DB read — proves CRUD round-trip works
@@ -85,6 +85,6 @@ test("PD-04: POST /auth/login then GET /auth/me returns user profile", async ({ 
   })
   expect(meRes.status()).toBe(200)
 
-  const meBody = await meRes.json() as { ok: boolean; data: { email: string } }
-  expect(meBody.data?.email).toBe(CANARY_EMAIL)
+  const meBody = await meRes.json() as { email: string }
+  expect(meBody.email).toBe(CANARY_EMAIL)
 })
