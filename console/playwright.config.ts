@@ -8,7 +8,7 @@ export default defineConfig({
   retries: 0,
   reporter: [["html", { open: "never" }], ["list"]],
   use: {
-    baseURL: "http://localhost:3002",
+    baseURL: process.env.BASE_URL ?? "http://localhost:3002",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
