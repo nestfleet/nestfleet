@@ -164,3 +164,48 @@ test.describe("/signup page (NF-BETA-01)", () => {
     expect(hasTerms + hasPrivacy).toBeGreaterThan(0)
   })
 })
+
+// ── Legal page load tests (LP-01) ─────────────────────────────────────────────
+
+test.describe("Legal pages (LP-01)", () => {
+  test("LP-01-a: /terms page loads and shows heading", async ({ page }) => {
+    await page.goto("/terms")
+    await page.waitForLoadState("networkidle")
+
+    await expect(page).toHaveTitle(/Terms of Service/i)
+    await expect(page.locator("h1")).toContainText(/Terms of Service/i)
+    // Draft banner must be visible (page is a placeholder)
+    await expect(page.locator("body")).toContainText(/draft|placeholder/i)
+    // Key sections present
+    await expect(page.locator("body")).toContainText(/Acceptance/i)
+    await expect(page.locator("body")).toContainText(/Intellectual Property/i)
+  })
+
+  test("LP-01-b: /privacy page loads and shows heading", async ({ page }) => {
+    await page.goto("/privacy")
+    await page.waitForLoadState("networkidle")
+
+    await expect(page).toHaveTitle(/Privacy Policy/i)
+    await expect(page.locator("h1")).toContainText(/Privacy Policy/i)
+    // Draft banner
+    await expect(page.locator("body")).toContainText(/draft|placeholder/i)
+    // GDPR sections present
+    await expect(page.locator("body")).toContainText(/Data Controller/i)
+    await expect(page.locator("body")).toContainText(/Legal Basis/i)
+    await expect(page.locator("body")).toContainText(/Your Rights/i)
+  })
+
+  test("LP-01-c: /terms links back to /privacy", async ({ page }) => {
+    await page.goto("/terms")
+    await page.waitForLoadState("networkidle")
+    const privacyLink = page.locator('a[href*="/privacy"]').first()
+    await expect(privacyLink).toBeVisible()
+  })
+
+  test("LP-01-d: /privacy links back to /terms", async ({ page }) => {
+    await page.goto("/privacy")
+    await page.waitForLoadState("networkidle")
+    const termsLink = page.locator('a[href*="/terms"]').first()
+    await expect(termsLink).toBeVisible()
+  })
+})

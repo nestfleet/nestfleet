@@ -615,6 +615,8 @@ export default function HomePage() {
                 GitHub
               </a>
               <a href="mailto:hello@nestfleet.dev" className="hover:text-gray-900 transition-colors">Contact</a>
+              <Link href="/terms"   className="hover:text-gray-900 transition-colors">Terms</Link>
+              <Link href="/privacy" className="hover:text-gray-900 transition-colors">Privacy</Link>
             </div>
             <p className="text-sm text-gray-400">
               © {new Date().getFullYear()} NestFleet. All rights reserved.

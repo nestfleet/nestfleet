@@ -64,41 +64,8 @@ export function AddProductButton({ onClick }: AddProductButtonProps) {
   const canAdd =
     productLimit === null || products.length < productLimit;
 
-  if (!canAdd) {
-    const tooltipText = `You've reached your plan's product limit (${productLimit}). Upgrade your plan to add more.`;
-    return (
-      <div className="relative group">
-        <button
-          disabled
-          className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-400 cursor-not-allowed"
-          aria-disabled="true"
-        >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
-          </svg>
-          Add Product
-        </button>
-        {/* Tooltip */}
-        <div
-          role="tooltip"
-          className="pointer-events-none absolute bottom-full left-0 mb-2 hidden w-56 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs text-gray-600 shadow-lg group-hover:block z-50"
-        >
-          {tooltipText}
-        </div>
-      </div>
-    );
-  }
+  // At limit — hide the button entirely (no disabled ghost that confuses users)
+  if (!canAdd) return null;
 
   return (
     <button

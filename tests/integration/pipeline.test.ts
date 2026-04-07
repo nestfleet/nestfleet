@@ -13,6 +13,11 @@ vi.mock("../../src/agents/dispatcher.js", () => ({
   dispatch: vi.fn().mockResolvedValue(undefined),
   dispatchInTransaction: vi.fn().mockResolvedValue("mock-job-id"),
 }))
+vi.mock("../../src/infra/queue/boss.js", () => ({
+  getBossState: vi.fn().mockReturnValue("started"),
+  initBoss:     vi.fn(),
+  getBoss:      vi.fn().mockResolvedValue(null),
+}))
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import type { TestDbContext } from "./helpers/db.js"

@@ -82,7 +82,7 @@ const mockStartDeprovisioning = vi.fn().mockResolvedValue(undefined)
 const mockBossSend         = vi.fn().mockResolvedValue(undefined)
 
 vi.mock("../../src/provisioning/hetzner-client.js", () => ({
-  createHetznerClient: vi.fn().mockReturnValue({ resetServer: mockResetServer }),
+  createHetznerClient: vi.fn().mockImplementation(() => ({ resetServer: mockResetServer })),
 }))
 
 vi.mock("../../src/provisioning/deprovision.js", () => ({
@@ -91,8 +91,9 @@ vi.mock("../../src/provisioning/deprovision.js", () => ({
 }))
 
 vi.mock("../../src/infra/queue/boss.js", () => ({
-  getBoss:   vi.fn().mockResolvedValue({ send: mockBossSend }),
-  initBoss:  vi.fn(),
+  getBoss:       vi.fn().mockImplementation(async () => ({ send: mockBossSend })),
+  initBoss:      vi.fn(),
+  getBossState:  vi.fn().mockReturnValue("started"),
 }))
 
 vi.mock("../../src/workers/provisioning-worker.js", () => ({
