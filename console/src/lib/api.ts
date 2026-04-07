@@ -5,8 +5,9 @@
  * - Throws ApiError on non-2xx responses
  */
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+// Empty string = same-origin (Caddy proxies /api/* to the API service).
+// Falls back to localhost only in local dev when NEXT_PUBLIC_API_URL is explicitly set.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 export class ApiError extends Error {
   constructor(
@@ -828,7 +829,7 @@ export function dsarExportUrl(
   identity: string,
   format: "json" | "csv",
 ): string {
-  const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const base = process.env.NEXT_PUBLIC_API_URL ?? "";
   return `${base}/api/v1/products/${productId}/dsar/export?identity=${encodeURIComponent(identity)}&format=${format}`;
 }
 
