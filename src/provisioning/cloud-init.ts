@@ -97,6 +97,10 @@ packages:
   - curl
   - gnupg
 
+# Prevent SSH login being blocked by expired password prompt
+chpasswd:
+  expire: false
+
 write_files:
   - path: /opt/nestfleet/.env
     permissions: '0600'
