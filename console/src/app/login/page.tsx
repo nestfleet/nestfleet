@@ -17,7 +17,7 @@ export default function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isLoading && user) {
-      router.replace("/cases");
+      router.replace("/app/resolve-product");
     }
   }, [isLoading, user, router]);
 
@@ -28,23 +28,7 @@ export default function LoginPage() {
 
     try {
       await login(email.trim(), password);
-      // Redirect to the first product's cases page after login
-      try {
-        const tok = localStorage.getItem("nestfleet_token") ?? ""
-        const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
-        const res = await fetch(`${apiBase}/api/v1/products`, {
-          headers: { Authorization: `Bearer ${tok}` },
-        })
-        if (res.ok) {
-          const json = await res.json() as { products?: Array<{ slug: string }> }
-          const firstSlug = json.products?.[0]?.slug
-          if (firstSlug) {
-            router.replace(`/p/${firstSlug}/cases`)
-            return
-          }
-        }
-      } catch { /* fall through to legacy route */ }
-      router.replace("/cases");
+      router.replace("/app/resolve-product");
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 401) {
