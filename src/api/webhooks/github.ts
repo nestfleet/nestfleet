@@ -22,6 +22,7 @@ import { Hono } from "hono"
 import type { Context } from "hono"
 import { logger } from "../../shared/logger.js"
 import { config } from "../../shared/config.js"
+import { decryptSecret } from "../../shared/crypto.js"
 import { validateGitHubWebhook } from "../../infra/github/webhook-validator.js"
 import {
   findChangeRequestByGithubPrNumber,
@@ -161,7 +162,7 @@ githubWebhookRouter.post("/events/:productId", async (c) => {
     if (product) {
       ciConfig = parseCiConfig(product.ci_config ?? {})
       if (ciConfig.github_webhook_secret) {
-        webhookSecret = ciConfig.github_webhook_secret
+        webhookSecret = decryptSecret(ciConfig.github_webhook_secret) ?? webhookSecret
       }
     }
   } catch (err) {
