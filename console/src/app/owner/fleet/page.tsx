@@ -125,7 +125,7 @@ function FleetRowActions({ row, onActionDone }: FleetRowActionsProps) {
   async function handleDeprovisionConfirm() {
     setDeprovisioning(true);
     try {
-      await postOwnerFleetDeprovisionApi(row.org_slug, { graceDays: 30 });
+      await postOwnerFleetDeprovisionApi(row.org_slug, { immediate: true });
       onActionDone();
       setShowConfirm(false);
     } catch {
