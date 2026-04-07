@@ -28,13 +28,13 @@
 
 | ID | Title | Size | Priority | Status | Spec |
 |----|-------|------|----------|--------|------|
-| ORGA-01 | Complete Launch Setup (domain, email, GitHub org/app, prod infra, Stripe live) | XL | P0 | 🔄 In Progress | [spec](ORGA-01-Launch-Setup.md) |
+| ORGA-01 | Complete Launch Setup (domain, email, GitHub org/app, prod infra, Stripe live) | XL | P0 | ⚡ Phase B in progress | [spec](ORGA-01-Launch-Setup.md) |
 | ORGA-01-S2 | `nestfleet.io` cybersquatter registration + redirect rule | XS | P1 | Deferred | [spec §2](ORGA-01-Launch-Setup.md#step-2) |
-| ORGA-01-S3 | Email: Google Workspace Starter — MX, SPF, DKIM, DMARC, mailboxes (`info@`, `ops@`, `alerts@`, `support@`, `billing@`) | XS | P0 | ✅ Done | [spec §3](ORGA-01-Launch-Setup.md#step-3) |
-| ORGA-01-S4 | Transactional email: switch to Google Workspace SMTP, remove Resend, update `.env` | XS | P0 | Not Started | [spec §4](ORGA-01-Launch-Setup.md#step-4) |
-| ORGA-01-S5 | GitHub org `nestfleet` + public repo + branch protection | XS | P0 | Not Started | [spec §5](ORGA-01-Launch-Setup.md#step-5) |
-| ORGA-01-S6 | GitHub App `NestFleet` (under org, PR drafting, rotate PAT) | S | P0 | Not Started | [spec §6](ORGA-01-Launch-Setup.md#step-6) |
-| ORGA-01-S8 | Prod infra: main Hetzner VPS, DNS A records, first deploy, deploy workflow | M | P0 | Not Started (Phase B) | [spec §8](ORGA-01-Launch-Setup.md#step-8) |
+| ORGA-01-S3 | Email: Google Workspace Starter — MX, SPF, DKIM, DMARC, mailboxes | XS | P0 | ✅ Done | [spec §3](ORGA-01-Launch-Setup.md#step-3) |
+| ORGA-01-S4 | Transactional email: Google Workspace SMTP, `noreply@nestfleet.dev`, remove Resend | XS | P0 | ✅ Done | [spec §4](ORGA-01-Launch-Setup.md#step-4) |
+| ORGA-01-S5 | GitHub org `nestfleet` + private repo (public flip deferred to v0.1.0) + deploy token | XS | P0 | ✅ Done | [spec §5](ORGA-01-Launch-Setup.md#step-5) |
+| ORGA-01-S6 | GitHub App `NestFleet` (App ID 3297524, under org, PAT removed) | S | P0 | ✅ Done | [spec §6](ORGA-01-Launch-Setup.md#step-6) |
+| ORGA-01-S8 | Prod infra: main Hetzner CX23 VPS, DNS A records, first deploy, deploy workflow | M | P0 | 🔄 In Progress (Phase B) | [spec §8](ORGA-01-Launch-Setup.md#step-8) |
 | ORGA-01-S9 | Stripe live keys + webhook endpoint + live price IDs | XS | P0 | Not Started (before first real customer) | [spec §9](ORGA-01-Launch-Setup.md#step-9) |
 
 ### Infrastructure
