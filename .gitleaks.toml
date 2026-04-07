@@ -1,0 +1,21 @@
+# gitleaks configuration for NestFleet
+# https://github.com/gitleaks/gitleaks
+
+title = "NestFleet gitleaks config"
+
+[allowlist]
+  description = "Allowlisted test fixtures and known false positives"
+  regexes = [
+    # Fake API keys in test fixtures
+    '''sk-test-abcd1234''',
+    # Fake license keys in unit test config fixtures
+    '''nf_lic_[a-f0-9]{24,}''',
+    # "credential" as a plain English word in documentation
+    '''credential changes''',
+  ]
+  paths = [
+    # Test files use deliberately fake keys
+    '''tests/''',
+    # Documentation prose
+    '''docs/''',
+  ]

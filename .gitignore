@@ -1,0 +1,51 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+*.pid
+coverage/
+.DS_Store
+
+# Local dev license file
+.license-dev
+
+# Private key / certificate files
+*.pem
+*.key
+*.p12
+*.pfx
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Local verification / scratch scripts (see CLAUDE.md)
+tmp_*/
+tmp_verification/
+
+# Claude Code local settings (may contain API keys)
+.claude/
+
+# Next.js build output (contains generated encryption keys)
+console/.next/
+console/out/
+
+# Test artifacts
+tests/integration/.tmp/
+
+# Docker volumes
+docker/data/
+
+# Backup files
+backups/
+*.pgdump
+
+# Internal / scratch files — not for public repo
+Params.txt
+FEATURE_AUDIT_REPORT.md
+CLAUDE.md
+Integration Test Scenario*
+console/BACKLOG.md
+chat-test.html
+.lineage-backup-*/

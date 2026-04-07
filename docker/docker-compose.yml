@@ -1,0 +1,33 @@
+name: nestfleet
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: nestfleet-postgres
+    ports:
+      - "5434:5432"   # 5434 — 5432/5433 reserved for DocuGardener
+    environment:
+      POSTGRES_DB: nestfleet
+      POSTGRES_USER: nestfleet
+      POSTGRES_PASSWORD: nestfleet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nestfleet -d nestfleet"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: nestfleet-jaeger
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4318:4318"     # OTLP HTTP (used by NestFleet)
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

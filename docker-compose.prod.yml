@@ -1,0 +1,156 @@
+# NestFleet — production docker-compose
+#
+# Usage:
+#   cp .env.example .env          # fill in all required vars
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Environment variables:
+#   NESTFLEET_DOMAIN   — customer subdomain, e.g. acme.nestfleet.io
+#   DATABASE_URL       — Postgres URL (internal: postgres://... or external managed DB)
+#   JWT_SECRET         — min 32 chars, generate: openssl rand -hex 32
+#   ENCRYPTION_KEY     — 64 hex chars, generate: openssl rand -hex 32
+#   LLM_PROVIDER       — anthropic | openai | ollama | google
+#   LLM_API_KEY        — customer-provided LLM key
+#   STRIPE_SECRET_KEY            — set when BILLING_ENABLED=true
+#   STRIPE_WEBHOOK_SECRET        — set when BILLING_ENABLED=true
+#   STRIPE_PRICE_STARTER_MONTHLY — Stripe price ID
+#   STRIPE_PRICE_STARTER_ANNUAL  — Stripe price ID
+#   STRIPE_PRICE_GROWTH_MONTHLY  — Stripe price ID
+#   STRIPE_PRICE_GROWTH_ANNUAL   — Stripe price ID
+
+name: nestfleet
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       nestfleet
+      POSTGRES_USER:     nestfleet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nestfleet -d nestfleet"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - internal
+
+  # ── NestFleet API ───────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV:         production
+      PORT:             3001
+      DATABASE_URL:     postgres://nestfleet:${POSTGRES_PASSWORD}@postgres:5432/nestfleet
+      JWT_SECRET:       ${JWT_SECRET:?JWT_SECRET required}
+      ENCRYPTION_KEY:   ${ENCRYPTION_KEY:?ENCRYPTION_KEY required}
+      LOG_LEVEL:        ${LOG_LEVEL:-info}
+      # LLM (customer-provided)
+      LLM_PROVIDER:     ${LLM_PROVIDER:-anthropic}
+      LLM_API_KEY:      ${LLM_API_KEY:-}
+      LLM_MODEL:        ${LLM_MODEL:-claude-sonnet-4-6}
+      LLM_MODEL_FAST:   ${LLM_MODEL_FAST:-}
+      LLM_MODEL_COMPLEX: ${LLM_MODEL_COMPLEX:-}
+      LLM_BASE_URL:     ${LLM_BASE_URL:-}
+      # Embeddings
+      EMBEDDING_PROVIDER:   ${EMBEDDING_PROVIDER:-openai}
+      EMBEDDING_API_KEY:    ${EMBEDDING_API_KEY:-}
+      EMBEDDING_MODEL:      ${EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_BASE_URL:   ${EMBEDDING_BASE_URL:-}
+      EMBEDDING_DIMENSIONS: ${EMBEDDING_DIMENSIONS:-768}
+      # Email
+      SMTP_HOST:        ${SMTP_HOST:-}
+      SMTP_PORT:        ${SMTP_PORT:-}
+      SMTP_USER:        ${SMTP_USER:-}
+      SMTP_PASS:        ${SMTP_PASS:-}
+      SMTP_FROM:        ${SMTP_FROM:-}
+      POSTMARK_API_KEY: ${POSTMARK_API_KEY:-}
+      RESEND_API_KEY:   ${RESEND_API_KEY:-}
+      # GitHub
+      GITHUB_APP_ID:             ${GITHUB_APP_ID:-}
+      GITHUB_APP_PRIVATE_KEY:    ${GITHUB_APP_PRIVATE_KEY:-}
+      GITHUB_WEBHOOK_SECRET:     ${GITHUB_WEBHOOK_SECRET:-}
+      GITHUB_TOKEN:              ${GITHUB_TOKEN:-}
+      # Slack
+      SLACK_BOT_TOKEN:       ${SLACK_BOT_TOKEN:-}
+      SLACK_DEFAULT_CHANNEL: ${SLACK_DEFAULT_CHANNEL:-}
+      # Telegram
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      # Console origin (for CORS)
+      CONSOLE_ORIGIN: https://${NESTFLEET_DOMAIN:?NESTFLEET_DOMAIN required}
+      # License (optional — community mode = all features enabled without a license)
+      LICENSE_FILE_PATH:   ${LICENSE_FILE_PATH:-}
+      LICENSE_SECRET:      ${LICENSE_SECRET:-}
+      NESTFLEET_CLOUD_URL: ${NESTFLEET_CLOUD_URL:-https://cloud.nestfleet.dev}
+      # Billing (disabled until NF Stripe integration is live)
+      BILLING_ENABLED:             ${BILLING_ENABLED:-false}
+      STRIPE_SECRET_KEY:           ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET:       ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_STARTER_MONTHLY: ${STRIPE_PRICE_STARTER_MONTHLY:-}
+      STRIPE_PRICE_STARTER_ANNUAL:  ${STRIPE_PRICE_STARTER_ANNUAL:-}
+      STRIPE_PRICE_GROWTH_MONTHLY:  ${STRIPE_PRICE_GROWTH_MONTHLY:-}
+      STRIPE_PRICE_GROWTH_ANNUAL:   ${STRIPE_PRICE_GROWTH_ANNUAL:-}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ── NestFleet Console ───────────────────────────────────────────────────────
+  console:
+    build:
+      context: ./console
+      dockerfile: Dockerfile
+      args:
+        # Same-origin routing — Caddy proxies /api/* to the API service.
+        # Leave empty so the browser uses the current origin for API calls.
+        NEXT_PUBLIC_API_URL: ""
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+    networks:
+      - internal
+
+  # ── Caddy reverse proxy + TLS ───────────────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      NESTFLEET_DOMAIN: ${NESTFLEET_DOMAIN}
+    depends_on:
+      - api
+      - console
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

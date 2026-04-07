@@ -1,0 +1,37 @@
+# NestFleet production Caddyfile
+#
+# Usage: replace {$NESTFLEET_DOMAIN} with your actual domain, e.g.
+#   NESTFLEET_DOMAIN=acme.nestfleet.io caddy run --config Caddyfile.prod
+#
+# Caddy auto-provisions Let's Encrypt TLS. Ensure port 443 is open.
+
+{$NESTFLEET_DOMAIN} {
+
+  # ── API + webhooks ────────────────────────────────────────────────────────
+  # All API traffic, webhooks, and the health endpoint go to the Node.js API.
+  @api {
+    path /api/*
+    path /webhooks/*
+    path /health
+  }
+  reverse_proxy @api api:3001
+
+  # ── Console ───────────────────────────────────────────────────────────────
+  # Everything else → Next.js console.
+  reverse_proxy console:3002
+
+  # ── Security headers ─────────────────────────────────────────────────────
+  header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
+  # ── Logging ───────────────────────────────────────────────────────────────
+  log {
+    output stderr
+    format json
+  }
+}
