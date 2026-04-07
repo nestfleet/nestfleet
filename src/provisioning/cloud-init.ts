@@ -28,7 +28,7 @@ async function loadFiles(): Promise<{ dockerCompose: string; caddyfile: string; 
   }
 
   const [dockerCompose, caddyfile, backupSh] = await Promise.all([
-    readFile(join(REPO_ROOT, "docker-compose.prod.yml"), "utf-8"),
+    readFile(join(REPO_ROOT, "docker-compose.customer.yml"), "utf-8"),
     readFile(join(REPO_ROOT, "docker/Caddyfile.prod"), "utf-8"),
     readFile(join(REPO_ROOT, "scripts/backup.sh"), "utf-8"),
   ])
@@ -51,6 +51,7 @@ export interface CloudInitOpts {
   bundledLlmApiKey:       string
   bundledEmbeddingApiKey: string
   opsPublicKey:           string
+  ghcrToken?:             string   // GHCR PAT for pulling images (omit if packages are public)
   backupS3Endpoint?:      string
   backupS3AccessKey?:     string
   backupS3SecretKey?:     string
@@ -74,6 +75,7 @@ export async function generateCloudInit(opts: CloudInitOpts): Promise<string> {
     bundledLlmApiKey,
     bundledEmbeddingApiKey,
     opsPublicKey,
+    ghcrToken,
   } = opts
 
   const backupS3Endpoint   = opts.backupS3Endpoint   ?? ""
@@ -143,8 +145,8 @@ ssh_authorized_keys:
 
 runcmd:
   - mkdir -p /opt/nestfleet/docker /opt/nestfleet/scripts /opt/nestfleet/backups
-  - cd /opt/nestfleet
-  - docker compose -f docker-compose.prod.yml pull || true
+  - cd /opt/nestfleet${ghcrToken ? `\n  - echo "${ghcrToken}" | docker login ghcr.io -u nestfleet --password-stdin` : ""}
+  - docker compose -f docker-compose.prod.yml pull
   - docker compose -f docker-compose.prod.yml up -d
   - echo "0 2 * * * root DATABASE_URL=\$(grep DATABASE_URL /opt/nestfleet/.env | cut -d= -f2-) /opt/nestfleet/scripts/backup.sh >> /var/log/nestfleet-backup.log 2>&1" > /etc/cron.d/nestfleet-backup
   - chmod 0644 /etc/cron.d/nestfleet-backup

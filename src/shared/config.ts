@@ -161,6 +161,9 @@ const ConfigSchema = z.object({
   // (customers on managed SaaS don't need their own keys)
   BUNDLED_LLM_API_KEY: z.string().optional(),
   BUNDLED_EMBEDDING_API_KEY: z.string().optional(),
+  // GHCR read-only PAT for pulling nestfleet-api/nestfleet-console images on customer VPSes.
+  // Leave unset if GHCR packages are public.
+  GHCR_TOKEN: z.string().optional(),
   // Owner console auth — comma-separated user IDs granted /owner/* access
   OWNER_USER_IDS: z.string().optional(),
 

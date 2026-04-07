@@ -8,6 +8,7 @@ import { AppLayout } from "@/components/AppLayout";
 
 import { Modal } from "@/components/Modal";
 import { useToast } from "@/components/Toast";
+import { SearchInput } from "@/components/SearchInput";
 import { getCasesApi, sendToChangeApi, resolveCaseApi, forwardToTeamApi } from "@/lib/api";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
 import type { CaseRow } from "@/lib/types";
@@ -127,6 +128,7 @@ export default function QueuePage() {
   const { toast } = useToast();
 
   const [activeTab, setActiveTab] = useState<Tab>("lead-review");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // ── Lead Review queue ────────────────────────────────────────────────────────
   const { data: leadData, error: leadError, isLoading: leadLoading, mutate: mutateLead } = useSWR(
@@ -156,6 +158,13 @@ export default function QueuePage() {
   const allChatCases: CaseRow[] = (chatData?.data ?? []).filter(
     (c) => !TERMINAL_STATUSES.has(c.status)
   );
+
+  const q = searchQuery.trim().toLowerCase();
+  const matchCase = (c: CaseRow) =>
+    !q || c.title.toLowerCase().includes(q) || c.case_id.toLowerCase().includes(q);
+  const filteredLeadCases    = allLeadCases.filter(matchCase);
+  const filteredHandoffCases = pendingHandoffCases.filter(matchCase);
+  const filteredChatCases    = allChatCases.filter(matchCase);
 
   const [activeModal, setActiveModal] = useState<ActiveModal | null>(null);
   const [resolution, setResolution] = useState("");
@@ -269,6 +278,11 @@ export default function QueuePage() {
           <h1 className="text-lg font-semibold text-gray-900">Queue</h1>
         </div>
 
+        {/* Search */}
+        <div className="flex items-center">
+          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search queue…" />
+        </div>
+
         {/* Tabs */}
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex gap-6" aria-label="Queue tabs">
@@ -309,8 +323,8 @@ export default function QueuePage() {
         {/* Tab content */}
         {activeTab === "lead-review" ? (
           <LeadReviewPanel
-            cases={allLeadCases}
-            pendingHandoffCases={pendingHandoffCases}
+            cases={filteredLeadCases}
+            pendingHandoffCases={filteredHandoffCases}
             isLoading={leadLoading}
             error={leadError}
             basePath={basePath}
@@ -321,7 +335,7 @@ export default function QueuePage() {
           />
         ) : (
           <LiveChatsPanel
-            cases={allChatCases}
+            cases={filteredChatCases}
             isLoading={chatLoading}
             error={chatError}
             basePath={basePath}

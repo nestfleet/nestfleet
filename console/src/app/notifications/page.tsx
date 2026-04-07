@@ -18,6 +18,7 @@ import useSWR from "swr";
 import { formatDistanceToNow, format } from "date-fns";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge } from "@/components/Badge";
+import { SearchInput } from "@/components/SearchInput";
 import { getNotificationsApi, ackNotificationApi } from "@/lib/api";
 import { useProductIdWithFallback } from "@/lib/product-context";
 import { useNotificationBadge } from "@/lib/useNotificationBadge";
@@ -441,6 +442,7 @@ export default function NotificationsPage() {
   const [priorityFilter,   setPriorityFilter]   = useState<string>("");
   const [sourceTypeFilter, setSourceTypeFilter] = useState<SourceTypeFilter>("");
   const [groupBy,          setGroupBy]          = useState<GroupByKey>("entity");
+  const [searchQuery,      setSearchQuery]      = useState("");
 
   const { lastSeenAt, markSeen } = useNotificationBadge();
 
@@ -463,9 +465,19 @@ export default function NotificationsPage() {
   );
 
   const allNotifications: Notification[] = data?.data ?? [];
-  const notifications = sourceTypeFilter
+  const sourceFiltered = sourceTypeFilter
     ? allNotifications.filter((n) => n.source_type === sourceTypeFilter)
     : allNotifications;
+
+  const nq = searchQuery.trim().toLowerCase();
+  const notifications = nq
+    ? sourceFiltered.filter((n) =>
+        (n.subject ?? "").toLowerCase().includes(nq) ||
+        n.kind.toLowerCase().includes(nq) ||
+        n.source_ref.toLowerCase().includes(nq) ||
+        n.recipient_ref.toLowerCase().includes(nq)
+      )
+    : sourceFiltered;
 
   if (!productId) {
     return (
@@ -515,6 +527,7 @@ export default function NotificationsPage() {
 
         {/* Filter + Group bar */}
         <div className="flex flex-wrap gap-3 items-center">
+          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search notifications…" />
           <GroupByPopover groupBy={groupBy} onChange={setGroupBy} />
           <NotifFilterPopover
             statusFilter={statusFilter}
@@ -563,7 +576,7 @@ export default function NotificationsPage() {
           <div className="flex flex-col items-center justify-center py-16 text-center rounded-xl bg-white shadow-sm ring-1 ring-black/5">
             <p className="text-sm font-medium text-gray-900">No notifications</p>
             <p className="mt-1 text-xs text-gray-500">
-              {statusFilter || priorityFilter ? "Try removing filters." : "Notifications will appear here as events occur."}
+              {statusFilter || priorityFilter || searchQuery ? "Try removing filters or clearing the search." : "Notifications will appear here as events occur."}
             </p>
           </div>
         ) : groupBy === "none" ? (

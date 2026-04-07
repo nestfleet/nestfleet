@@ -151,8 +151,8 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
       bundledEmbeddingApiKey: config.BUNDLED_EMBEDDING_API_KEY ?? "",
       opsPublicKey:           config.OPS_SSH_PUBLIC_KEY ?? "",
       backupS3Bucket:         config.BACKUP_S3_BUCKET,
-      // Optional S3 fields: only set when the config value is defined so that
-      // exactOptionalPropertyTypes is satisfied (undefined !== absent key).
+      // Optional fields: only set when config value is defined
+      ...(config.GHCR_TOKEN           !== undefined && { ghcrToken:          config.GHCR_TOKEN }),
       ...(config.BACKUP_S3_ENDPOINT   !== undefined && { backupS3Endpoint:   config.BACKUP_S3_ENDPOINT }),
       ...(config.BACKUP_S3_ACCESS_KEY !== undefined && { backupS3AccessKey:  config.BACKUP_S3_ACCESS_KEY }),
       ...(config.BACKUP_S3_SECRET_KEY !== undefined && { backupS3SecretKey:  config.BACKUP_S3_SECRET_KEY }),
@@ -164,7 +164,7 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
     try {
       server = await hetzner.createServer({
         name:       `nestfleet-${slug}`,
-        serverType: "cx21",
+        serverType: "cx23",
         image:      "ubuntu-22.04",
         location:   "nbg1",
         userData,

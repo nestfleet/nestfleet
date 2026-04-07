@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { formatDistanceToNow } from "date-fns";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusDot, SeverityDot } from "@/components/Badge";
+import { SearchInput } from "@/components/SearchInput";
 import { getCasesApi } from "@/lib/api";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
 import { usePendingNotificationRefs } from "@/lib/usePendingNotificationRefs";
@@ -105,6 +106,7 @@ export default function CasesPage() {
   const [statusFilter, setStatusFilter]         = useState<string>("");
   const [severityFilter, setSeverityFilter]     = useState<string>("");
   const [pendingHandoffFilter, setPendingHandoffFilter] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data, error, isLoading } = useSWR(
     productId ? ["cases", productId, statusFilter, severityFilter] : null,
@@ -130,6 +132,14 @@ export default function CasesPage() {
   const cases: CaseRow[] = pendingHandoffFilter
     ? sorted.filter((c) => c.status === "in-resolution" && c.last_event_action === "case.forwarded_to_team")
     : sorted;
+
+  const q = searchQuery.trim().toLowerCase();
+  const visibleCases = q
+    ? cases.filter((c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.case_id.toLowerCase().includes(q)
+      )
+    : cases;
 
   if (!productId) {
     return (
@@ -163,12 +173,17 @@ export default function CasesPage() {
             <p className="text-sm text-gray-500">
               {isLoading
                 ? "Loading…"
-                : `${cases.length} case${cases.length !== 1 ? "s" : ""}${statusFilter || severityFilter || pendingHandoffFilter ? " (filtered)" : ""}`}
+                : `${visibleCases.length} case${visibleCases.length !== 1 ? "s" : ""}${statusFilter || severityFilter || pendingHandoffFilter || searchQuery ? " (filtered)" : ""}`}
             </p>
           </div>
 
           {/* Quick-filter + popover row */}
           <div className="flex items-center gap-2">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search cases…"
+            />
             {/* Pending Handoff quick-filter pill */}
             {(pendingHandoffCount > 0 || pendingHandoffFilter) && (
               <button
@@ -239,7 +254,7 @@ export default function CasesPage() {
 
         {/* Table card */}
         <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
-          {isLoading && cases.length === 0 ? (
+          {isLoading && visibleCases.length === 0 ? (
             <div className="flex items-center justify-center py-14">
               <div className="flex flex-col items-center gap-3">
                 <div className="h-6 w-6 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
@@ -256,7 +271,7 @@ export default function CasesPage() {
               <p className="text-sm font-medium text-gray-900">Failed to load cases</p>
               <p className="mt-1 text-xs text-gray-500">{(error as Error).message}</p>
             </div>
-          ) : cases.length === 0 ? (
+          ) : visibleCases.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-14 text-center">
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100">
                 <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -265,7 +280,7 @@ export default function CasesPage() {
               </div>
               <p className="text-sm font-medium text-gray-900">No cases found</p>
               <p className="mt-1 text-xs text-gray-500">
-                {statusFilter || severityFilter ? "Try removing filters." : "No cases have been created yet."}
+                {statusFilter || severityFilter || searchQuery ? "Try removing filters or clearing the search." : "No cases have been created yet."}
               </p>
             </div>
           ) : (
@@ -288,7 +303,7 @@ export default function CasesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {cases.map((c) => (
+                  {visibleCases.map((c) => (
                     <CaseTableRow
                       key={c.case_id}
                       caseItem={c}
@@ -302,7 +317,7 @@ export default function CasesPage() {
           )}
         </div>
 
-        {!isLoading && !error && cases.length > 0 && (
+        {!isLoading && !error && visibleCases.length > 0 && (
           <p className="text-xs text-gray-400 text-right">Auto-refreshes every 30s</p>
         )}
       </div>
