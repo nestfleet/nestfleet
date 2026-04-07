@@ -4,6 +4,7 @@ import { Hono } from "hono"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
 import { pingDb } from "../infra/db/client.js"
+import { getBossState } from "../infra/queue/boss.js"
 import { isAppError } from "../shared/errors.js"
 import { logger } from "../shared/logger.js"
 import { config } from "../shared/config.js"
@@ -603,16 +604,18 @@ app.get("/widget/test/:productId", async (c) => {
 
 app.get("/health", async (c) => {
   const dbOk = await pingDb()
-  const status = dbOk ? "ok" : "degraded"
+  const queueState = getBossState()
+  const allOk = dbOk && queueState === "started"
   return c.json(
     {
-      status,
+      status: allOk ? "ok" : "degraded",
       service: "nestfleet",
       version: "0.1.0",
       db: dbOk ? "ok" : "error",
+      queue: queueState,
       timestamp: new Date().toISOString(),
     },
-    dbOk ? 200 : 503,
+    allOk ? 200 : 503,
   )
 })
 

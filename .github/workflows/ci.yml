@@ -97,8 +97,72 @@ jobs:
             docker compose -f docker-compose.prod.yml up -d --no-deps api console
           '
 
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
       - name: Smoke test
         run: |
           sleep 30
-          curl --fail --silent https://nestfleet.dev/health | grep -q '"status"'
-          echo "Health check passed"
+
+          # 1. Health — DB + queue both must report ok
+          HEALTH=$(curl --fail --silent https://nestfleet.dev/health)
+          echo "$HEALTH" | grep -q '"status":"ok"'    || (echo "Health status not ok: $HEALTH"  && exit 1)
+          echo "$HEALTH" | grep -q '"queue":"started"' || (echo "pg-boss not started: $HEALTH"  && exit 1)
+          echo "$HEALTH" | grep -q '"db":"ok"'         || (echo "DB not ok: $HEALTH"            && exit 1)
+          echo "Health check passed: $HEALTH"
+
+          # 2. Auth flow — real login, JWT returned (proves DB read works)
+          if [ -n "${{ secrets.CANARY_EMAIL }}" ] && [ -n "${{ secrets.CANARY_PASSWORD }}" ]; then
+            LOGIN=$(curl --fail --silent -X POST https://nestfleet.dev/api/v1/auth/login \
+              -H "Content-Type: application/json" \
+              -d '{"email":"${{ secrets.CANARY_EMAIL }}","password":"${{ secrets.CANARY_PASSWORD }}"}')
+            echo "$LOGIN" | grep -q '"token"' || (echo "Login did not return a token: $LOGIN" && exit 1)
+            echo "Auth smoke passed"
+
+            # 3. Authenticated /auth/me — proves full DB CRUD round-trip
+            TOKEN=$(echo "$LOGIN" | jq -r '.data.token')
+            ME=$(curl --fail --silent https://nestfleet.dev/api/v1/auth/me \
+              -H "Authorization: Bearer $TOKEN")
+            echo "$ME" | grep -q '"email"' || (echo "/auth/me failed: $ME" && exit 1)
+            echo "CRUD smoke passed"
+          else
+            echo "Canary creds not set — skipping auth/CRUD smoke"
+          fi
+
+  e2e:
+    name: E2E — post-deploy browser tests
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: console
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: console/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run post-deploy E2E tests
+        env:
+          BASE_URL: https://nestfleet.dev
+          CANARY_EMAIL: ${{ secrets.CANARY_EMAIL }}
+          CANARY_PASSWORD: ${{ secrets.CANARY_PASSWORD }}
+        run: npx playwright test e2e/post-deploy.spec.ts
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: console/playwright-report/
+          retention-days: 7

@@ -49,6 +49,15 @@ export async function getBoss(): Promise<PgBoss> {
 }
 
 /**
+ * Return the current pg-boss lifecycle state for health reporting.
+ * "started" means the instance is live and processing jobs.
+ * "stopped" means it has not yet started or was shut down.
+ */
+export function getBossState(): "started" | "stopped" {
+  return _boss ? "started" : "stopped"
+}
+
+/**
  * Graceful shutdown — call on SIGTERM/SIGINT.
  */
 export async function stopBoss(): Promise<void> {
