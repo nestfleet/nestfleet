@@ -277,7 +277,7 @@ export default function NewCustomerPage() {
             <SlugIndicator />
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            Instance URL: <span className="text-slate-400">{slug || "your-slug"}.nestfleet.io</span>
+            Instance URL: <span className="text-slate-400">{slug || "your-slug"}.nestfleet.dev</span>
           </p>
           {(slugState.status === "taken" || slugState.status === "invalid") && (
             <p className="mt-1 text-xs text-red-400" role="alert">{slugState.error}</p>
