@@ -132,6 +132,9 @@ services:
         # Same-origin routing — Caddy proxies /api/* to the API service.
         # Leave empty so the browser uses the current origin for API calls.
         NEXT_PUBLIC_API_URL: ""
+        # Product ID baked into the console build (single-product deployment).
+        # Set in .env on the VPS after the first product is created via setup wizard.
+        NEXT_PUBLIC_PRODUCT_ID: ${NEXT_PUBLIC_PRODUCT_ID:-}
     restart: unless-stopped
     depends_on:
       - api
