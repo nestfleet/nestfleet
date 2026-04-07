@@ -137,7 +137,11 @@ export type LineageActionType =
   | "reject"
   | "escalate"
   | "view_cr"
-  | "view_pr";
+  | "view_pr"
+  | "send_to_change"
+  | "resolve"
+  | "reopen"
+  | "send_followup";
 
 export interface LineageNode {
   nodeId: string;
