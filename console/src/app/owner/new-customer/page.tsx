@@ -14,14 +14,14 @@ const PLANS: { id: "starter" | "growth"; label: string; price: string; descripti
   {
     id:          "starter",
     label:       "Starter",
-    price:       "$49 / mo",
-    description: "1 product, up to 500 cases/mo",
+    price:       "$99 / mo",
+    description: "3 products · 1 000 OUs/mo · 5 users",
   },
   {
     id:          "growth",
     label:       "Growth",
-    price:       "$149 / mo",
-    description: "3 products, up to 5 000 cases/mo",
+    price:       "$499 / mo",
+    description: "10 products · 10 000 OUs/mo · 25 users",
   },
 ];
 
