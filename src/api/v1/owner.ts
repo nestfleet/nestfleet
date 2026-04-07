@@ -10,6 +10,10 @@
  * POST /api/v1/owner/fleet/:slug/deprovision — start 30-day grace period (or immediate)
  * POST /api/v1/owner/fleet/:slug/retry       — re-enqueue provision_vps for failed rows
  * GET  /api/v1/owner/telemetry        — last-24h telemetry aggregation (NF-OPS-01 Phase 2)
+ *
+ * OWN-NC: Owner-initiated customer provisioning (semi-manual onboarding flow)
+ * GET  /api/v1/owner/slug-check/:slug — validate slug format + DB uniqueness
+ * POST /api/v1/owner/new-customer     — create signup intent + Stripe checkout session
  */
 
 import { Hono } from "hono"
@@ -27,10 +31,13 @@ import { createHetznerClient } from "../../provisioning/hetzner-client.js"
 import { deprovisionOne, startDeprovisioning } from "../../provisioning/deprovision.js"
 import { getBoss } from "../../infra/queue/boss.js"
 import { PROVISION_JOB } from "../../workers/provisioning-worker.js"
+import Stripe from "stripe"
 import { getStripeClient } from "../../billing/stripe.js"
 import { aggregateRevenue, buildCohorts } from "../../billing/stripe-revenue.js"
 import type { RevenueData, CohortWeek } from "../../billing/stripe-revenue.js"
 import { getRecentTelemetry, countDistinctInstances } from "../../infra/db/repositories/telemetry.js"
+import { validateAndCheckSlug } from "../../provisioning/slug.js"
+import { createSignupIntent } from "../../infra/db/repositories/provisionings.js"
 
 // ── Revenue cache (5 min TTL) ─────────────────────────────────────────────────
 
@@ -293,4 +300,85 @@ ownerRouter.post("/fleet/:slug/retry", async (c) => {
 
   logger.info({ slug, intentId: prov.intent_id }, "Owner: provisioning retry enqueued")
   return c.json({ ok: true, message: "Retry enqueued. The saga will resume from the last completed step." })
+})
+
+// ── GET /owner/slug-check/:slug ───────────────────────────────────────────────
+
+ownerRouter.get("/slug-check/:slug", async (c) => {
+  const slug = c.req.param("slug")
+  const result = await validateAndCheckSlug(slug)
+  if (result.ok) {
+    return c.json({ ok: true, available: true })
+  }
+  return c.json({ ok: true, available: false, error: result.error })
+})
+
+// ── POST /owner/new-customer ──────────────────────────────────────────────────
+
+const NewCustomerSchema = z.object({
+  email:       z.string().email(),
+  slug:        z.string(),
+  plan:        z.enum(["starter", "growth"]),
+  companyName: z.string().min(1).max(200).optional(),
+})
+
+ownerRouter.post("/new-customer", async (c) => {
+  let body: unknown
+  try { body = await c.req.json() } catch {
+    throw new ValidationError("Invalid JSON body")
+  }
+
+  const parsed = NewCustomerSchema.safeParse(body)
+  if (!parsed.success) {
+    throw new ValidationError("Invalid input", parsed.error.flatten().fieldErrors)
+  }
+
+  const { email, slug, plan } = parsed.data
+
+  const slugResult = await validateAndCheckSlug(slug)
+  if (!slugResult.ok) {
+    throw new ValidationError(slugResult.error)
+  }
+
+  const intent = await createSignupIntent({ email, orgSlug: slug, plan })
+
+  const priceMap: Record<string, string | undefined> = {
+    starter: config.STRIPE_PRICE_STARTER_MONTHLY,
+    growth:  config.STRIPE_PRICE_GROWTH_MONTHLY,
+  }
+  const priceId = priceMap[plan]
+  if (!priceId) {
+    logger.error({ plan }, "Owner new-customer: no Stripe price ID configured for plan")
+    throw new ValidationError(`No Stripe price configured for plan '${plan}'`)
+  }
+
+  const stripe = new Stripe(config.STRIPE_SECRET_KEY!, { apiVersion: "2026-03-25.dahlia" })
+  const consoleOrigin = config.CONSOLE_ORIGIN ?? "https://nestfleet.dev"
+
+  const session = await stripe.checkout.sessions.create({
+    mode:                 "subscription",
+    payment_method_types: ["card"],
+    line_items:           [{ price: priceId, quantity: 1 }],
+    customer_email:       email,
+    metadata: {
+      event_type: "saas_signup",
+      intent_id:  intent.id,
+      slug,
+      email,
+      plan,
+    },
+    success_url: `${consoleOrigin}/signup/success?intent=${intent.id}`,
+    cancel_url:  `${consoleOrigin}/owner/new-customer?cancelled=1`,
+    subscription_data: {
+      metadata: {
+        event_type: "saas_subscription",
+        intent_id:  intent.id,
+        slug,
+      },
+    },
+  })
+
+  logger.info({ intentId: intent.id, slug, plan }, "Owner new-customer: checkout session created")
+
+  return c.json({ ok: true, checkoutUrl: session.url, intentId: intent.id }, 201)
 })
