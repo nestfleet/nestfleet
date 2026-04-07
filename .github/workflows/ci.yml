@@ -92,7 +92,8 @@ jobs:
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.HETZNER_HOST }} '
             set -e
             cd /opt/nestfleet
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker compose -f docker-compose.prod.yml build api console
             docker compose -f docker-compose.prod.yml up -d --no-deps api console
           '
