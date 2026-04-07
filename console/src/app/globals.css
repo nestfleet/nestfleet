@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Inter font from system */
+@layer base {
+  html {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+}
+
+/* Smooth scrollbar for main content */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
+}
+
+/* Simple animation utilities (no plugin needed) */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.slide-in-from-bottom-2 {
+  animation: slideInFromBottom 0.2s ease-out;
+}
+
+.fade-in {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.duration-200 {
+  animation-duration: 0.2s;
+}
+
+/* ── Landing page animations ─────────────────────────────────────────────── */
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.97) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Hero staggered entrance */
+.hero-anim-1 { animation: fade-in-up 0.55s ease-out 0.05s both; }
+.hero-anim-2 { animation: fade-in-up 0.6s  ease-out 0.15s both; }
+.hero-anim-3 { animation: fade-in-up 0.6s  ease-out 0.25s both; }
+.hero-anim-4 { animation: fade-in-up 0.6s  ease-out 0.35s both; }
+.hero-anim-5 { animation: fade-in-up 0.6s  ease-out 0.45s both; }
+
+/* How it works step content swap */
+@keyframes hiw-fade {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-how-it-works-fade {
+  animation: hiw-fade 0.35s ease-out both;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
