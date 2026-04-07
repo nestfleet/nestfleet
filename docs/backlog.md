@@ -65,6 +65,26 @@
 | FEAT-003 | Channel Richness Gap & Architecture | S | Low | ✅ Done | `feat/FEAT-003-channel-richness-gap` | [spec](specs/FEAT-003-channel-richness-gap.md) |
 | NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
 
+### UX Improvements
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | Not Started | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. No backend changes needed for MVP; backend `?q=` param upgrade later. |
+| UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | Not Started | Button visible even when limit is hit; confusing for single-product tier users. |
+
+### Landing Page & Legal
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| LP-01 | `/terms` and `/privacy` pages — create real content (or placeholder with correct structure) | S | P1 | Not Started | Signup form links to `/terms` and `/privacy` — both return 404. Blocks signup flow trust. |
+| LP-02 | Landing page audit + copy/routing polish | S | P2 | Not Started | Hero CTAs, pricing section links, AGPL copy, "Deploy from source" → GitHub repo, overall routing consistency. |
+
+### Beta Testing
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| BETA-NF-01 | NestFleet self-hosted beta eval — inject NF-as-product scenarios on main VPS | M | P1 | Not Started | Adapt inject-signals.ts for NestFleet (nestfleet/nestfleet repo) as the product under test. Run DG-style scenario groups (support cases, change requests, PR drafts) end-to-end on live VPS. Manual runbook. |
+
 ---
 
 ## Deferred

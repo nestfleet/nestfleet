@@ -5,10 +5,18 @@
  * Verifies: response shape, DB connectivity, correct status codes.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest"
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest"
 import type { TestDbContext } from "./helpers/db.js"
 import { setupTestDb } from "./helpers/db.js"
 import { app } from "../../src/api/index.js"
+
+// pg-boss never starts in the testcontainer setup — mock it as "started"
+// so the health endpoint returns 200 (queue status is infrastructure, not DB)
+vi.mock("../../src/infra/queue/boss.js", () => ({
+  getBossState: vi.fn().mockReturnValue("started"),
+  initBoss:     vi.fn(),
+  getBoss:      vi.fn().mockResolvedValue(null),
+}))
 
 describe("GET /health (integration)", () => {
   let ctx: TestDbContext
