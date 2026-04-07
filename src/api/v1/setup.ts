@@ -15,7 +15,9 @@ import { Hono } from "hono"
 import { z } from "zod"
 import { logger } from "../../shared/logger.js"
 import { listProducts, createProduct } from "../../infra/db/repositories/products.js"
+import { findOperatorUserById, updateOperatorUser } from "../../infra/db/repositories/operator-users.js"
 import { encryptSecret } from "../../shared/crypto.js"
+import { verifyJwt } from "../../auth/jwt.js"
 
 export const setupRouter = new Hono()
 
@@ -141,6 +143,25 @@ setupRouter.post("/setup/complete", async (c) => {
     })
 
     logger.info({ productId: product.product_id, productName }, "First-run setup complete — product created")
+
+    // If the caller is authenticated, link the new product to their account so
+    // their JWT (on next login) includes the product ID.
+    try {
+      const authHeader = c.req.header("Authorization")
+      const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null
+      if (token) {
+        const payload = verifyJwt(token)
+        const user = await findOperatorUserById(payload.sub)
+        if (user) {
+          const updated = [...new Set([...(user.product_ids ?? []), product.product_id])]
+          await updateOperatorUser(payload.sub, { product_ids: updated })
+          logger.info({ userId: payload.sub, productId: product.product_id }, "Product linked to user after setup")
+        }
+      }
+    } catch (err) {
+      // Non-fatal — user can still be linked manually or via products API
+      logger.warn({ err }, "Could not link product to user after setup (non-fatal)")
+    }
 
     return c.json({
       ok: true,
