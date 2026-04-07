@@ -2,6 +2,12 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 import { z } from "zod"
 
+// Docker Compose passes unset optional vars as empty strings — treat "" as undefined.
+const optionalUrl = z.preprocess(
+  (v) => (v === "" ? undefined : v),
+  z.string().url().optional()
+)
+
 const ConfigSchema = z.object({
   // Server
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -21,7 +27,7 @@ const ConfigSchema = z.object({
     .default("info"),
 
   // OpenTelemetry
-  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().url().optional(),
+  OTEL_EXPORTER_OTLP_ENDPOINT: optionalUrl,
   OTEL_SERVICE_NAME: z.string().default("nestfleet"),
 
   NESTFLEET_LICENSE_KEY: z
@@ -41,14 +47,14 @@ const ConfigSchema = z.object({
   //   complex → change_prep, pr_draft_prep
   LLM_MODEL_FAST: z.string().optional(),
   LLM_MODEL_COMPLEX: z.string().optional(),
-  LLM_BASE_URL: z.string().url().optional(),
+  LLM_BASE_URL: optionalUrl,
 
   // Embeddings — may differ from the chat model (e.g. openai for embeddings, anthropic for chat)
   EMBEDDING_PROVIDER: z.enum(["openai", "ollama"]).default("openai"),
   EMBEDDING_API_KEY: z.string().optional(),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
   EMBEDDING_DIMENSIONS: z.coerce.number().int().min(64).max(3072).default(768),
-  EMBEDDING_BASE_URL: z.string().url().optional(),
+  EMBEDDING_BASE_URL: optionalUrl,
 
   // GitHub
   GITHUB_APP_ID: z.string().optional(),
@@ -71,7 +77,7 @@ const ConfigSchema = z.object({
   TELEGRAM_BOT_TOKEN: z.string().optional(),
 
   // Slack
-  SLACK_WEBHOOK_URL:      z.string().url().optional(),
+  SLACK_WEBHOOK_URL:      optionalUrl,
   SLACK_BOT_TOKEN:        z.string().optional(),
   SLACK_DEFAULT_CHANNEL:  z.string().optional(),
 
@@ -85,7 +91,7 @@ const ConfigSchema = z.object({
   // In dev mode (no LICENSE_FILE_PATH set) the value is never read, so it can remain unset.
   LICENSE_FILE_PATH: z.string().optional(),
   LICENSE_SECRET: z.string().min(32, "LICENSE_SECRET must be at least 32 characters").optional(),
-  NESTFLEET_CLOUD_URL: z.string().url().optional().default("https://cloud.nestfleet.dev"),
+  NESTFLEET_CLOUD_URL: optionalUrl.default("https://cloud.nestfleet.dev"),
   // SEC-M4: HMAC secret for verifying signed cloud validate responses.
   // When unset, HMAC verification is skipped (backward-compatible).
   CLOUD_REFRESH_HMAC_SECRET: z.string().min(32, "CLOUD_REFRESH_HMAC_SECRET must be at least 32 characters").optional(),
@@ -99,7 +105,7 @@ const ConfigSchema = z.object({
   BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(14).default(12),
 
   // Operator console (SLICE-08)
-  CONSOLE_ORIGIN: z.string().url().optional(),
+  CONSOLE_ORIGIN: optionalUrl,
 
   // Telemetry (opt-in)
   TELEMETRY_ENABLED: z
@@ -131,7 +137,7 @@ const ConfigSchema = z.object({
 
   // Error monitoring (Sentry). When set, uncaught exceptions are sent to Sentry.
   // Get your DSN at sentry.io → Project Settings → Client Keys.
-  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_DSN: optionalUrl,
 
   // ── SaaS Fleet Provisioning (FEAT-001) ────────────────────────────────────
   // Only required on the main NestFleet instance (nestfleet.dev).
@@ -159,7 +165,7 @@ const ConfigSchema = z.object({
   OWNER_USER_IDS: z.string().optional(),
 
   // Backup — Hetzner Object Storage (S3-compatible). Optional — local-only if unset.
-  BACKUP_S3_ENDPOINT:   z.string().url().optional(),
+  BACKUP_S3_ENDPOINT:   optionalUrl,
   BACKUP_S3_ACCESS_KEY: z.string().optional(),
   BACKUP_S3_SECRET_KEY: z.string().optional(),
   BACKUP_S3_BUCKET:     z.string().default("nestfleet-backups"),
