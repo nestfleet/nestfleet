@@ -8,11 +8,12 @@
  * Enforcement thresholds:
  *   ≥ 80% usage  → "warning"  (proceed, surface banner in console)
  *   ≥ 100% usage → "blocked"  (soft-block new case intake)
- *   limit = 0    → "ok"       (unlimited — dev mode or enterprise)
+ *   limit = 0    → "ok"       (unlimited — set COMMUNITY_OU_LIMIT=0 or enterprise license)
  */
 
 import { getDb } from "../infra/db/client.js"
 import { getLicenseState } from "../license/validator.js"
+import { config } from "../shared/config.js"
 import { logger } from "../shared/logger.js"
 
 export type OuEventType = "case.resolved" | "cr.completed"
@@ -71,7 +72,9 @@ export async function getOuUsage(): Promise<OuUsage> {
   `
   const usage = parseInt(row?.count ?? "0", 10)
 
-  const limit = getLicenseState()?.payload?.maxOutcomeUnitsMonthly ?? 0
+  // Licensed installs use the JWT limit; community (no JWT) uses the configured cap.
+  const licenseLimit = getLicenseState()?.payload?.maxOutcomeUnitsMonthly
+  const limit = licenseLimit ?? config.COMMUNITY_OU_LIMIT
   const percent = limit > 0 ? (usage / limit) * 100 : 0
 
   return { month, usage, limit, percent }
