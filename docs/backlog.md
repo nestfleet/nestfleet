@@ -74,6 +74,12 @@
 | UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | ✅ Done (2026-04-07) | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. |
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
 
+### Billing-Integrated License Reissue (FEAT-013)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| FEAT-013 | Stripe-Integrated License Reissue — sync tier changes with Stripe subscriptions | M | P1 | Not Started | Owner-initiated reissue currently updates JWT + DB only — no Stripe event. Need to call `stripe.subscriptions.update()` with the new price ID so Stripe reflects the upgrade/downgrade in money (proration charged or credited automatically on the stored payment method — no card details needed from owner). Two paths: (1) existing subscription → `subscriptions.update()` + prorate; (2) no subscription yet → send customer a Stripe Payment Link, reissue JWT only after payment confirmed via webhook. Downgrade: same `subscriptions.update()` call, Stripe credits the balance to the next invoice. Add "Bill via Stripe" toggle to ReissueLicenseDialog — when enabled, fires Stripe update before JWT deploy. |
+
 ### SaaS Provisioning: Fleet Update Management (OPS-FLEET-02)
 
 | ID | Title | Size | Priority | Status | Notes |
