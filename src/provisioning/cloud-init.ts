@@ -48,6 +48,7 @@ export interface CloudInitOpts {
   postgresPassword:       string
   jwtSecret:              string
   encryptionKey:          string
+  licenseSecret:          string
   bundledLlmApiKey:       string
   bundledEmbeddingApiKey: string
   opsPublicKey:           string
@@ -72,6 +73,7 @@ export async function generateCloudInit(opts: CloudInitOpts): Promise<string> {
     postgresPassword,
     jwtSecret,
     encryptionKey,
+    licenseSecret,
     bundledLlmApiKey,
     bundledEmbeddingApiKey,
     opsPublicKey,
@@ -112,6 +114,7 @@ write_files:
       POSTGRES_PASSWORD=${postgresPassword}
       JWT_SECRET=${jwtSecret}
       ENCRYPTION_KEY=${encryptionKey}
+      LICENSE_SECRET=${licenseSecret}
       REGISTRATION_ENABLED=true
       BILLING_ENABLED=false
       LLM_PROVIDER=google

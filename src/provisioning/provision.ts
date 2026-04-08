@@ -41,6 +41,7 @@ interface VpsSecrets {
   postgresPassword: string
   jwtSecret:        string
   encryptionKey:    string
+  licenseSecret:    string
 }
 
 function generateSecrets(): VpsSecrets {
@@ -48,6 +49,7 @@ function generateSecrets(): VpsSecrets {
     postgresPassword: randomBytes(32).toString("hex"),
     jwtSecret:        randomBytes(32).toString("hex"),
     encryptionKey:    randomBytes(32).toString("hex"),
+    licenseSecret:    randomBytes(32).toString("hex"),
   }
 }
 
@@ -147,6 +149,7 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
       postgresPassword:       secrets.postgresPassword,
       jwtSecret:              secrets.jwtSecret,
       encryptionKey:          secrets.encryptionKey,
+      licenseSecret:          secrets.licenseSecret,
       bundledLlmApiKey:       config.BUNDLED_LLM_API_KEY ?? "",
       bundledEmbeddingApiKey: config.BUNDLED_EMBEDDING_API_KEY ?? "",
       opsPublicKey:           config.OPS_SSH_PUBLIC_KEY ?? "",

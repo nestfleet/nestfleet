@@ -35,6 +35,7 @@ const BASE_OPTS = {
   postgresPassword:       "aabbcc001122334455667788990011223344556677889900112233445566778899",
   jwtSecret:              "bbccdd001122334455667788990011223344556677889900112233445566778800",
   encryptionKey:          "ccddee001122334455667788990011223344556677889900112233445566778800",
+  licenseSecret:          "ddee00112233445566778899001122334455667788990011223344556677880000",
   bundledLlmApiKey:       "sk-google-test-key",
   bundledEmbeddingApiKey: "sk-google-embedding-key",
   opsPublicKey:           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA ops@nestfleet.dev",
