@@ -157,4 +157,16 @@ describe("generateCloudInit", () => {
     expect(yaml).toContain("path: /opt/nestfleet/license.jwt")
     expect(yaml).toContain(DUMMY_LICENSE_TOKEN)
   })
+
+  it("NF-UNIT-CLINIT-16: docker-compose.customer.yml bind-mounts license.jwt into the api container", async () => {
+    // This test reads the real compose file from disk (bypasses the fs mock)
+    // to confirm the volume mount line is present — it would be invisible to
+    // the cloud-init unit tests since readFile is mocked above.
+    const { readFile: realReadFile } = await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises")
+    const composeContent = await realReadFile(
+      new URL("../../../docker-compose.customer.yml", import.meta.url),
+      "utf-8"
+    )
+    expect(composeContent).toContain("/opt/nestfleet/license.jwt:/opt/nestfleet/license.jwt:ro")
+  })
 })

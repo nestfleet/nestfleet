@@ -84,6 +84,8 @@ services:
       PROVISIONING_ENABLED:        false
       REGISTRATION_ENABLED:        ${REGISTRATION_ENABLED:-true}
       OWNER_USER_IDS:              ${OWNER_USER_IDS:-}
+    volumes:
+      - /opt/nestfleet/license.jwt:/opt/nestfleet/license.jwt:ro
     networks:
       - internal
     healthcheck:
