@@ -1998,13 +1998,23 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
         )}
       </div>
 
-      {/* Contact admin — shown when BILLING_ENABLED=false (API returns 404) */}
-      {!isPaid && availableUpgrades.length > 0 && billingDisabled && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center space-y-1">
-          <p className="text-sm font-medium text-gray-700">Want to upgrade?</p>
+      {/* Contact admin — shown for any tier when BILLING_ENABLED=false (API returns 404).
+          Covers both upgrade and downgrade requests — no self-service on managed VPSes. */}
+      {billingDisabled && (
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-2">
+          <p className="text-sm font-medium text-gray-700">Manage Subscription</p>
           <p className="text-xs text-gray-500">
-            To change your plan, contact your NestFleet administrator.
+            To upgrade or downgrade your plan, reach out to your NestFleet administrator.
           </p>
+          <a
+            href="?section=contact-form"
+            className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          >
+            Contact administrator
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
         </div>
       )}
       {/* Upgrade CTAs — shown only when billing is confirmed active (billingData returned) */}
