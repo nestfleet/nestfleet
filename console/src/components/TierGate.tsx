@@ -62,12 +62,23 @@ export function TierGate({ currentTier, requiredTier, featureName, children }: T
         </span>
       </p>
 
-      <a
-        href={`${basePath}/settings?section=plan`}
-        className="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
-      >
-        View plans →
-      </a>
+      {currentTier === "community" || currentTier === null ? (
+        <a
+          href="https://nestfleet.dev"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
+        >
+          Upgrade at nestfleet.dev →
+        </a>
+      ) : (
+        <a
+          href={`${basePath}/settings?section=plan`}
+          className="mt-4 inline-flex items-center rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700"
+        >
+          View plans →
+        </a>
+      )}
     </div>
   );
 }

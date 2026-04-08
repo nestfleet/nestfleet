@@ -1,5 +1,29 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "NestFleet — AI-native product operations platform",
+  description:
+    "Self-host for free or get managed hosting. NestFleet handles support intake, triage, change management, and AI-assisted replies for your product.",
+  openGraph: {
+    title: "NestFleet — AI-native product operations platform",
+    description:
+      "Self-host for free or get managed hosting. AI-driven triage, auto-reply, change management, and living knowledge base for your product.",
+    url: "https://nestfleet.dev",
+    siteName: "NestFleet",
+    type: "website",
+    images: [{ url: "https://nestfleet.dev/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NestFleet — AI-native product operations platform",
+    description:
+      "Self-host for free or get managed hosting. AI-driven triage, auto-reply, and change management.",
+    images: ["https://nestfleet.dev/og-image.png"],
+  },
+  alternates: { canonical: "https://nestfleet.dev" },
+};
 import { ZoomOnScroll }     from "@/components/ZoomOnScroll";
 import { LandingNav }       from "@/components/LandingNav";
 import { HeroDemoCard }     from "@/components/HeroDemoCard";
@@ -495,6 +519,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* TODO LP-03: add console screenshot here once available */}
       {/* ── INTEGRATIONS ─────────────────────────────────────────────────── */}
       {/* To activate an integration: change status from "coming" to "live"  */}
       <IntegrationsSection />
