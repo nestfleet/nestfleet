@@ -55,9 +55,14 @@ export async function provisionOrg(opts: ProvisionOpts): Promise<ProvisionedOrg>
   const registerToken = regData.token as string
 
   // ── 2. Setup / create first product ─────────────────────────────────────────
+  // Authorization header is required so the backend links the new product to
+  // the registered user (setup.ts:149-164). Without it product_ids stays [].
   const setupRes = await app.request("/api/v1/setup/complete", {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": `Bearer ${registerToken}`,
+    },
     body:    JSON.stringify({ productName }),
   })
   if (setupRes.status !== 200) {
