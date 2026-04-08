@@ -8,6 +8,14 @@ const optionalUrl = z.preprocess(
   z.string().url().optional()
 )
 
+// z.coerce.boolean() uses Boolean() which treats "false" as true (non-empty string).
+// Docker Compose passes ${VAR:-false} as the string "false", so we must handle it explicitly.
+// Only the string "true" or boolean true maps to true — everything else is false.
+const boolEnv = z.preprocess(
+  (v) => v === "true" || v === true,
+  z.boolean()
+)
+
 const ConfigSchema = z.object({
   // Server
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
@@ -116,11 +124,11 @@ const ConfigSchema = z.object({
   // Self-report: stable identifier for this instance (auto-generated UUID if unset)
   INSTANCE_ID: z.string().optional(),
   // Opt-in telemetry ping to NESTFLEET_CLOUD_URL on startup
-  TELEMETRY_OPT_IN: z.coerce.boolean().default(false),
+  TELEMETRY_OPT_IN: boolEnv.default(false),
 
   // NF-PIVOT: Billing module gate.
   // Set to true only after NF Stripe account is configured.
-  BILLING_ENABLED: z.coerce.boolean().default(false),
+  BILLING_ENABLED: boolEnv.default(false),
 
   // Stripe — only required when BILLING_ENABLED=true
   STRIPE_SECRET_KEY:            z.string().optional(),
@@ -133,7 +141,7 @@ const ConfigSchema = z.object({
   // Public registration — enable for SaaS deployments.
   // Disabled by default to protect self-hosted installs.
   // When true: POST /api/v1/auth/register is open to the public.
-  REGISTRATION_ENABLED: z.coerce.boolean().default(false),
+  REGISTRATION_ENABLED: boolEnv.default(false),
 
   // Error monitoring (Sentry). When set, uncaught exceptions are sent to Sentry.
   // Get your DSN at sentry.io → Project Settings → Client Keys.
@@ -142,7 +150,7 @@ const ConfigSchema = z.object({
   // ── SaaS Fleet Provisioning (FEAT-001) ────────────────────────────────────
   // Only required on the main NestFleet instance (nestfleet.dev).
   // Set PROVISIONING_ENABLED=true only after infra setup (NF-OPS-03).
-  PROVISIONING_ENABLED: z.coerce.boolean().default(false),
+  PROVISIONING_ENABLED: boolEnv.default(false),
   // Hetzner Cloud API token (read-write scope)
   HETZNER_API_TOKEN: z.string().optional(),
   // Pre-created Hetzner firewall ID (see NF-OPS-03 runbook)
