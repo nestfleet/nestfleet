@@ -17,8 +17,17 @@ import type { RevenueData, CohortWeek } from "../../../src/billing/stripe-revenu
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const WEEK_SECS = 7 * 24 * 60 * 60
+
+/**
+ * Return the Unix timestamp (seconds) for the START of the Unix week that is
+ * `n` weeks before the current week.  Using week-start anchors guarantees that
+ * adding small offsets (e.g. +3600, +86400) stays within the same bucket,
+ * regardless of what day of the week today is.
+ */
 function weeksAgo(n: number): number {
-  return Math.floor((Date.now() - n * 7 * 24 * 60 * 60 * 1000) / 1000)
+  const currentWeek = Math.floor(Date.now() / 1000 / WEEK_SECS)
+  return (currentWeek - n) * WEEK_SECS
 }
 
 function daysAgo(n: number): number {
