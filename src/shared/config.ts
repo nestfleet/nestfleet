@@ -165,8 +165,10 @@ const ConfigSchema = z.object({
   OPS_ALERT_EMAIL: z.string().email().optional(),
   // SSH public key injected into all customer VPSes for break-glass access
   OPS_SSH_PUBLIC_KEY:    z.string().optional(),
-  // FEAT-012: SSH private key for license reissue operations.
-  // Use FLEET_SSH_PRIVATE_KEY_B64 (base64-encoded PEM) to avoid multiline .env issues.
+  // FEAT-012: SSH key pair for license reissue operations.
+  // Public key (injected into customer VPS authorized_keys); include IP restriction prefix.
+  FLEET_SSH_PUBLIC_KEY:      z.string().optional(),
+  // Private key — use FLEET_SSH_PRIVATE_KEY_B64 (base64-encoded PEM) to avoid multiline .env issues.
   // If both are set, FLEET_SSH_PRIVATE_KEY takes precedence.
   FLEET_SSH_PRIVATE_KEY:     z.string().optional(),
   FLEET_SSH_PRIVATE_KEY_B64: z.string().optional(),
