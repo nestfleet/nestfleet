@@ -606,7 +606,8 @@ export async function setupCompleteApi(
   return apiFetch("/api/v1/setup/complete", {
     method: "POST",
     body: payload,
-    skipAuth: true,
+    // skipAuth removed: token is sent so the backend can link the new product to the
+    // registered user. The endpoint also works unauthenticated (token check is non-fatal).
   });
 }
 

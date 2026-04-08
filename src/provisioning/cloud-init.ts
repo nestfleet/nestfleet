@@ -49,6 +49,7 @@ export interface CloudInitOpts {
   jwtSecret:              string
   encryptionKey:          string
   licenseSecret:          string
+  licenseToken:           string
   bundledLlmApiKey:       string
   bundledEmbeddingApiKey: string
   opsPublicKey:           string
@@ -74,6 +75,7 @@ export async function generateCloudInit(opts: CloudInitOpts): Promise<string> {
     jwtSecret,
     encryptionKey,
     licenseSecret,
+    licenseToken,
     bundledLlmApiKey,
     bundledEmbeddingApiKey,
     opsPublicKey,
@@ -115,6 +117,7 @@ write_files:
       JWT_SECRET=${jwtSecret}
       ENCRYPTION_KEY=${encryptionKey}
       LICENSE_SECRET=${licenseSecret}
+      LICENSE_FILE_PATH=/opt/nestfleet/license.jwt
       REGISTRATION_ENABLED=true
       BILLING_ENABLED=false
       LLM_PROVIDER=google
@@ -146,6 +149,11 @@ ${indent(caddyfile)}
     permissions: '0755'
     content: |
 ${indent(backupSh)}
+
+  - path: /opt/nestfleet/license.jwt
+    permissions: '0600'
+    content: |
+      ${licenseToken}
 
 ssh_authorized_keys:
   - ${opsPublicKey}
