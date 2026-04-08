@@ -177,7 +177,12 @@ const ConfigSchema = z.object({
 export type Config = z.infer<typeof ConfigSchema>
 
 function parseConfig(): Config {
-  const result = ConfigSchema.safeParse(process.env)
+  // Strip empty strings so docker-compose ${VAR:-} passthroughs are treated
+  // as absent rather than as invalid values by Zod's .optional() validators.
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([, v]) => v !== ""),
+  )
+  const result = ConfigSchema.safeParse(env)
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors
     const messages = Object.entries(errors)
