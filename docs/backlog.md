@@ -78,7 +78,7 @@
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
 | UX-03 | Billing Plan card: show "Manage Subscription" + contact administrator link for all tiers when BILLING_ENABLED=false — was showing Stripe upgrade cards (non-functional on customer VPSes) | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
 | UX-04 | ReissueLicenseDialog: exclude current tier from dropdown — reissue is a tier change, not a renewal; default to first available option | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
-| UX-05 | Owner Console — Deprovision confirm dialog too wide; confirmation text overflows the modal frame | XS | P3 | Not Started | Constrain max-width or wrap text; dialog body should fit comfortably within the modal container. |
+| UX-05 | Owner Console — Deprovision confirm dialog too wide; confirmation text overflows the modal frame | XS | P3 | ✅ Done (2026-04-08) | Deprovision confirm dialog: max-w-xs (was max-w-sm), break-all on slug. main. |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 
@@ -106,9 +106,9 @@
 |----|-------|------|----------|--------|-------|
 | LP-01 | `/terms` and `/privacy` pages — create real content (or placeholder with correct structure) | S | P1 | ✅ Done | GDPR-structured placeholder pages with amber draft banner, mutual links, and E2E tests. |
 | LP-02 | Landing page audit + copy/routing polish | S | P2 | ✅ Done | Footer now has Terms + Privacy links; middleware bypass for /terms, /privacy, /signup. |
-| LP-03 | Landing page: embed console screenshots + lineage GIF; replace placeholder hero visuals | S | P1 | Not Started | Hero needs at least one real screenshot (Cases list or Triage view). Current page has no product visuals. |
-| LP-04 | Landing page: Pricing section — Free (community, self-hosted) vs Starter / Growth / Scale with feature comparison table | S | P1 | Not Started | Two CTAs: "Self-host free → GitHub" and "Get managed hosting → /signup". Mirrors nestfleet.dev/pricing. |
-| LP-05 | Landing page: SEO basics — title, meta description, OG image, Twitter card, structured data | XS | P2 | Not Started | Currently missing OG tags and structured data for search indexing. |
+| LP-03 | Landing page: embed console screenshots + lineage GIF; replace placeholder hero visuals | S | P1 | ✅ Done then rolled back (2026-04-08) | Screenshots section added then removed — redundant with HowItWorksSection and ComplianceSection. PNGs kept in public/screenshots/ for docs use. |
+| LP-04 | Landing page: Pricing section — Free (community, self-hosted) vs Starter / Growth / Scale with feature comparison table | S | P1 | ✅ Done (2026-04-08) | Pricing section: Free (community, self-hosted) vs Starter/Growth/Scale. CTAs: "Self-host free on GitHub" + "Get managed hosting → /signup". main. |
+| LP-05 | Landing page: SEO basics — title, meta description, OG image, Twitter card, structured data | XS | P2 | ✅ Done (2026-04-08) | OG/Twitter meta tags added to landing page. main. |
 
 ### Self-Host Foundation (FREE track)
 
@@ -117,10 +117,10 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| FREE-01 | Create `docker-compose.yml` for self-hosters — api + console + postgres + caddy; separate from `docker-compose.prod.yml` (SaaS operator) and `docker-compose.customer.yml` (VPS template). No HETZNER/CLOUDFLARE/FLEET vars. | S | P0 | Not Started | `docker-compose.prod.yml` is the NestFleet.dev operator compose — wrong file for self-hosters. Step 5 of the README points to it incorrectly. |
-| FREE-02 | Fix README quickstart — Step 5 points to `.prod.yml`; replace with `docker-compose.yml`; verify end-to-end on clean machine; add "3-command" fast path at the top | S | P0 | Not Started | Current quickstart is dev-mode only (npm run dev). Production self-hosters have no working command. |
-| FREE-03 | First-run auto-registration — if DB has 0 users AND `REGISTRATION_ENABLED` is unset/empty, auto-enable for first admin creation then auto-lock. Banner shown until first user exists. **Pending user decision.** | S | P1 | Pending | Safe for SaaS VPSes: cloud-init always sets `REGISTRATION_ENABLED=false` explicitly. |
-| FREE-04 | Community product limit decision — today `productLimit=null` = unlimited. Decide: keep unlimited or cap at N (e.g. 3) to create natural upgrade pressure. If capped: enforce in DB layer + show in Settings → Plan. **Pending user decision.** | XS | P1 | Pending | — |
+| FREE-01 | Create `docker-compose.yml` for self-hosters — api + console + postgres + caddy; separate from `docker-compose.prod.yml` (SaaS operator) and `docker-compose.customer.yml` (VPS template). No HETZNER/CLOUDFLARE/FLEET vars. | S | P0 | ✅ Done (2026-04-08) | `docker-compose.yml` for self-hosters created (api + console + postgres + caddy). Separate from prod and customer compose files. main. |
+| FREE-02 | Fix README quickstart — Step 5 points to `.prod.yml`; replace with `docker-compose.yml`; verify end-to-end on clean machine; add "3-command" fast path at the top | S | P0 | ✅ Done (2026-04-08) | README quickstart updated to use `docker-compose.yml`; 3-command fast path at top. main. |
+| FREE-03 | First-run auto-registration — if DB has 0 users AND `REGISTRATION_ENABLED` is unset/empty, auto-enable for first admin creation then auto-lock. Banner shown until first user exists. **Pending user decision.** | S | P1 | ✅ Done (2026-04-08) | Auto-registration: `GET /auth/first-run` endpoint; auto-opens when 0 users in DB and REGISTRATION_ENABLED unset. Auto-locks after first admin created. main. |
+| FREE-04 | Community product limit decision — today `productLimit=null` = unlimited. Decide: keep unlimited or cap at N (e.g. 3) to create natural upgrade pressure. If capped: enforce in DB layer + show in Settings → Plan. **Pending user decision.** | XS | P1 | ✅ Done (2026-04-08) | Community OU cap: 200 OUs/month via `COMMUNITY_OU_LIMIT` env var (default 200). Enforced in signal ingress — "blocked" status at 100%. main. |
 
 ### Free → Paid Bridge (BRIDGE track)
 
@@ -129,9 +129,9 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| BRIDGE-01 | Settings → Plan: community self-hosted branch — show tier limits, feature comparison, and CTA "Upgrade to managed SaaS at nestfleet.dev" when `tier=community && billingDisabled`. Currently shows "contact your NestFleet administrator" for all `billingDisabled` cases — wrong for self-hosters. | S | P1 | Not Started | Three distinct states: (1) community+billingDisabled → "upgrade at nestfleet.dev"; (2) licensed+billingDisabled → "contact administrator"; (3) licensed+billingEnabled → Stripe upgrade cards. |
-| BRIDGE-02 | TierGate upgrade prompt: replace generic "View plans →" with context-aware link — community self-hosters go to `nestfleet.dev/pricing` (or LP-04 anchor), SaaS customers go to `settings?section=plan`. | XS | P1 | Not Started | Current TierGate always links to internal settings. Self-hosters need to be sent to nestfleet.dev to actually upgrade. |
-| BRIDGE-03 | OU usage nudge: when OU usage ≥ 80% of limit AND limit > 0 (i.e. has a paid license), show amber banner in the console header. For community (limit=0), no nudge — OUs are unlimited in community mode. | XS | P2 | Not Started | ou-tracker already computes percent; just needs a console banner component wired to `/api/v1/license/status` ouUsage field. |
+| BRIDGE-01 | Settings → Plan: community self-hosted branch — show tier limits, feature comparison, and CTA "Upgrade to managed SaaS at nestfleet.dev" when `tier=community && billingDisabled`. Currently shows "contact your NestFleet administrator" for all `billingDisabled` cases — wrong for self-hosters. | S | P1 | ✅ Done (2026-04-08) | Three-branch Settings → Plan: community shows "Upgrade to managed SaaS at nestfleet.dev →"; licensed+billingDisabled shows "contact administrator". main. |
+| BRIDGE-02 | TierGate upgrade prompt: replace generic "View plans →" with context-aware link — community self-hosters go to `nestfleet.dev/pricing` (or LP-04 anchor), SaaS customers go to `settings?section=plan`. | XS | P1 | ✅ Done (2026-04-08) | TierGate community path links to `https://nestfleet.dev` (external, new tab); licensed path links to internal settings. main. |
+| BRIDGE-03 | OU usage nudge: when OU usage ≥ 80% of limit AND limit > 0 (i.e. has a paid license), show amber banner in the console header. For community (limit=0), no nudge — OUs are unlimited in community mode. | XS | P2 | ✅ Done (2026-04-08) | `OuUsageBanner.tsx` — amber banner at ≥80%, red non-dismissible at 100%, admin-only, session-dismissible, refreshes every 5 min. Added to AppLayout. main. |
 
 ### Docs (DOCS track)
 
@@ -172,6 +172,7 @@
 > **FEAT-003** ✅ 2026-04-05 — Channel threading (email inReplyTo dedup, channel_thread_id index), external webhook ingress (source_type "external", Bearer auth, JSONB identity lookup), outbound callback (fireOutboundCallback, 5s AbortController timeout). Migrations 0044–0046. 26 new tests (NF-UNIT-THR/EXT/CHN + NF-INT-THR/EXT) all pass.
 > **FEAT-002** ✅ 2026-04-05 — Channels Hub (ChannelsHub, ChannelCard, ChannelSetupPanel, ChannelPickerStep components), static channel catalog (7 active + 5 coming soon), GET /channels/status endpoint, Settings → Channels section with legacy redirects (ci/chat/contact-form → channels), AddProductWizard expanded to 4 steps (channel picker step 3), Sidebar completeness badge for unconfigured channels.
 > **2026-04-08** ✅ FEAT-012 (Owner License Reissue) complete — SSH JWT deploy, /license/tier public endpoint, reissue worker polls tier change, Owner Console Fleet UI (tier badge, expiry column, reissue dialog, history panel, bulk renew). Bug fixes: BEF-23 (z.coerce.boolean() false→true), BEF-24 (FLEET_SSH_PRIVATE_KEY* missing from compose), BEF-25 (/license/status auth-gated). UX: UX-03 (Manage Subscription card for all tiers), UX-04 (current tier excluded from reissue dropdown). Ops: CI publish job (GHCR), docker housekeeping cron on main VPS. FEAT-013 added to backlog (Stripe-integrated reissue).
+> **2026-04-08 (session 2)** ✅ FREE track complete — FREE-01/02 (self-host docker-compose + README), FREE-03 (first-run auto-registration), FREE-04 (community OU cap 200/month, enforced at signal ingress). BRIDGE track complete — BRIDGE-01/02/03 (Settings Plan community branch, TierGate nestfleet.dev links, OU usage amber/red banner). LP-04/05 (pricing section, OG meta). UX-05 (deprovision dialog width). LP-03 added then rolled back (screenshots redundant). Settings Plan cosmetic fix: "3 / ∞" for null product limit. nodemailer bumped to 8.0.5 (Dependabot #14, CRLF injection CVE).
 > **BEF-22** ✅ 2026-04-05 — Integration test suite: fixed 5 root causes: (1) `cases/resolve` endpoint used `requireRole("operator")` instead of `requireRole("support_lead")` per PO RBAC decision 2026-03-19 — updated source + 3 conflicting tests; (2) `"enterprise"` missing from `LicenseTier` union — added + mapped to `"scale"` in `licenseToProductTier`; (3) memory-ingest mock emitted 1536-dim vectors but DB schema is `vector(768)` after migration 0005; (4) `GET /products` admin bypass returned all products ignoring JWT `productIds` — removed bypass, always filter by JWT; (5) `products-api` NF-INT-509 read response body twice (Fetch one-read limit). 43/43 integration files passing.
 
 ---
