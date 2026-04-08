@@ -245,11 +245,11 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
     if (pollResult === "timeout") {
       await updateProvisioning(prov.id, {
         status:        "failed",
-        error_message: "health_timeout: VPS did not become healthy within 7.5 minutes",
+        error_message: "health_timeout: VPS did not become healthy within 12.5 minutes",
       })
       await sendOpsAlert(
         `[NestFleet] Provisioning health timeout: ${slug}`,
-        `VPS for ${slug} (intent: ${intentId}) did not become healthy within 7.5 minutes.\n\nVPS IP: ${prov.hetzner_server_ip}\nHetzner server ID: ${prov.hetzner_server_id}\n\nThe VPS has NOT been deleted — SSH in to investigate.\nOnce fixed, use the owner console retry action to re-check health and send the welcome email.`,
+        `VPS for ${slug} (intent: ${intentId}) did not become healthy within 12.5 minutes.\n\nVPS IP: ${prov.hetzner_server_ip}\nHetzner server ID: ${prov.hetzner_server_id}\n\nThe VPS has NOT been deleted — SSH in to investigate.\nOnce fixed, use the owner console retry action to re-check health and send the welcome email.`,
       )
       // Do not throw — job completes without error so pg-boss doesn't retry.
       // Ops uses the owner console /retry action to resume.
