@@ -33,7 +33,7 @@ const PLANS: PlanMeta[] = [
     price:   "$0",
     period:  "forever · free · AGPL-3.0 open source",
     desc:    "For developers, OSS projects, and personal experiments. No time limit.",
-    limits:  ["Unlimited products", "100 Outcome Units / month", "Email channel", "Community support"],
+    limits:  ["Unlimited products", "200 Outcome Units / month", "Email channel", "Community support"],
     cta:     "Self-host free on GitHub",
     ctaHref: "https://github.com/nestfleet/nestfleet",
     popular: false,

@@ -139,9 +139,14 @@ const ConfigSchema = z.object({
   STRIPE_PRICE_GROWTH_ANNUAL:   z.string().optional(),
 
   // Public registration — enable for SaaS deployments.
-  // Disabled by default to protect self-hosted installs.
+  // Disabled by default; auto-enabled on first run (0 users in DB) for self-hosters.
   // When true: POST /api/v1/auth/register is open to the public.
   REGISTRATION_ENABLED: boolEnv.default(false),
+
+  // Community tier monthly OU cap — applied when no license JWT is present.
+  // Set to 0 for unlimited (e.g. local dev, air-gapped installs).
+  // Self-hosters can override; SaaS instances always have a license JWT so this is ignored.
+  COMMUNITY_OU_LIMIT: z.coerce.number().int().min(0).default(200),
 
   // Error monitoring (Sentry). When set, uncaught exceptions are sent to Sentry.
   // Get your DSN at sentry.io → Project Settings → Client Keys.
