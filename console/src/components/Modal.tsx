@@ -65,7 +65,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2
             id="modal-title"
-            className="text-base font-semibold text-gray-900"
+            className="text-base font-semibold text-gray-900 min-w-0 break-words"
           >
             {title}
           </h2>
