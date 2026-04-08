@@ -7,6 +7,7 @@ import clsx from "clsx";
 import {
   getOwnerFleetApi,
   postOwnerFleetResetApi,
+  postOwnerFleetRetryApi,
   postOwnerFleetDeprovisionApi,
   type FleetResponse,
   type Provisioning,
@@ -107,8 +108,21 @@ interface FleetRowActionsProps {
 
 function FleetRowActions({ row, onActionDone }: FleetRowActionsProps) {
   const [resetting, setResetting] = useState(false);
+  const [retrying, setRetrying] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deprovisioning, setDeprovisioning] = useState(false);
+
+  async function handleRetry() {
+    setRetrying(true);
+    try {
+      await postOwnerFleetRetryApi(row.org_slug);
+      onActionDone();
+    } catch {
+      // ignore
+    } finally {
+      setRetrying(false);
+    }
+  }
 
   async function handleReset() {
     setResetting(true);
@@ -146,6 +160,16 @@ function FleetRowActions({ row, onActionDone }: FleetRowActionsProps) {
         />
       )}
       <div className="flex items-center gap-2">
+        {row.status === "failed" && (
+          <button
+            onClick={handleRetry}
+            disabled={retrying}
+            className="rounded px-2 py-1 text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+            aria-label={`Retry provisioning ${row.org_slug}`}
+          >
+            {retrying ? "Retrying..." : "Retry"}
+          </button>
+        )}
         <button
           onClick={handleReset}
           disabled={resetting}

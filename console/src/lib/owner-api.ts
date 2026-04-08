@@ -130,6 +130,14 @@ export async function postOwnerFleetResetApi(
   });
 }
 
+export async function postOwnerFleetRetryApi(
+  slug: string
+): Promise<ActionResponse> {
+  return apiFetch<ActionResponse>(`/api/v1/owner/fleet/${slug}/retry`, {
+    method: "POST",
+  });
+}
+
 // ─── Telemetry ────────────────────────────────────────────────────────────────
 
 export interface VersionBucket {
