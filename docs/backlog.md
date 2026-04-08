@@ -57,6 +57,9 @@
 | BEF-20 | Cross-product lineage link missing — same identity across products not connected in Lineage graph | S | P2 | ✅ Done | `fix/BEF-20-cross-product-lineage` | — |
 | BEF-21 | Chat widget test harness — persistent per-product HTML test page for SSE + widget validation without manual setup | S | P2 | ✅ Done | `fix/BEF-21-widget-test-harness` | — |
 | BEF-22 | Integration test suite fixes — 5 root causes across 4 test files (see Done notes) | S | P3 | ✅ Done | `fix/BEF-22-int-test-suite-fixes` | — |
+| BEF-23 | `z.coerce.boolean()` docker-compose env parsing bug — BILLING_ENABLED, REGISTRATION_ENABLED, PROVISIONING_ENABLED, TELEMETRY_OPT_IN all evaluated to `true` when set to string `"false"` | XS | P0 | ✅ Done (2026-04-08) | `main` | — |
+| BEF-24 | FLEET_SSH_PRIVATE_KEY / FLEET_SSH_PRIVATE_KEY_B64 / FLEET_SSH_USER missing from docker-compose.prod.yml api env block — reissue worker had no SSH key despite it being in .env | XS | P0 | ✅ Done (2026-04-08) | `main` | — |
+| BEF-25 | /api/v1/license/status requires admin auth — reissue worker poller always got 401, timed out. Added public GET /api/v1/license/tier (tier only, no sensitive data) and updated worker to poll it | XS | P0 | ✅ Done (2026-04-08) | `main` | — |
 
 ### Feature Specs
 
@@ -64,7 +67,7 @@
 |----|-------|------|----------|--------|--------|------|
 | FEAT-002 | Onboarding & Channels Hub Refactor | L | Medium | ✅ Done | `feat/FEAT-002-onboarding-channels-hub-refactor` | [spec](specs/FEAT-002-onboarding-channels-hub-refactor.md) |
 | FEAT-003 | Channel Richness Gap & Architecture | S | Low | ✅ Done | `feat/FEAT-003-channel-richness-gap` | [spec](specs/FEAT-003-channel-richness-gap.md) |
-| FEAT-012 | Owner Fleet — Reissue License | L | P1 | todo | — | [spec](specs/FEAT-012-reissue-license.md) |
+| FEAT-012 | Owner Fleet — Reissue License | L | P1 | ✅ Done (2026-04-08) | `main` | [spec](specs/FEAT-012-reissue-license.md) |
 | NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
 
 ### UX Improvements
@@ -73,6 +76,8 @@
 |----|-------|------|----------|--------|-------|
 | UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | ✅ Done (2026-04-07) | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. |
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
+| UX-03 | Billing Plan card: show "Manage Subscription" + contact administrator link for all tiers when BILLING_ENABLED=false — was showing Stripe upgrade cards (non-functional on customer VPSes) | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
+| UX-04 | ReissueLicenseDialog: exclude current tier from dropdown — reissue is a tier change, not a renewal; default to first available option | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 
@@ -91,6 +96,8 @@
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
 | OPS-IMAGE-01 | Publish Docker images to GHCR and update cloud-init to use `image:` refs | S | P0 | ✅ Done (2026-04-07) | Images published to ghcr.io/nestfleet/nestfleet-api:latest + nestfleet-console:latest via docker-publish.yml on CI. Both packages public — no auth needed on customer VPSes. docker-compose.customer.yml uses `image:` refs. Also fixed cloud-init: Docker CE from official repo (not docker.io), chpasswd expire:false, 50-attempt health poll. |
+| OPS-IMAGE-02 | Restructure CI: add publish job (build + push to GHCR in CI, not on VPS); deploy job pulls pre-built images. NEXT_PUBLIC_PRODUCT_ID baked via GitHub secret for main VPS console image. | S | P0 | ✅ Done (2026-04-08) | `main` | — |
+| OPS-OPS-01 | Docker housekeeping cron on main VPS — daily at 3am UTC, prunes dangling images, build cache >24h, unused images >7d. Prevents disk exhaustion (hit 100% disk during FEAT-012 testing). | XS | P1 | ✅ Done (2026-04-08) | manual (main VPS crontab) | — |
 
 ### Landing Page & Legal
 
@@ -129,6 +136,7 @@
 > **FEAT-001 code complete** ✅ 2026-04-05 — All 15 new source files implemented (saga pattern, Hetzner + Cloudflare clients, cloud-init, health poller, deprovision scheduler, owner API, saas signup API, Stripe webhook extension). 27 unit + 13 integration tests (NF-UNIT-SLUG/SEC-PROV/CLINIT, NF-INT-PROV-01..13) all pass. Pending: NF-OPS-03 infra setup, NF-OPS-04 compose verify, NF-OPS-07 backups, real-world VPS spin-up smoke test.
 > **FEAT-003** ✅ 2026-04-05 — Channel threading (email inReplyTo dedup, channel_thread_id index), external webhook ingress (source_type "external", Bearer auth, JSONB identity lookup), outbound callback (fireOutboundCallback, 5s AbortController timeout). Migrations 0044–0046. 26 new tests (NF-UNIT-THR/EXT/CHN + NF-INT-THR/EXT) all pass.
 > **FEAT-002** ✅ 2026-04-05 — Channels Hub (ChannelsHub, ChannelCard, ChannelSetupPanel, ChannelPickerStep components), static channel catalog (7 active + 5 coming soon), GET /channels/status endpoint, Settings → Channels section with legacy redirects (ci/chat/contact-form → channels), AddProductWizard expanded to 4 steps (channel picker step 3), Sidebar completeness badge for unconfigured channels.
+> **2026-04-08** ✅ FEAT-012 (Owner License Reissue) complete — SSH JWT deploy, /license/tier public endpoint, reissue worker polls tier change, Owner Console Fleet UI (tier badge, expiry column, reissue dialog, history panel, bulk renew). Bug fixes: BEF-23 (z.coerce.boolean() false→true), BEF-24 (FLEET_SSH_PRIVATE_KEY* missing from compose), BEF-25 (/license/status auth-gated). UX: UX-03 (Manage Subscription card for all tiers), UX-04 (current tier excluded from reissue dropdown). Ops: CI publish job (GHCR), docker housekeeping cron on main VPS. FEAT-013 added to backlog (Stripe-integrated reissue).
 > **BEF-22** ✅ 2026-04-05 — Integration test suite: fixed 5 root causes: (1) `cases/resolve` endpoint used `requireRole("operator")` instead of `requireRole("support_lead")` per PO RBAC decision 2026-03-19 — updated source + 3 conflicting tests; (2) `"enterprise"` missing from `LicenseTier` union — added + mapped to `"scale"` in `licenseToProductTier`; (3) memory-ingest mock emitted 1536-dim vectors but DB schema is `vector(768)` after migration 0005; (4) `GET /products` admin bypass returned all products ignoring JWT `productIds` — removed bypass, always filter by JWT; (5) `products-api` NF-INT-509 read response body twice (Fetch one-read limit). 43/43 integration files passing.
 
 ---
