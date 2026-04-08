@@ -7,6 +7,7 @@ import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { GracePeriodBanner } from "./GracePeriodBanner";
 import { LicenseStatusBanner } from "./LicenseStatusBanner";
+import { OuUsageBanner } from "./OuUsageBanner";
 import { ProductHeadManager } from "./ProductHeadManager";
 import { CrossProductNotifier } from "./CrossProductNotifier";
 import { ProductCommandPalette } from "./ProductCommandPalette";
@@ -109,6 +110,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         />
         <GracePeriodBanner />
         <LicenseStatusBanner />
+        <OuUsageBanner />
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>

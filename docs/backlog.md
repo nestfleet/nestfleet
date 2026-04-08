@@ -78,6 +78,7 @@
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
 | UX-03 | Billing Plan card: show "Manage Subscription" + contact administrator link for all tiers when BILLING_ENABLED=false — was showing Stripe upgrade cards (non-functional on customer VPSes) | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
 | UX-04 | ReissueLicenseDialog: exclude current tier from dropdown — reissue is a tier change, not a renewal; default to first available option | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
+| UX-05 | Owner Console — Deprovision confirm dialog too wide; confirmation text overflows the modal frame | XS | P3 | Not Started | Constrain max-width or wrap text; dialog body should fit comfortably within the modal container. |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 
@@ -105,6 +106,40 @@
 |----|-------|------|----------|--------|-------|
 | LP-01 | `/terms` and `/privacy` pages — create real content (or placeholder with correct structure) | S | P1 | ✅ Done | GDPR-structured placeholder pages with amber draft banner, mutual links, and E2E tests. |
 | LP-02 | Landing page audit + copy/routing polish | S | P2 | ✅ Done | Footer now has Terms + Privacy links; middleware bypass for /terms, /privacy, /signup. |
+| LP-03 | Landing page: embed console screenshots + lineage GIF; replace placeholder hero visuals | S | P1 | Not Started | Hero needs at least one real screenshot (Cases list or Triage view). Current page has no product visuals. |
+| LP-04 | Landing page: Pricing section — Free (community, self-hosted) vs Starter / Growth / Scale with feature comparison table | S | P1 | Not Started | Two CTAs: "Self-host free → GitHub" and "Get managed hosting → /signup". Mirrors nestfleet.dev/pricing. |
+| LP-05 | Landing page: SEO basics — title, meta description, OG image, Twitter card, structured data | XS | P2 | Not Started | Currently missing OG tags and structured data for search indexing. |
+
+### Self-Host Foundation (FREE track)
+
+> Goal: a developer can clone the repo, run 3 commands, and have a working NestFleet instance.
+> **Isolation rule:** all changes in this track must be guarded so they cannot activate on SaaS customer VPSes (those have explicit env vars in cloud-init that override any default behavior).
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| FREE-01 | Create `docker-compose.yml` for self-hosters — api + console + postgres + caddy; separate from `docker-compose.prod.yml` (SaaS operator) and `docker-compose.customer.yml` (VPS template). No HETZNER/CLOUDFLARE/FLEET vars. | S | P0 | Not Started | `docker-compose.prod.yml` is the NestFleet.dev operator compose — wrong file for self-hosters. Step 5 of the README points to it incorrectly. |
+| FREE-02 | Fix README quickstart — Step 5 points to `.prod.yml`; replace with `docker-compose.yml`; verify end-to-end on clean machine; add "3-command" fast path at the top | S | P0 | Not Started | Current quickstart is dev-mode only (npm run dev). Production self-hosters have no working command. |
+| FREE-03 | First-run auto-registration — if DB has 0 users AND `REGISTRATION_ENABLED` is unset/empty, auto-enable for first admin creation then auto-lock. Banner shown until first user exists. **Pending user decision.** | S | P1 | Pending | Safe for SaaS VPSes: cloud-init always sets `REGISTRATION_ENABLED=false` explicitly. |
+| FREE-04 | Community product limit decision — today `productLimit=null` = unlimited. Decide: keep unlimited or cap at N (e.g. 3) to create natural upgrade pressure. If capped: enforce in DB layer + show in Settings → Plan. **Pending user decision.** | XS | P1 | Pending | — |
+
+### Free → Paid Bridge (BRIDGE track)
+
+> Goal: a community user who hits limits or wants more capacity knows exactly what to do and where to go (nestfleet.dev).
+> **Isolation rule:** bridge UX shows only when `tier === "community"` (no valid license JWT). SaaS customers (`tier` = starter/growth/scale with `BILLING_ENABLED=false`) continue to see "contact administrator". Paid+billing users see Stripe upgrade cards.
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| BRIDGE-01 | Settings → Plan: community self-hosted branch — show tier limits, feature comparison, and CTA "Upgrade to managed SaaS at nestfleet.dev" when `tier=community && billingDisabled`. Currently shows "contact your NestFleet administrator" for all `billingDisabled` cases — wrong for self-hosters. | S | P1 | Not Started | Three distinct states: (1) community+billingDisabled → "upgrade at nestfleet.dev"; (2) licensed+billingDisabled → "contact administrator"; (3) licensed+billingEnabled → Stripe upgrade cards. |
+| BRIDGE-02 | TierGate upgrade prompt: replace generic "View plans →" with context-aware link — community self-hosters go to `nestfleet.dev/pricing` (or LP-04 anchor), SaaS customers go to `settings?section=plan`. | XS | P1 | Not Started | Current TierGate always links to internal settings. Self-hosters need to be sent to nestfleet.dev to actually upgrade. |
+| BRIDGE-03 | OU usage nudge: when OU usage ≥ 80% of limit AND limit > 0 (i.e. has a paid license), show amber banner in the console header. For community (limit=0), no nudge — OUs are unlimited in community mode. | XS | P2 | Not Started | ou-tracker already computes percent; just needs a console banner component wired to `/api/v1/license/status` ouUsage field. |
+
+### Docs (DOCS track)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| DOCS-01 | README overhaul — hero screenshot, 3-command quickstart at top, minimal required env vars table, common issues section, link to full self-hosting guide | S | P1 | Not Started | Current README buries quickstart; no visuals; env vars table is mixed required/optional. |
+| DOCS-02 | `docs/self-hosting.md` — full setup guide: compose, first admin, GitHub App, email provider, channels, production checklist | M | P2 | Not Started | NF-PIVOT-11 umbrella; start with this as the core doc. |
+| DOCS-03 | `docs/channels/` — one setup guide per channel type: email (SMTP/Postmark/Resend), Telegram bot, GitHub webhook, contact form widget, external webhook | S | P2 | Not Started | Currently undocumented. Channel setup is a major friction point for self-hosters. |
 
 ### Beta Testing
 

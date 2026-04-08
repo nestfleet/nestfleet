@@ -249,9 +249,10 @@ interface ConfirmDeprovisionDialogProps {
 function ConfirmDeprovisionDialog({ slug, onConfirm, onCancel, pending }: ConfirmDeprovisionDialogProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-labelledby="deprovision-dialog-title">
-      <div className="bg-white rounded-xl shadow-2xl ring-1 ring-black/10 p-6 max-w-sm w-full mx-4">
+      <div className="bg-white rounded-xl shadow-2xl ring-1 ring-black/10 p-6 max-w-xs w-full mx-4">
         <h2 id="deprovision-dialog-title" className="text-base font-semibold text-gray-900">
-          Deprovision <span className="font-mono text-sm text-gray-600">{slug}</span>?
+          Deprovision{" "}
+          <span className="break-all font-mono text-sm text-gray-600">{slug}</span>?
         </h2>
         <p className="mt-2 text-sm text-gray-500">
           Are you sure? This will start a 30-day grace period before the server is permanently deprovisioned.
