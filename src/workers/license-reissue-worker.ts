@@ -134,7 +134,7 @@ export async function executeLicenseReissue(payload: LicenseReissuePayload): Pro
 
   // ── Step 6: Poll /api/v1/license/status ───────────────────────────────────
   const domain  = `${slug}.${config.CUSTOMER_BASE_DOMAIN}`
-  const pollUrl = `https://${domain}/api/v1/license/status`
+  const pollUrl = `https://${domain}/api/v1/license/tier`
 
   let verified = false
   for (let attempt = 0; attempt < pollMaxAttempts; attempt++) {
