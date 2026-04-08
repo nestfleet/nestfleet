@@ -16,6 +16,8 @@ import { FleetStatusBadge } from "@/components/owner/FleetStatusBadge";
 
 const PAGE_LIMIT = 20;
 
+type StatusFilter = "all" | "active" | "failed" | "provisioning" | "deprovisioned";
+
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", {
@@ -71,14 +73,14 @@ function ConfirmDeprovisionDialog({
       <div className="bg-white rounded-xl shadow-2xl ring-1 ring-black/10 p-6 max-w-sm w-full mx-4">
         <h2
           id="deprovision-dialog-title"
-          className="text-base font-semibold text-gray-900"
+          className="text-base font-semibold text-gray-900 min-w-0"
         >
           Deprovision{" "}
-          <span className="font-mono text-sm text-gray-600">{slug}</span>?
+          <span className="font-mono text-sm text-gray-600 break-all">{slug}</span>?
         </h2>
         <p className="mt-2 text-sm text-gray-500">
-          Are you sure? This will start a 30-day grace period before the server
-          is permanently deprovisioned.
+          This will <strong className="text-gray-700">immediately</strong> delete
+          the VPS and remove the DNS record. This action cannot be undone.
         </p>
         <div className="mt-5 flex justify-end gap-3">
           <button
@@ -191,8 +193,28 @@ function FleetRowActions({ row, onActionDone }: FleetRowActionsProps) {
   );
 }
 
+function rowClass(status: string): string {
+  return clsx(
+    "transition-colors",
+    status === "failed"        && "bg-red-50 hover:bg-red-100",
+    status === "provisioning"  && "bg-amber-50 hover:bg-amber-100",
+    status === "deprovisioned" && "bg-gray-50 opacity-50",
+    status === "active"        && "bg-white hover:bg-gray-50",
+    status === "deprovisioning" && "bg-amber-50 opacity-70",
+  );
+}
+
+const FILTERS: { label: string; value: StatusFilter }[] = [
+  { label: "All",            value: "all" },
+  { label: "Active",         value: "active" },
+  { label: "Failed",         value: "failed" },
+  { label: "Provisioning",   value: "provisioning" },
+  { label: "Deprovisioned",  value: "deprovisioned" },
+];
+
 export default function FleetPage() {
   const [offset, setOffset] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const fetcher = () => getOwnerFleetApi({ limit: PAGE_LIMIT, offset });
 
@@ -207,10 +229,20 @@ export default function FleetPage() {
     { keepPreviousData: true }
   );
 
-  const rows: Provisioning[] = data?.data ?? [];
+  const allRows: Provisioning[] = data?.data ?? [];
+  const rows = statusFilter === "all"
+    ? allRows
+    : allRows.filter((r) => r.status === statusFilter);
+
   const total = data?.total ?? 0;
   const totalPages = Math.ceil(total / PAGE_LIMIT);
   const currentPage = Math.floor(offset / PAGE_LIMIT) + 1;
+
+  // Count per status for filter badges
+  const counts = allRows.reduce<Record<string, number>>((acc, r) => {
+    acc[r.status] = (acc[r.status] ?? 0) + 1;
+    return acc;
+  }, {});
 
   function onActionDone() {
     void mutate();
@@ -227,6 +259,36 @@ export default function FleetPage() {
             {total !== 1 ? "s" : ""}
           </p>
         </div>
+      </div>
+
+      {/* Filter bar */}
+      <div className="flex flex-wrap gap-2">
+        {FILTERS.map(({ label, value }) => {
+          const count = value === "all" ? allRows.length : (counts[value] ?? 0);
+          const active = statusFilter === value;
+          return (
+            <button
+              key={value}
+              onClick={() => setStatusFilter(value)}
+              className={clsx(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                active
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"
+              )}
+            >
+              {label}
+              <span
+                className={clsx(
+                  "rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none",
+                  active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
+                )}
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Error banner */}
@@ -291,8 +353,8 @@ export default function FleetPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 bg-white">
-              {isLoading && rows.length === 0 ? (
+            <tbody className="divide-y divide-gray-100">
+              {isLoading && allRows.length === 0 ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} aria-hidden="true">
                     {Array.from({ length: 7 }).map((__, j) => (
@@ -308,14 +370,16 @@ export default function FleetPage() {
                     colSpan={7}
                     className="px-4 py-10 text-center text-gray-400 text-sm"
                   >
-                    No fleet entries found.
+                    {statusFilter === "all"
+                      ? "No fleet entries found."
+                      : `No ${statusFilter} instances.`}
                   </td>
                 </tr>
               ) : (
                 rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="hover:bg-gray-50 transition-colors"
+                    className={rowClass(row.status)}
                   >
                     <td className="px-4 py-3 font-mono text-xs text-gray-900 whitespace-nowrap">
                       <Link
@@ -338,7 +402,11 @@ export default function FleetPage() {
                       {formatDate(row.provisioned_at)}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <HealthDot status={row.last_health_status} />
+                      <HealthDot
+                        status={
+                          row.status === "active" ? row.last_health_status : null
+                        }
+                      />
                     </td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <FleetRowActions row={row} onActionDone={onActionDone} />
