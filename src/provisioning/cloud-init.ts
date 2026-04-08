@@ -151,7 +151,7 @@ ${indent(caddyfile)}
 ${indent(backupSh)}
 
   - path: /opt/nestfleet/license.jwt
-    permissions: '0600'
+    permissions: '0644'
     content: |
       ${licenseToken}
 
