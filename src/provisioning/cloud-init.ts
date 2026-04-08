@@ -53,6 +53,7 @@ export interface CloudInitOpts {
   bundledLlmApiKey:       string
   bundledEmbeddingApiKey: string
   opsPublicKey:           string
+  fleetPublicKey?:        string   // FEAT-012: fleet key for license reissue (injected into authorized_keys)
   ghcrToken?:             string   // GHCR PAT for pulling images (omit if packages are public)
   backupS3Endpoint?:      string
   backupS3AccessKey?:     string
@@ -79,6 +80,7 @@ export async function generateCloudInit(opts: CloudInitOpts): Promise<string> {
     bundledLlmApiKey,
     bundledEmbeddingApiKey,
     opsPublicKey,
+    fleetPublicKey,
     ghcrToken,
   } = opts
 
@@ -156,7 +158,7 @@ ${indent(backupSh)}
       ${licenseToken}
 
 ssh_authorized_keys:
-  - ${opsPublicKey}
+  - ${opsPublicKey}${fleetPublicKey ? `\n  - ${fleetPublicKey}` : ""}
 
 runcmd:
   # Install Docker CE from official apt repo (supports docker compose plugin)
@@ -175,6 +177,9 @@ runcmd:
   - docker compose -f docker-compose.prod.yml up -d
   - echo "0 2 * * * root DATABASE_URL=\$(grep DATABASE_URL /opt/nestfleet/.env | cut -d= -f2-) /opt/nestfleet/scripts/backup.sh >> /var/log/nestfleet-backup.log 2>&1" > /etc/cron.d/nestfleet-backup
   - chmod 0644 /etc/cron.d/nestfleet-backup
+  # Docker housekeeping — prune images/containers older than 7 days, runs 03:00 daily
+  - echo "0 3 * * * root /usr/bin/docker system prune -af --filter 'until=168h' >> /var/log/docker-housekeep.log 2>&1" > /etc/cron.d/docker-housekeep
+  - chmod 0644 /etc/cron.d/docker-housekeep
 `
 }
 
