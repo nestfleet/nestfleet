@@ -1,6 +1,6 @@
 # NestFleet SaaS — Fleet Provisioning Architecture
 
-> **Status:** Phase A complete 2026-04-06 — Code + infra setup done. NF-OPS-03 ✅ (Hetzner firewall/token/SSH, Cloudflare token/zone, all .env vars set). NF-OPS-04 ✅ (compose reviewed, Gemini vars added, verify-compose.sh written). NF-OPS-07 ✅ (backup.sh S3 upload, cloud-init Gemini+S3 injection). Pending Phase B: spin up main NestFleet VPS + E2E smoke test (provision demo.nestfleet.dev, verify TLS + health + backups, deprovision).
+> **Status:** Phase B in progress (2026-04-07) — Main VPS live at nestfleet.dev. NF-OPS-03 ✅ NF-OPS-04 ✅ NF-OPS-07 ✅ OPS-IMAGE-01 ✅ OWN-NC ✅. Three cloud-init bugs fixed and deployed: Docker CE official repo, chpasswd expire:false, 50-attempt health poll. Stripe webhook URL corrected to /webhooks/stripe. smoke-test-10 failed (fix not deployed at trigger time). smoke-test-11 PENDING — blocked on Hetzner limit increase approval (requested 2026-04-07, Servers→50 / Primary IPs→50).
 > **Related backlog:** `docs/backlog.md` (FEAT-001, NF-OPS-02..08)
 > **Related:** `docs/business/saas-model-rationale.md`
 
@@ -17,7 +17,7 @@
 | `src/provisioning/hetzner-client.ts` | Hetzner Cloud API client |
 | `src/provisioning/cloudflare-client.ts` | Cloudflare DNS API client |
 | `src/provisioning/cloud-init.ts` | cloud-init YAML generator (embeds docker-compose, Caddyfile, backup.sh) |
-| `src/provisioning/health-poller.ts` | VPS health poll (60s delay, 30×15s attempts) |
+| `src/provisioning/health-poller.ts` | VPS health poll (60s delay, 50×15s attempts = 12.5 min window) |
 | `src/provisioning/provision.ts` | 7-step saga with per-step idempotency and compensation |
 | `src/provisioning/deprovision.ts` | Best-effort VPS + DNS cleanup; 30-day grace start |
 | `src/workers/provisioning-worker.ts` | pg-boss worker: `provision_vps` queue |
@@ -186,7 +186,7 @@ ProvisioningWorker.execute({ intent_id, slug, email, plan })
   3. Build cloud-init payload (see §4.1)
 
   4. POST api.hetzner.cloud/v1/servers
-       server_type: cx21
+       server_type: cx23  (cx21 deprecated)
        image:       ubuntu-22.04
        location:    nbg1  (Nuremberg — EU, GDPR)
        name:        nestfleet-{slug}
@@ -201,9 +201,9 @@ ProvisioningWorker.execute({ intent_id, slug, email, plan })
   6. Wait 60s (DNS TTL minimum before polling makes sense)
 
   7. Poll GET https://{slug}.nestfleet.dev/health
-       Retry strategy: 15s intervals, max 30 attempts (7.5 min total)
+       Retry strategy: 15s intervals, max 50 attempts (12.5 min total) + 60s initial delay
        Success: { status: 'ok', db: 'ok' }
-       Caddy ACME on first request adds ~30-60s on top of DNS wait
+       Caddy ACME on first request adds ~30-60s; Docker CE install takes ~3 min extra
 
   8. On health 200:
      a. Update provisionings: status = 'active', provisioned_at = now()
@@ -212,7 +212,7 @@ ProvisioningWorker.execute({ intent_id, slug, email, plan })
           Body: login URL, first-login instructions, docs link
      c. Log success
 
-  9. On poll timeout (30 attempts exhausted):
+  9. On poll timeout (50 attempts exhausted):
      a. Update provisionings: status = 'failed', error_message = 'health_timeout'
      b. Send ops alert to OPS_ALERT_EMAIL
      c. Do NOT delete VPS (ops may want to SSH in and debug)
@@ -234,9 +234,13 @@ The provisioning service generates the complete `.env` in memory and injects it 
 #cloud-config
 package_update: true
 packages:
-  - docker.io
-  - docker-compose-plugin
+  - ca-certificates
   - curl
+  - gnupg
+
+# CRITICAL: prevents SSH login being blocked by expired root password on Ubuntu cloud images
+chpasswd:
+  expire: false
 
 write_files:
   - path: /opt/nestfleet/.env
@@ -251,18 +255,21 @@ write_files:
       ENCRYPTION_KEY={encryption_key}
       REGISTRATION_ENABLED=true
       BILLING_ENABLED=false
-      LLM_PROVIDER=anthropic
+      LLM_PROVIDER=google
       LLM_API_KEY={bundled_llm_api_key}
-      LLM_MODEL=claude-sonnet-4-6
+      LLM_MODEL=gemini-2.5-flash-lite
+      LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
       EMBEDDING_PROVIDER=openai
       EMBEDDING_API_KEY={bundled_embedding_api_key}
-      EMBEDDING_MODEL=text-embedding-3-small
+      EMBEDDING_MODEL=gemini-embedding-001
+      EMBEDDING_DIMENSIONS=768
+      EMBEDDING_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
       CONSOLE_ORIGIN=https://{slug}.nestfleet.dev
       LOG_LEVEL=info
 
   - path: /opt/nestfleet/docker-compose.prod.yml
     content: |
-      {docker_compose_content}  ← embedded verbatim from repo
+      {docker_compose_content}  ← embedded verbatim from docker-compose.customer.yml
 
   - path: /opt/nestfleet/docker/Caddyfile.prod
     content: |
@@ -277,11 +284,27 @@ ssh_authorized_keys:
   - {OPS_SSH_PUBLIC_KEY}  ← NestFleet ops key for emergency access
 
 runcmd:
+  # Install Docker CE from official repo — docker.io from Ubuntu default apt is too old
+  # and does not include docker-compose-plugin (provides `docker compose` subcommand)
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  - chmod a+r /etc/apt/keyrings/docker.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+  - apt-get update -y
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  - systemctl enable docker && systemctl start docker
+  - mkdir -p /opt/nestfleet/docker /opt/nestfleet/scripts /opt/nestfleet/backups
   - cd /opt/nestfleet
   - docker compose -f docker-compose.prod.yml pull
   - docker compose -f docker-compose.prod.yml up -d
-  - echo "0 2 * * * root docker compose -f /opt/nestfleet/docker-compose.prod.yml run --rm backup" >> /etc/cron.d/nestfleet-backup
+  - echo "0 2 * * * root DATABASE_URL=$(grep DATABASE_URL /opt/nestfleet/.env | cut -d= -f2-) /opt/nestfleet/scripts/backup.sh >> /var/log/nestfleet-backup.log 2>&1" > /etc/cron.d/nestfleet-backup
+  - chmod 0644 /etc/cron.d/nestfleet-backup
 ```
+
+**Known cloud-init failure modes (all fixed as of 2026-04-07):**
+1. `docker-compose-plugin` not in Ubuntu 22.04 default apt → use Docker CE official repo (above)
+2. Root password expiry blocks SSH (no TTY error) → `chpasswd: {expire: false}` (above)
+3. `docker.io` installs old Docker 20.x without `compose` plugin → use `docker-ce` package
 
 **Why `write_files` over `git clone`:**
 - No external dependency at boot (GitHub outage cannot break provisioning)
@@ -322,13 +345,17 @@ Docker's internal network prevents them from being reachable outside the VPS reg
 
 | Scenario | Estimated time |
 |----------|---------------|
-| With `docker pull` (pre-built images in registry) | 3–5 min |
-| With `docker build` from source (current compose) | 7–10 min |
-| Health poll timeout | 7.5 min (30 × 15s) |
+| Docker CE install | ~3 min |
+| `docker compose pull` (GHCR images) | ~1–2 min |
+| Container startup + health check | ~1 min |
+| Caddy ACME certificate on first request | +30–60s |
+| **Total typical provisioning** | **~6–8 min** |
+| Health poll window | 12.5 min (50 × 15s + 60s initial delay) |
 
-**For Phase 1: keep `build:` in docker-compose.prod.yml and set health poll to 30 attempts.**
-When provisioning volume justifies it (Phase 1b, ~20+ customers), publish images to GHCR
-and switch compose to `image:` pull — reduces provisioning to 3–4 minutes reliably.
+**OPS-IMAGE-01 complete (2026-04-07):** GHCR images published at `ghcr.io/nestfleet/nestfleet-api:latest`
+and `ghcr.io/nestfleet/nestfleet-console:latest`. Both packages public — no auth needed on customer VPSes.
+`docker-compose.customer.yml` uses `image:` references. Health poll increased to 50 attempts to
+accommodate Docker CE install time.
 
 ---
 
@@ -544,7 +571,7 @@ E2E staging uses a separate Hetzner project and `*.staging.nestfleet.dev` subdom
 ## 13. What is NOT in Phase 1
 
 - Custom customer domains (`support.acme-corp.com`) — deferred to Phase 2
-- GHCR image publishing / `docker pull` provisioning — deferred to Phase 1b (~20 customers)
+- GHCR image publishing / `docker pull` provisioning — ✅ Done in OPS-IMAGE-01 (2026-04-07)
 - Per-customer virtual LLM API keys (Anthropic Workspaces) — deferred to Phase 2
 - Owner console fleet view (VPS health dashboard) — ✅ shipped in NF-OPS-01 (fleet-health-worker, /owner/fleet pages)
 - Automatic VPS resize on plan upgrade — not needed until Growth → Scale tier distinction matters

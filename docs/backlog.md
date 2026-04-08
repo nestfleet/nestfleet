@@ -14,7 +14,7 @@
 
 | ID | Title | Size | Priority | Status | Branch | Spec |
 |----|-------|------|----------|--------|--------|------|
-| FEAT-001 | SaaS Fleet Provisioning (umbrella) | XL | High | ⚡ Phase B — awaiting main VPS spin-up | `feat/FEAT-001-saas-fleet-provisioning` | [spec](specs/FEAT-001-saas-fleet-provisioning.md) |
+| FEAT-001 | SaaS Fleet Provisioning (umbrella) | XL | High | ⚡ Phase B — smoke-test-11 pending Hetzner limit increase approval (requested 2026-04-07) | `feat/FEAT-001-saas-fleet-provisioning` | [spec](specs/FEAT-001-saas-fleet-provisioning.md) |
 | NF-OPS-03 | One-Time Infra Setup (Cloudflare, Hetzner firewall, SSH key, DNS) | XS | P0 | ✅ Done | `feat/NF-OPS-03-infra-setup` | active-backlog §18 |
 | NF-OPS-04 | docker-compose.prod.yml Verification (health, backup service, smoke test) | XS | P0 | ✅ Done | `feat/NF-OPS-04-compose-verify` | active-backlog §18 |
 | NF-OPS-05 | Stripe Webhook Extension + DB Tables (signup_intents, provisionings, saas/signup) | M | P0 | ✅ Done | `feat/NF-OPS-05-stripe-webhook` | active-backlog §18 |
@@ -23,6 +23,7 @@
 | NF-OPS-08 | Provisioning Test Suite (unit + integration + E2E staging runbook) | M | P0 | ✅ Done | `feat/NF-OPS-08-provisioning-tests` | active-backlog §18 |
 | NF-OPS-06 | Deprovisioning on Churn (30-day grace, nightly pg-boss, Hetzner + CF cleanup) | S | P1 | ✅ Done | `feat/NF-OPS-06-deprovision` | active-backlog §18 |
 | NF-OPS-01 | Owner Admin Console (fleet health, revenue KPIs, telemetry pipeline + console UI) | XL | P2 | ✅ Done | `feat/NF-OPS-01-owner-console` | active-backlog §16 |
+| OWN-NC | Owner-initiated new customer provisioning (slug check, Stripe checkout URL gen, /owner/new-customer page, /signup/success page) | M | P1 | ✅ Done (2026-04-07) | `main` | — |
 
 ### Launch Setup (ORGA-01)
 
@@ -34,7 +35,7 @@
 | ORGA-01-S4 | Transactional email: Google Workspace SMTP, `noreply@nestfleet.dev`, remove Resend | XS | P0 | ✅ Done | [spec §4](ORGA-01-Launch-Setup.md#step-4) |
 | ORGA-01-S5 | GitHub org `nestfleet` + private repo (public flip deferred to v0.1.0) + deploy token | XS | P0 | ✅ Done | [spec §5](ORGA-01-Launch-Setup.md#step-5) |
 | ORGA-01-S6 | GitHub App `NestFleet` (App ID 3297524, under org, PAT removed) | S | P0 | ✅ Done | [spec §6](ORGA-01-Launch-Setup.md#step-6) |
-| ORGA-01-S8 | Prod infra: main Hetzner CX23 VPS, DNS A records, first deploy, deploy workflow | M | P0 | 🔄 In Progress (Phase B) | [spec §8](ORGA-01-Launch-Setup.md#step-8) |
+| ORGA-01-S8 | Prod infra: main Hetzner CX23 VPS, DNS A records, first deploy, deploy workflow | M | P0 | ✅ Done — main VPS live at nestfleet.dev, CI/CD running, GHCR images public | [spec §8](ORGA-01-Launch-Setup.md#step-8) |
 | ORGA-01-S9 | Stripe live keys + webhook endpoint + live price IDs | XS | P0 | Not Started (before first real customer) | [spec §9](ORGA-01-Launch-Setup.md#step-9) |
 
 ### Infrastructure
@@ -69,14 +70,14 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | Not Started | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. No backend changes needed for MVP; backend `?q=` param upgrade later. |
+| UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | ✅ Done (2026-04-07) | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. |
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
 
 ### SaaS Provisioning: Docker Registry (OPS-IMAGE-01)
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| OPS-IMAGE-01 | Publish Docker images to GHCR and update cloud-init to use `image:` refs | S | P0 | Not Started | Smoke test revealed: cloud-init embeds docker-compose.prod.yml which has `build: context: .` directives — but customer VPSes have no source code. VPS spins up but containers fail to start. Fix: build API + console images in CI (GitHub Actions), push to `ghcr.io/nestfleet/api:latest` + `ghcr.io/nestfleet/console:latest`, and update docker-compose.prod.yml to use `image:` instead of `build:`. Also fix server type: cx21→cx23 (cx21 deprecated). |
+| OPS-IMAGE-01 | Publish Docker images to GHCR and update cloud-init to use `image:` refs | S | P0 | ✅ Done (2026-04-07) | Images published to ghcr.io/nestfleet/nestfleet-api:latest + nestfleet-console:latest via docker-publish.yml on CI. Both packages public — no auth needed on customer VPSes. docker-compose.customer.yml uses `image:` refs. Also fixed cloud-init: Docker CE from official repo (not docker.io), chpasswd expire:false, 50-attempt health poll. |
 
 ### Landing Page & Legal
 

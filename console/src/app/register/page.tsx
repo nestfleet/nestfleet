@@ -4,18 +4,41 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
-import { ApiError } from "@/lib/api";
+import { apiFetch, ApiError } from "@/lib/api";
 
-export default function LoginPage() {
-  const { login, user, isLoading } = useAuth();
+const TOKEN_KEY = "nestfleet_token";
+
+interface RegisterResponse {
+  ok: boolean;
+  data: {
+    token: string;
+    user: { userId: string; email: string; roles: string[]; productIds: string[] };
+  };
+}
+
+async function registerApi(
+  email: string,
+  password: string,
+  displayName: string,
+): Promise<RegisterResponse> {
+  return apiFetch<RegisterResponse>("/api/v1/auth/register", {
+    method: "POST",
+    body: { email, password, displayName: displayName || undefined },
+    skipAuth: true,
+  });
+}
+
+export default function RegisterPage() {
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail]               = useState("");
+  const [password, setPassword]         = useState("");
+  const [displayName, setDisplayName]   = useState("");
+  const [error, setError]               = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect if already authenticated
+  // Already authenticated → go straight to app
   useEffect(() => {
     if (!isLoading && user) {
       router.replace("/app/resolve-product");
@@ -28,14 +51,20 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(email.trim(), password);
-      router.replace("/app/resolve-product");
+      const res = await registerApi(email.trim(), password, displayName.trim());
+      // Store token and redirect to setup wizard
+      localStorage.setItem(TOKEN_KEY, res.data.token);
+      router.replace("/setup");
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401) {
-          setError("Invalid email or password. Please try again.");
+        if (err.status === 404) {
+          setError("Account creation is not enabled on this instance. Contact your administrator.");
+        } else if (err.status === 409) {
+          setError("An account with this email already exists. Please sign in.");
+        } else if (err.status === 400) {
+          setError("Please check your inputs and try again.");
         } else {
-          setError(`Login failed: ${err.message}`);
+          setError(`Registration failed: ${err.message}`);
         }
       } else {
         setError("An unexpected error occurred. Is the API server running?");
@@ -75,8 +104,8 @@ export default function LoginPage() {
             </svg>
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900">NestFleet Console</h1>
-            <p className="mt-1 text-sm text-gray-500">Sign in to your operator account</p>
+            <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+            <p className="mt-1 text-sm text-gray-500">Set up your NestFleet admin account</p>
           </div>
         </div>
 
@@ -107,12 +136,27 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Display Name */}
+            <div className="space-y-1.5">
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700">
+                Your name
+                <span className="ml-1 font-normal text-gray-400">(optional)</span>
+              </label>
+              <input
+                id="displayName"
+                type="text"
+                autoComplete="name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                disabled={isSubmitting}
+                placeholder="Jane Smith"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 disabled:text-gray-400"
+              />
+            </div>
+
             {/* Email */}
             <div className="space-y-1.5">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
               <input
@@ -123,28 +167,25 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubmitting}
-                placeholder="operator@example.com"
+                placeholder="you@yourcompany.com"
                 className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 disabled:text-gray-400"
               />
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
               <input
                 id="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isSubmitting}
-                placeholder="••••••••"
+                placeholder="At least 8 characters"
                 className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 disabled:text-gray-400"
               />
             </div>
@@ -161,19 +202,19 @@ export default function LoginPage() {
                     className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
                     aria-hidden="true"
                   />
-                  Signing in...
+                  Creating account…
                 </>
               ) : (
-                "Sign in"
+                "Create account"
               )}
             </button>
           </form>
         </div>
 
         <p className="mt-5 text-center text-sm text-gray-500">
-          First time here?{" "}
-          <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-            Create your account
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+            Sign in
           </Link>
         </p>
 
