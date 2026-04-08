@@ -32,10 +32,10 @@ const PLANS: PlanMeta[] = [
     name:    "Community",
     price:   "$0",
     period:  "forever · free · AGPL-3.0 open source",
-    desc:    "One product for developers, OSS projects, and personal experiments. No time limit.",
-    limits:  ["1 active product", "100 Outcome Units / month", "Email channel", "Community support"],
-    cta:     "Get started free",
-    ctaHref: "/signup",
+    desc:    "For developers, OSS projects, and personal experiments. No time limit.",
+    limits:  ["Unlimited products", "100 Outcome Units / month", "Email channel", "Community support"],
+    cta:     "Self-host free on GitHub",
+    ctaHref: "https://github.com/nestfleet/nestfleet",
     popular: false,
     badge:   null,
     prev:    null,
@@ -196,16 +196,31 @@ function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; 
         )}
       </ul>
 
-      <Link
-        href={plan.ctaHref}
-        className={`block w-full rounded-xl py-3 text-center text-sm font-bold transition-all active:scale-95 ${
-          plan.popular
-            ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200"
-            : "border border-gray-200 text-gray-700 hover:border-indigo-200 hover:text-indigo-700 hover:bg-indigo-50"
-        }`}
-      >
-        {plan.cta}
-      </Link>
+      {plan.ctaHref.startsWith("http") || plan.ctaHref.startsWith("mailto") ? (
+        <a
+          href={plan.ctaHref}
+          target={plan.ctaHref.startsWith("http") ? "_blank" : undefined}
+          rel={plan.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+          className={`block w-full rounded-xl py-3 text-center text-sm font-bold transition-all active:scale-95 ${
+            plan.popular
+              ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200"
+              : "border border-gray-200 text-gray-700 hover:border-indigo-200 hover:text-indigo-700 hover:bg-indigo-50"
+          }`}
+        >
+          {plan.cta}
+        </a>
+      ) : (
+        <Link
+          href={plan.ctaHref}
+          className={`block w-full rounded-xl py-3 text-center text-sm font-bold transition-all active:scale-95 ${
+            plan.popular
+              ? "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200"
+              : "border border-gray-200 text-gray-700 hover:border-indigo-200 hover:text-indigo-700 hover:bg-indigo-50"
+          }`}
+        >
+          {plan.cta}
+        </Link>
+      )}
     </div>
   );
 }

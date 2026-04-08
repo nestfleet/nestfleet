@@ -1,0 +1,43 @@
+# NestFleet self-hosted Caddyfile
+#
+# For local dev:  NESTFLEET_DOMAIN defaults to "localhost" → plain HTTP, no TLS.
+# For production: set NESTFLEET_DOMAIN=yourcompany.example.com in .env and open
+#                 ports 80 + 443 — Caddy auto-provisions a Let's Encrypt cert.
+
+{$NESTFLEET_DOMAIN:localhost} {
+
+  # ── SSE / WebSocket (socket.io) ─────────────────────────────────────────────
+  @socketio {
+    path /socket.io/*
+  }
+  reverse_proxy @socketio api:3001 {
+    header_up Connection {http.request.header.Connection}
+    header_up Upgrade {http.request.header.Upgrade}
+  }
+
+  # ── API + webhooks + health ──────────────────────────────────────────────────
+  @api {
+    path /api/*
+    path /webhooks/*
+    path /health
+  }
+  reverse_proxy @api api:3001
+
+  # ── Console (Next.js) ────────────────────────────────────────────────────────
+  # Everything else goes to the Next.js console.
+  reverse_proxy console:3000
+
+  # ── Security headers ─────────────────────────────────────────────────────────
+  header {
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    -Server
+  }
+
+  # ── Logging ───────────────────────────────────────────────────────────────────
+  log {
+    output stderr
+    format json
+  }
+}

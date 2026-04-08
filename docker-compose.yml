@@ -1,0 +1,95 @@
+# Self-hosted / community compose file.
+# For NestFleet.dev SaaS operator use: docker-compose.prod.yml
+# For customer VPS provisioning: docker-compose.customer.yml
+#
+# Usage:
+#   cp .env.example .env   # set JWT_SECRET, ENCRYPTION_KEY, LLM_API_KEY
+#   docker compose up -d
+#
+# Console → http://localhost:3000  (or https://{NESTFLEET_DOMAIN} in production)
+
+name: nestfleet
+
+services:
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       nestfleet
+      POSTGRES_USER:     nestfleet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nestfleet}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nestfleet -d nestfleet"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - nestfleet
+
+  # ── NestFleet API ───────────────────────────────────────────────────────────
+  api:
+    image: ghcr.io/nestfleet/nestfleet-api:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # Internal defaults — override in .env as needed
+      NODE_ENV:     production
+      PORT:         3001
+      DATABASE_URL: postgres://nestfleet:${POSTGRES_PASSWORD:-nestfleet}@postgres:5432/nestfleet
+    # Port 3001 is NOT published externally — traffic goes through Caddy only.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:3001/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - nestfleet
+
+  # ── NestFleet Console ───────────────────────────────────────────────────────
+  console:
+    image: ghcr.io/nestfleet/nestfleet-console:latest
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    networks:
+      - nestfleet
+
+  # ── Caddy reverse proxy + TLS ───────────────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - console
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile.selfhost:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      NESTFLEET_DOMAIN: ${NESTFLEET_DOMAIN:-localhost}
+    networks:
+      - nestfleet
+
+networks:
+  nestfleet:
+    driver: bridge
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

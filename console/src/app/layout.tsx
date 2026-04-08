@@ -4,8 +4,8 @@ import { AuthProvider } from "@/lib/auth";
 import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
-  title: "NestFleet Console",
-  description: "Operator console for NestFleet incident management",
+  title: "NestFleet",
+  description: "NestFleet operator console",
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>",
   },
