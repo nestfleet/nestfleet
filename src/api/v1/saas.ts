@@ -138,13 +138,30 @@ saasRouter.get("/status/:intentId", async (c) => {
   if (!intent) throw new NotFoundError("signup_intent", intentId)
 
   const prov = await findProvisioningByIntentId(intentId)
+  const status = prov?.status ?? "pending_payment"
+
+  // Derive provisioning step from DB state so the frontend can render a progress bar:
+  //   1 = payment received, job queued (status = pending)
+  //   2 = creating VPS              (provisioning, no hetzner_server_id yet)
+  //   3 = configuring DNS           (provisioning, VPS ready, no cloudflare_record_id)
+  //   4 = health polling            (provisioning, VPS + DNS ready)
+  //   null for terminal states (pending_payment / active / failed)
+  let step: number | null = null
+  if (status === "pending") {
+    step = 1
+  } else if (status === "provisioning") {
+    if (!prov?.hetzner_server_id) step = 2
+    else if (!prov?.cloudflare_record_id) step = 3
+    else step = 4
+  }
 
   return c.json({
-    ok:     true,
-    status: prov?.status ?? "pending_payment",
-    slug:   intent.org_slug,
+    ok:   true,
+    status,
+    slug: intent.org_slug,
+    ...(step !== null ? { step } : {}),
     ...(prov?.provisioned_at ? { provisionedAt: prov.provisioned_at } : {}),
-    ...(prov?.status === "failed" ? { error: prov.error_message } : {}),
+    ...(status === "failed" ? { error: prov?.error_message } : {}),
   })
 })
 
