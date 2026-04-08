@@ -152,10 +152,12 @@ describe("generateCloudInit", () => {
     expect(yaml).toContain("LICENSE_FILE_PATH=/opt/nestfleet/license.jwt")
   })
 
-  it("NF-UNIT-CLINIT-15: write_files contains /opt/nestfleet/license.jwt entry with the token", async () => {
+  it("NF-UNIT-CLINIT-15: write_files contains /opt/nestfleet/license.jwt with token and 0644 permissions", async () => {
     const yaml = await generateCloudInit(BASE_OPTS)
     expect(yaml).toContain("path: /opt/nestfleet/license.jwt")
     expect(yaml).toContain(DUMMY_LICENSE_TOKEN)
+    // 0644 so the nestfleet container user (uid=999) can read it
+    expect(yaml).toContain("permissions: '0644'")
   })
 
   it("NF-UNIT-CLINIT-16: docker-compose.customer.yml bind-mounts license.jwt into the api container", async () => {
