@@ -296,8 +296,8 @@ async function sendWelcomeEmail(slug: string, email: string, baseDomain: string)
       `Your NestFleet instance is live at ${loginUrl}`,
       "",
       "Next steps:",
-      "  1. Open the link above",
-      "  2. Create your admin account (click 'Register')",
+      `  1. Open ${loginUrl}/register`,
+      "  2. Create your admin account",
       "  3. Complete the setup wizard to configure your first product",
       "",
       "Documentation: https://nestfleet.dev/docs",
@@ -306,8 +306,7 @@ async function sendWelcomeEmail(slug: string, email: string, baseDomain: string)
     html: `<p>Your NestFleet instance is live at <a href="${loginUrl}">${loginUrl}</a></p>
 <p><strong>Next steps:</strong></p>
 <ol>
-  <li>Open the link above</li>
-  <li>Create your admin account (click 'Register')</li>
+  <li><a href="${loginUrl}/register">Open the registration page</a> to create your admin account</li>
   <li>Complete the setup wizard to configure your first product</li>
 </ol>
 <p>
