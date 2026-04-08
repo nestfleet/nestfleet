@@ -102,3 +102,53 @@ describe("Setup API (integration)", () => {
     expect(res.status).toBe(400)
   }, 30_000)
 })
+
+describe("Setup API — product-to-user linking (NF-INT-127)", () => {
+  let ctx: TestDbContext
+
+  beforeAll(async () => {
+    ctx = await setupTestDb()
+  }, 60_000)
+
+  afterAll(async () => {
+    await ctx.teardown()
+  })
+
+  it("NF-INT-127: setup/complete with Authorization header links product to the registered user", async () => {
+    // 1. Register a new user — token has productIds: []
+    const regRes = await app.request("/api/v1/auth/register", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email: "link-test@example.com", password: "SecurePass123" }),
+    })
+    expect(regRes.status).toBe(201)
+    const regBody = await regRes.json() as Record<string, unknown>
+    const regData = regBody.data as Record<string, unknown>
+    const registerToken = regData.token as string
+
+    // 2. Call setup/complete WITH the register token
+    const setupRes = await app.request("/api/v1/setup/complete", {
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${registerToken}`,
+      },
+      body: JSON.stringify({ productName: "Auth Link Test Product" }),
+    })
+    expect(setupRes.status).toBe(200)
+    const setupBody = await setupRes.json() as Record<string, unknown>
+    const productId = (setupBody.data as Record<string, unknown>).productId as string
+    expect(productId).toBeTruthy()
+
+    // 3. Log in again — the new JWT must contain the productId (read from DB)
+    const loginRes = await app.request("/api/v1/auth/login", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ email: "link-test@example.com", password: "SecurePass123" }),
+    })
+    expect(loginRes.status).toBe(200)
+    const loginBody = await loginRes.json() as Record<string, unknown>
+    const productIds = (loginBody.user as Record<string, unknown>).productIds as string[]
+    expect(productIds).toContain(productId)
+  }, 30_000)
+})
