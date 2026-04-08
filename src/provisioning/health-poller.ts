@@ -53,7 +53,7 @@ export async function pollUntilHealthy(opts: PollOpts): Promise<PollResult> {
     logger.info({ slug, attempt, maxAttempts, healthUrl }, "Health poller: polling")
 
     let healthy = false
-    let healthStatus: "ok" | "degraded" | "unreachable" = "unreachable"
+    let healthStatus: string = "unreachable"
 
     try {
       const res = await fetch(healthUrl, {
@@ -61,15 +61,21 @@ export async function pollUntilHealthy(opts: PollOpts): Promise<PollResult> {
       })
 
       if (res.ok) {
-        const body = await res.json() as { status?: string; db?: string }
+        const body = await res.json() as { status?: string; db?: string; queue?: string }
         if (body.status === "ok" && body.db === "ok") {
           healthy      = true
           healthStatus = "ok"
         } else {
-          healthStatus = "degraded"
+          // Store partial detail so owner console can show db/queue state
+          healthStatus = JSON.stringify({
+            status: body.status ?? "unknown",
+            db:     body.db    ?? "unknown",
+            queue:  body.queue ?? "unknown",
+          })
           logger.info({ slug, attempt, body }, "Health poller: degraded response")
         }
       } else {
+        healthStatus = `http_${res.status}`
         logger.info({ slug, attempt, status: res.status }, "Health poller: non-200 response")
       }
     } catch (err) {

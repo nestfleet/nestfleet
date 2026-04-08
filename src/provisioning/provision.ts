@@ -243,13 +243,27 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
     })
 
     if (pollResult === "timeout") {
+      // Clean up the Cloudflare DNS record — it points to an unhealthy VPS and
+      // will be recreated by the retry saga. The Hetzner VPS is intentionally kept
+      // alive so ops can SSH in and investigate.
+      if (prov.cloudflare_record_id) {
+        const cloudflare = createCloudflareClient(config.CLOUDFLARE_API_TOKEN!)
+        try {
+          await cloudflare.deleteDnsRecord(config.CLOUDFLARE_ZONE_ID!, prov.cloudflare_record_id)
+          logger.info({ slug }, "Provisioning: DNS record removed after health timeout")
+        } catch (err) {
+          logger.warn({ err, slug }, "Provisioning: DNS delete after timeout failed — manual cleanup needed")
+        }
+      }
+
       await updateProvisioning(prov.id, {
-        status:        "failed",
-        error_message: "health_timeout: VPS did not become healthy within 12.5 minutes",
+        status:               "failed",
+        error_message:        "health_timeout: VPS did not become healthy within 12.5 minutes",
+        cloudflare_record_id: null,   // cleared so retry recreates the DNS record
       })
       await sendOpsAlert(
         `[NestFleet] Provisioning health timeout: ${slug}`,
-        `VPS for ${slug} (intent: ${intentId}) did not become healthy within 12.5 minutes.\n\nVPS IP: ${prov.hetzner_server_ip}\nHetzner server ID: ${prov.hetzner_server_id}\n\nThe VPS has NOT been deleted — SSH in to investigate.\nOnce fixed, use the owner console retry action to re-check health and send the welcome email.`,
+        `VPS for ${slug} (intent: ${intentId}) did not become healthy within 12.5 minutes.\n\nVPS IP: ${prov.hetzner_server_ip}\nHetzner server ID: ${prov.hetzner_server_id}\n\nThe VPS has NOT been deleted — SSH in to investigate.\nDNS record has been removed.\nOnce fixed, use the owner console retry action to re-check health and send the welcome email.`,
       )
       // Do not throw — job completes without error so pg-boss doesn't retry.
       // Ops uses the owner console /retry action to resume.

@@ -160,6 +160,8 @@ saasRouter.get("/status/:intentId", async (c) => {
     status,
     slug: intent.org_slug,
     ...(step !== null ? { step } : {}),
+    ...(step === 4 && prov?.last_health_status ? { healthDetail: prov.last_health_status } : {}),
+    ...(step === 4 && prov?.last_health_check_at ? { lastHealthCheckAt: prov.last_health_check_at } : {}),
     ...(prov?.provisioned_at ? { provisionedAt: prov.provisioned_at } : {}),
     ...(status === "failed" ? { error: prov?.error_message } : {}),
   })

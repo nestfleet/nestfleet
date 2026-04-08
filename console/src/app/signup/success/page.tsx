@@ -10,13 +10,21 @@ type ProvisioningStatus =
   | "active"
   | "failed";
 
+interface HealthDetail {
+  status: string;
+  db:     string;
+  queue:  string;
+}
+
 interface StatusResponse {
-  ok:            boolean;
-  status:        ProvisioningStatus;
-  slug:          string;
-  step?:         number;
-  provisionedAt?: string;
-  error?:        string;
+  ok:               boolean;
+  status:           ProvisioningStatus;
+  slug:             string;
+  step?:            number;
+  healthDetail?:    string;   // JSON string or "ok"/"unreachable"/etc.
+  lastHealthCheckAt?: string;
+  provisionedAt?:   string;
+  error?:           string;
 }
 
 interface ProvStep {
@@ -38,7 +46,22 @@ function activeStepIndex(status: ProvisioningStatus, step: number | undefined): 
   return -1;
 }
 
-function StepList({ status, step }: { status: ProvisioningStatus; step?: number }) {
+function parseHealthDetail(raw: string | null): HealthDetail | null {
+  if (!raw || raw === "ok" || raw === "unreachable") return null;
+  try { return JSON.parse(raw) as HealthDetail; } catch { return null; }
+}
+
+function HealthBadge({ label, value }: { label: string; value: string }) {
+  const ok = value === "ok" || value === "started";
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs ${ok ? "text-emerald-400" : "text-amber-400"}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${ok ? "bg-emerald-400" : "bg-amber-400"}`} />
+      {label}: {value}
+    </span>
+  );
+}
+
+function StepList({ status, step, healthDetail }: { status: ProvisioningStatus; step?: number; healthDetail?: string | null }) {
   const activeIdx = activeStepIndex(status, step);
   const isDone    = status === "active";
   const isFailed  = status === "failed";
@@ -80,6 +103,16 @@ function StepList({ status, step }: { status: ProvisioningStatus; step?: number 
               {active && (
                 <p className="text-xs text-slate-500 mt-0.5">{s.detail}</p>
               )}
+              {active && i === 3 && (() => {
+                const detail = parseHealthDetail(healthDetail ?? null);
+                return detail ? (
+                  <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
+                    <HealthBadge label="API"   value={detail.status} />
+                    <HealthBadge label="DB"    value={detail.db} />
+                    <HealthBadge label="Queue" value={detail.queue} />
+                  </div>
+                ) : null;
+              })()}
             </div>
           </li>
         );
@@ -100,11 +133,12 @@ function SignupSuccessContent() {
   const params   = useSearchParams();
   const intentId = params.get("intent");
 
-  const [status, setStatus] = useState<ProvisioningStatus>("pending_payment");
-  const [step,   setStep]   = useState<number | undefined>(undefined);
-  const [slug,   setSlug]   = useState<string>("");
-  const [error,  setError]  = useState<string | null>(null);
-  const [done,   setDone]   = useState(false);
+  const [status,       setStatus]       = useState<ProvisioningStatus>("pending_payment");
+  const [step,         setStep]         = useState<number | undefined>(undefined);
+  const [slug,         setSlug]         = useState<string>("");
+  const [healthDetail, setHealthDetail] = useState<string | null>(null);
+  const [error,        setError]        = useState<string | null>(null);
+  const [done,         setDone]         = useState(false);
 
   useEffect(() => {
     if (!intentId) return;
@@ -117,6 +151,7 @@ function SignupSuccessContent() {
         setStatus(body.status);
         setStep(body.step);
         setSlug(body.slug ?? "");
+        setHealthDetail(body.healthDetail ?? null);
         if (body.error) setError(body.error);
         if (body.status === "active" || body.status === "failed") setDone(true);
       } catch {
@@ -178,7 +213,7 @@ function SignupSuccessContent() {
         </p>
 
         {/* Step list — shown while provisioning */}
-        {inProgress && <StepList status={status} step={step} />}
+        {inProgress && <StepList status={status} step={step} healthDetail={healthDetail} />}
 
         {/* All steps done checkmark when active */}
         {status === "active" && <StepList status="active" step={undefined} />}
