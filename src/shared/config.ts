@@ -157,9 +157,12 @@ const ConfigSchema = z.object({
   OPS_ALERT_EMAIL: z.string().email().optional(),
   // SSH public key injected into all customer VPSes for break-glass access
   OPS_SSH_PUBLIC_KEY:    z.string().optional(),
-  // FEAT-012: SSH private key (PEM) for license reissue operations
-  FLEET_SSH_PRIVATE_KEY: z.string().optional(),
-  FLEET_SSH_USER:        z.string().default("root"),
+  // FEAT-012: SSH private key for license reissue operations.
+  // Use FLEET_SSH_PRIVATE_KEY_B64 (base64-encoded PEM) to avoid multiline .env issues.
+  // If both are set, FLEET_SSH_PRIVATE_KEY takes precedence.
+  FLEET_SSH_PRIVATE_KEY:     z.string().optional(),
+  FLEET_SSH_PRIVATE_KEY_B64: z.string().optional(),
+  FLEET_SSH_USER:            z.string().default("root"),
   // Bundled LLM API keys — written into each customer VPS .env at provision time
   // (customers on managed SaaS don't need their own keys)
   BUNDLED_LLM_API_KEY: z.string().optional(),
@@ -198,3 +201,16 @@ function parseConfig(): Config {
 
 // Singleton — parsed once at startup
 export const config: Config = parseConfig()
+
+/**
+ * Returns the fleet SSH private key as a PEM string.
+ * Prefers FLEET_SSH_PRIVATE_KEY (raw PEM); falls back to decoding FLEET_SSH_PRIVATE_KEY_B64.
+ * Returns undefined if neither is set.
+ */
+export function getFleetSshPrivateKey(): string | undefined {
+  if (config.FLEET_SSH_PRIVATE_KEY) return config.FLEET_SSH_PRIVATE_KEY
+  if (config.FLEET_SSH_PRIVATE_KEY_B64) {
+    return Buffer.from(config.FLEET_SSH_PRIVATE_KEY_B64, "base64").toString("utf8")
+  }
+  return undefined
+}

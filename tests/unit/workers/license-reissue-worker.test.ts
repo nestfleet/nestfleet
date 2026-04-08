@@ -44,6 +44,7 @@ vi.mock("../../../src/shared/config.js", () => ({
     FLEET_SSH_USER:        "root",
     CUSTOMER_BASE_DOMAIN:  "nestfleet.dev",
   },
+  getFleetSshPrivateKey: vi.fn().mockReturnValue("fake-private-key"),
 }))
 
 vi.mock("../../../src/shared/logger.js", () => ({
