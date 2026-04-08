@@ -175,8 +175,11 @@ export default function SettingsPage() {
           <div className="flex-1 min-w-0 max-w-2xl">
             <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
               {/* Product section reads from context — independent of settings API */}
+              {/* Plan section fetches its own data — independent of product settings API */}
               {activeSection === "product" ? (
                 <ProductSection />
+              ) : activeSection === "plan" ? (
+                isAdmin ? <LicenseSection stripeReturn={stripeReturn} onStripeReturnHandled={() => setStripeReturn(null)} /> : <AdminOnlyNotice />
               ) : isLoading ? (
                 <div className="flex items-center justify-center py-10">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
@@ -200,7 +203,6 @@ export default function SettingsPage() {
                   {activeSection === "chat" && <ChatWidgetSection key={productId} settings={settings} />}
                   {activeSection === "roles" && <RolesSection />}
                   {activeSection === "users" && (isAdmin ? <UsersSection /> : <AdminOnlyNotice />)}
-                  {activeSection === "plan" && (isAdmin ? <LicenseSection stripeReturn={stripeReturn} onStripeReturnHandled={() => setStripeReturn(null)} /> : <AdminOnlyNotice />)}
                 </>
               ) : null}
             </div>
@@ -1845,6 +1847,15 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
 
   const plan      = billing?.plan ?? "community";
   const isPaid    = plan === "starter" || plan === "growth" || plan === "scale";
+
+  // Upgrade options: filter out plans the user is already on or above.
+  // When billing is not active (BILLING_ENABLED=false on customer VPS), use the
+  // license JWT tier as the effective rank so Starter installs only see Growth.
+  const TIER_RANK: Record<string, number> = { community: 0, trial: 0, starter: 1, growth: 2, scale: 3 }
+  const effectiveRank = TIER_RANK[isPaid ? plan : (tier ?? "community")] ?? 0
+  const availableUpgrades = PLAN_OPTIONS.filter(
+    (opt) => (TIER_RANK[opt.id.toLowerCase()] ?? 0) > effectiveRank,
+  )
   const isCanceling = !!billing?.cancelAt;
   const productPct  = license ? Math.min(100, (license.currentProducts / Math.max(1, license.productLimit)) * 100) : 0;
   const tierColor   = TIER_COLORS[tier ?? "community"] ?? "bg-gray-100 text-gray-700";
@@ -1983,8 +1994,8 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
         )}
       </div>
 
-      {/* Upgrade CTAs — community plan */}
-      {!isPaid && (
+      {/* Upgrade CTAs — shown only when higher-tier plans are available */}
+      {!isPaid && availableUpgrades.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h3 className="text-sm font-medium text-gray-700">Upgrade your plan</h3>
@@ -2004,7 +2015,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {PLAN_OPTIONS.map((opt) => {
+            {availableUpgrades.map((opt) => {
               const planKey = opt.id.toLowerCase() as "starter" | "growth";
               const isLoading = checkoutLoading === `${planKey}-${billingInterval}`;
               return (
