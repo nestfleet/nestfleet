@@ -14,7 +14,7 @@
 import type { Job } from "pg-boss"
 import { getBoss } from "../infra/queue/boss.js"
 import { logger } from "../shared/logger.js"
-import { config } from "../shared/config.js"
+import { config, getFleetSshPrivateKey } from "../shared/config.js"
 import { decryptSecret } from "../shared/crypto.js"
 import {
   findProvisioningBySlug,
@@ -97,10 +97,22 @@ export async function executeLicenseReissue(payload: LicenseReissuePayload): Pro
   await updateLicenseReissue(reissueId, { pending_jwt: signedJwt })
 
   // ── Step 4 + 5: SSH write + restart ───────────────────────────────────────
+  const privateKey = getFleetSshPrivateKey()
+  if (!privateKey) {
+    log.error("LicenseReissueWorker: FLEET_SSH_PRIVATE_KEY / FLEET_SSH_PRIVATE_KEY_B64 not configured")
+    await updateLicenseReissue(reissueId, {
+      status:       "failed",
+      failed_reason: "SSH private key not configured on this instance",
+      completed_at: new Date(),
+    })
+    await updateProvisioning(prov.id, { reissue_status: "failed" })
+    return
+  }
+
   const sshOpts = {
     host:       prov.hetzner_server_ip!,
     username:   config.FLEET_SSH_USER,
-    privateKey: config.FLEET_SSH_PRIVATE_KEY!,
+    privateKey,
     timeoutMs:  60_000,
   }
 
