@@ -10,6 +10,10 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ARG NEXT_PUBLIC_PRODUCT_ID=""
 ENV NEXT_PUBLIC_PRODUCT_ID=${NEXT_PUBLIC_PRODUCT_ID}
 
+# Set to "true" to show the marketing landing page at /. Leave empty for app-only builds.
+ARG NEXT_PUBLIC_SHOW_LANDING=""
+ENV NEXT_PUBLIC_SHOW_LANDING=${NEXT_PUBLIC_SHOW_LANDING}
+
 WORKDIR /app
 
 # node-gyp deps (needed by some native npm packages)
