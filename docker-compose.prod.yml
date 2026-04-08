@@ -42,9 +42,7 @@ services:
 
   # ── NestFleet API ───────────────────────────────────────────────────────────
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/nestfleet/nestfleet-api:latest
     restart: unless-stopped
     depends_on:
       postgres:
@@ -125,16 +123,11 @@ services:
 
   # ── NestFleet Console ───────────────────────────────────────────────────────
   console:
-    build:
-      context: ./console
-      dockerfile: Dockerfile
-      args:
-        # Same-origin routing — Caddy proxies /api/* to the API service.
-        # Leave empty so the browser uses the current origin for API calls.
-        NEXT_PUBLIC_API_URL: ""
-        # Product ID baked into the console build (single-product deployment).
-        # Set in .env on the VPS after the first product is created via setup wizard.
-        NEXT_PUBLIC_PRODUCT_ID: ${NEXT_PUBLIC_PRODUCT_ID:-}
+    image: ghcr.io/nestfleet/nestfleet-console:latest
+    # Console image is built by CI with NEXT_PUBLIC_PRODUCT_ID baked in.
+    # On the main VPS (nestfleet.dev) this image is pulled from GHCR.
+    # On customer VPSes it is rebuilt locally during provisioning so the
+    # correct per-customer product ID is embedded.
     restart: unless-stopped
     depends_on:
       - api
