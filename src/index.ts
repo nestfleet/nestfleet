@@ -35,6 +35,7 @@ import { registerDigestCron } from "./workers/digest-cron.js"
 import { registerProvisioningWorker } from "./workers/provisioning-worker.js"
 import { registerDeprovisionScheduler } from "./workers/deprovision-scheduler.js"
 import { registerFleetHealthWorker } from "./workers/fleet-health-worker.js"
+import { registerLicenseReissueWorker } from "./workers/license-reissue-worker.js"
 
 async function main(): Promise<void> {
   logger.info({ version: "0.1.0", env: config.NODE_ENV }, "NestFleet starting")
@@ -72,6 +73,7 @@ async function main(): Promise<void> {
       workerRegistrations.push(registerProvisioningWorker())
       workerRegistrations.push(registerDeprovisionScheduler())
       workerRegistrations.push(registerFleetHealthWorker())
+      workerRegistrations.push(registerLicenseReissueWorker())
     }
 
     await Promise.all(workerRegistrations)

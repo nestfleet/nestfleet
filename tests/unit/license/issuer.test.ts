@@ -11,6 +11,8 @@
  * NF-UNIT-LIC-08  scale features are a superset of growth features
  * NF-UNIT-LIC-09  unknown plan throws with descriptive error
  * NF-UNIT-LIC-10  standard JWT exp claim matches expiresAt custom field
+ * NF-UNIT-LIC-11  custom expiresAt Date is honoured in both exp and expiresAt fields
+ * NF-UNIT-LIC-12  expiresAt omitted → default ~1 year (backwards-compatible)
  */
 
 import { describe, it, expect } from "vitest"
@@ -125,5 +127,24 @@ describe("issueLicenseToken", () => {
     const token = issueLicenseToken({ slug: SLUG, plan: "starter", licenseSecret: SECRET, customerEmail: EMAIL })
     const payload = decode(token, SECRET)
     expect(payload["exp"]).toBe(payload["expiresAt"])
+  })
+
+  it("NF-UNIT-LIC-11: custom expiresAt Date is honoured in exp and expiresAt", () => {
+    const customExpiry = new Date("2028-01-01T00:00:00.000Z")
+    const expectedSecs = Math.floor(customExpiry.getTime() / 1000)
+    const token = issueLicenseToken({ slug: SLUG, plan: "growth", licenseSecret: SECRET, customerEmail: EMAIL, expiresAt: customExpiry })
+    const payload = decode(token, SECRET)
+    expect(payload["expiresAt"]).toBe(expectedSecs)
+    expect(payload["exp"]).toBe(expectedSecs)
+  })
+
+  it("NF-UNIT-LIC-12: omitting expiresAt keeps default 1-year behaviour", () => {
+    const before = Math.floor(Date.now() / 1000)
+    const token = issueLicenseToken({ slug: SLUG, plan: "starter", licenseSecret: SECRET, customerEmail: EMAIL })
+    const after  = Math.floor(Date.now() / 1000)
+    const payload = decode(token, SECRET)
+    const oneYear = 365 * 24 * 60 * 60
+    expect(payload["expiresAt"] as number).toBeGreaterThanOrEqual(before + oneYear - 2)
+    expect(payload["expiresAt"] as number).toBeLessThanOrEqual(after  + oneYear + 2)
   })
 })

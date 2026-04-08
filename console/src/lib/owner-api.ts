@@ -63,6 +63,43 @@ export interface Provisioning {
   last_health_status: string | null;
   error_message: string | null;
   created_at: string;
+  // FEAT-012: license fields
+  license_tier: string | null;
+  license_expires_at: string | null;
+  reissue_status: "idle" | "in_progress" | "failed" | null;
+}
+
+export interface LicenseReissue {
+  id: string;
+  provisioning_id: string;
+  performed_by: string;
+  previous_tier: string;
+  new_tier: string;
+  previous_expires_at: string | null;
+  new_expires_at: string;
+  reason: string;
+  status: "pending" | "complete" | "failed";
+  failed_reason: string | null;
+  pending_jwt: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+export interface LicenseHistoryResponse {
+  ok: boolean;
+  data: LicenseReissue[];
+}
+
+export interface ReissueResponse {
+  ok: boolean;
+  jobId: string;
+  reissueId: string;
+}
+
+export interface BulkReissueResponse {
+  ok: boolean;
+  queued: number;
+  jobIds: string[];
 }
 
 export interface FleetResponse {
@@ -212,6 +249,51 @@ export async function postOwnerNewCustomerApi(
   body: NewCustomerRequest
 ): Promise<NewCustomerResponse> {
   return apiFetch<NewCustomerResponse>("/api/v1/owner/new-customer", {
+    method: "POST",
+    body,
+  });
+}
+
+// ─── License reissue (FEAT-012) ───────────────────────────────────────────────
+
+export interface ReissueLicenseRequest {
+  tier: "starter" | "growth" | "scale";
+  expiresAt: string; // ISO 8601
+  reason: string;
+}
+
+export async function postReissueLicenseApi(
+  slug: string,
+  body: ReissueLicenseRequest
+): Promise<ReissueResponse> {
+  return apiFetch<ReissueResponse>(`/api/v1/owner/fleet/${slug}/reissue-license`, {
+    method: "POST",
+    body,
+  });
+}
+
+export async function getLicenseHistoryApi(slug: string): Promise<LicenseHistoryResponse> {
+  return apiFetch<LicenseHistoryResponse>(`/api/v1/owner/fleet/${slug}/license-history`);
+}
+
+export async function getLicenseJwtBlobUrl(slug: string): Promise<string> {
+  const token = typeof window !== "undefined"
+    ? window.localStorage.getItem("nestfleet_token")
+    : null;
+  const res = await fetch(`/api/v1/owner/fleet/${slug}/license-jwt-download`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error("No downloadable JWT available");
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+export async function postReissueLicenseBulkApi(body: {
+  slugs: string[];
+  expiresAt: string;
+  reason: string;
+}): Promise<BulkReissueResponse> {
+  return apiFetch<BulkReissueResponse>("/api/v1/owner/fleet/reissue-license-bulk", {
     method: "POST",
     body,
   });

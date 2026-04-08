@@ -52,6 +52,8 @@ export interface IssueLicenseOpts {
   plan:          string   // "starter" | "growth" | "scale"
   licenseSecret: string   // per-instance LICENSE_SECRET
   customerEmail: string
+  /** Override expiry date. Defaults to 1 year from now when omitted. */
+  expiresAt?:    Date
 }
 
 /**
@@ -74,7 +76,9 @@ export function issueLicenseToken(opts: IssueLicenseOpts): string {
   const tier = plan as LicenseTier
 
   const issuedAt  = Math.floor(Date.now() / 1000)
-  const expiresAt = issuedAt + 365 * 24 * 60 * 60
+  const expiresAt = opts.expiresAt
+    ? Math.floor(opts.expiresAt.getTime() / 1000)
+    : issuedAt + 365 * 24 * 60 * 60
 
   const payload = {
     sub:          slug,
@@ -89,8 +93,7 @@ export function issueLicenseToken(opts: IssueLicenseOpts): string {
 
   return jwt.sign(payload, licenseSecret, {
     algorithm: "HS256",
-    // Set standard JWT claims to match the custom payload fields so validator.ts
-    // can prefer exp/iat (NF-SEC-02 Phase B) while still passing isRawPayload.
-    expiresIn: 365 * 24 * 60 * 60,
+    // Pin exp to the computed expiresAt so custom expiry is honoured exactly.
+    expiresIn: expiresAt - issuedAt,
   })
 }
