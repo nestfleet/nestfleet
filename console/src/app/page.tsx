@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "NestFleet — AI-native product operations platform",
@@ -516,57 +515,6 @@ export default function HomePage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CONSOLE SCREENSHOTS (LP-03) ─────────────────────────────────── */}
-      <section className="py-24 px-5 sm:px-8 bg-white overflow-hidden">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center mb-14">
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600 ring-1 ring-indigo-200">
-              THE CONSOLE
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              See it in action.
-            </h2>
-            <p className="mt-4 max-w-xl mx-auto text-gray-500 text-lg leading-relaxed">
-              A live NestFleet instance handling real product signals — triage, lineage, and case detail.
-            </p>
-          </div>
-
-          {/* Cases list — full width hero */}
-          <div className="rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/10 mb-5">
-            <Image
-              src="/screenshots/Case-list.png"
-              alt="NestFleet cases list — AI triage, severity badges, and channel routing"
-              width={1687}
-              height={1106}
-              className="w-full"
-              priority
-            />
-          </div>
-
-          {/* Case detail — graph + text side by side */}
-          <div className="grid sm:grid-cols-2 gap-5">
-            <div className="rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/10">
-              <Image
-                src="/screenshots/Case-detail-graph.png"
-                alt="Case lineage graph — visual signal dependency mapping"
-                width={1684}
-                height={1107}
-                className="w-full"
-              />
-            </div>
-            <div className="rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/10">
-              <Image
-                src="/screenshots/Case-detail-text.png"
-                alt="Case detail — AI triage output, lineage text view, and approval controls"
-                width={1681}
-                height={1105}
-                className="w-full"
-              />
-            </div>
           </div>
         </div>
       </section>

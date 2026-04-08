@@ -1861,7 +1861,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
     (opt) => (TIER_RANK[opt.id.toLowerCase()] ?? 0) > effectiveRank,
   )
   const isCanceling = !!billing?.cancelAt;
-  const productPct  = license ? Math.min(100, (license.currentProducts / Math.max(1, license.productLimit)) * 100) : 0;
+  const productPct  = (license && license.productLimit) ? Math.min(100, (license.currentProducts / Math.max(1, license.productLimit)) * 100) : 0;
   const tierColor   = TIER_COLORS[tier ?? "community"] ?? "bg-gray-100 text-gray-700";
   const tierLabel   = tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : "Community";
 
@@ -1961,7 +1961,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-gray-500">
               <span>Products</span>
-              <span>{license.currentProducts} / {license.productLimit >= 999 ? "unlimited" : license.productLimit}</span>
+              <span>{license.currentProducts} / {(!license.productLimit || license.productLimit >= 999) ? "∞" : license.productLimit}</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
               <div
