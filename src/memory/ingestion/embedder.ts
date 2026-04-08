@@ -8,6 +8,7 @@
 
 import { config as envConfig } from "../../shared/config.js"
 import { findProductById } from "../../infra/db/repositories/products.js"
+import { decryptSecret } from "../../shared/crypto.js"
 import { logger } from "../../shared/logger.js"
 
 const BATCH_SIZE = 100
@@ -42,7 +43,7 @@ async function resolveEmbeddingConfig(productId?: string): Promise<EmbeddingConf
 
         return {
           provider: embProvider,
-          apiKey: (llm.apiKey as string | undefined) ?? envConfig.EMBEDDING_API_KEY,
+          apiKey: decryptSecret(llm.apiKey as string | undefined) ?? envConfig.EMBEDDING_API_KEY,
           model: llm.embeddingModel as string,
           dimensions: (llm.embeddingDimensions as number | undefined) ?? envConfig.EMBEDDING_DIMENSIONS,
           baseUrl: (llm.baseUrl as string | undefined) ?? envConfig.EMBEDDING_BASE_URL,

@@ -112,18 +112,26 @@ export async function runTriageAgent(input: TriageInput): Promise<AgentResult<Tr
   const { productId, caseId, jobId, signalText, productVersion } = input
 
   // ── Retrieve evidence pack (abstain check) ───────────────────────────────
-  const { embedding: queryEmbedding } = await embedText(signalText.slice(0, 512), productId)
-
-  const evidencePack = await retrieve({
-    productId,
-    queryText: signalText,
-    queryEmbedding,
-    actionType: "triage",
-    audience: "internal",
-    topK: 20,
-    topN: 6,
-    ...(productVersion ? { productVersion } : {}),
-  })
+  // Embedding failure is non-fatal: triage continues on signal text alone.
+  let evidencePack: Awaited<ReturnType<typeof retrieve>> = {
+    chunks: [], tierSummary: { 1: 0, 2: 0, 3: 0, 4: 0 }, minFreshness: 0,
+    avgFreshness: 0, hasConflicts: false, abstain: false, abstainReason: null,
+  }
+  try {
+    const { embedding: queryEmbedding } = await embedText(signalText.slice(0, 512), productId)
+    evidencePack = await retrieve({
+      productId,
+      queryText: signalText,
+      queryEmbedding,
+      actionType: "triage",
+      audience: "internal",
+      topK: 20,
+      topN: 6,
+      ...(productVersion ? { productVersion } : {}),
+    })
+  } catch (err) {
+    logger.warn({ err, productId, caseId }, "Embedding/retrieval failed — triaging without RAG context")
+  }
 
   if (evidencePack.abstain && evidencePack.abstainReason !== "insufficient_tier") {
     // Hard abstain (no results, audience violation, stale, conflict)
