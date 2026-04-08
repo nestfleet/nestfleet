@@ -156,7 +156,10 @@ const ConfigSchema = z.object({
   // Ops email for provisioning failure alerts
   OPS_ALERT_EMAIL: z.string().email().optional(),
   // SSH public key injected into all customer VPSes for break-glass access
-  OPS_SSH_PUBLIC_KEY: z.string().optional(),
+  OPS_SSH_PUBLIC_KEY:    z.string().optional(),
+  // FEAT-012: SSH private key (PEM) for license reissue operations
+  FLEET_SSH_PRIVATE_KEY: z.string().optional(),
+  FLEET_SSH_USER:        z.string().default("root"),
   // Bundled LLM API keys — written into each customer VPS .env at provision time
   // (customers on managed SaaS don't need their own keys)
   BUNDLED_LLM_API_KEY: z.string().optional(),

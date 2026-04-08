@@ -14,6 +14,12 @@
  * OWN-NC: Owner-initiated customer provisioning (semi-manual onboarding flow)
  * GET  /api/v1/owner/slug-check/:slug — validate slug format + DB uniqueness
  * POST /api/v1/owner/new-customer     — create signup intent + Stripe checkout session
+ *
+ * FEAT-012: License reissue
+ * POST /api/v1/owner/fleet/:slug/reissue-license       — queue license reissue job
+ * POST /api/v1/owner/fleet/reissue-license-bulk        — queue N reissue jobs (renewal)
+ * GET  /api/v1/owner/fleet/:slug/license-history       — last 10 reissue records
+ * GET  /api/v1/owner/fleet/:slug/license-jwt-download  — download pending JWT for failed reissue
  */
 
 import { Hono } from "hono"
@@ -38,6 +44,13 @@ import type { RevenueData, CohortWeek } from "../../billing/stripe-revenue.js"
 import { getRecentTelemetry, countDistinctInstances } from "../../infra/db/repositories/telemetry.js"
 import { validateAndCheckSlug } from "../../provisioning/slug.js"
 import { createSignupIntent } from "../../infra/db/repositories/provisionings.js"
+import {
+  createLicenseReissue,
+  listLicenseReissues,
+  findFailedPendingJwt,
+  clearPendingJwt,
+} from "../../infra/db/repositories/license-reissues.js"
+import { LICENSE_REISSUE_JOB } from "../../workers/license-reissue-worker.js"
 
 // ── Revenue cache (5 min TTL) ─────────────────────────────────────────────────
 
@@ -381,4 +394,166 @@ ownerRouter.post("/new-customer", async (c) => {
   logger.info({ intentId: intent.id, slug, plan }, "Owner new-customer: checkout session created")
 
   return c.json({ ok: true, checkoutUrl: session.url, intentId: intent.id }, 201)
+})
+
+// ── FEAT-012: License reissue routes ──────────────────────────────────────────
+
+const ReissueSchema = z.object({
+  tier:      z.enum(["starter", "growth", "scale"]),
+  expiresAt: z.string().datetime({ message: "expiresAt must be an ISO 8601 datetime" }),
+  reason:    z.string().min(10, "Reason must be at least 10 characters"),
+})
+
+// POST /owner/fleet/:slug/reissue-license
+ownerRouter.post("/fleet/:slug/reissue-license", async (c) => {
+  const slug = c.req.param("slug")
+
+  let body: unknown
+  try { body = await c.req.json() } catch { throw new ValidationError("Invalid JSON body") }
+
+  const parsed = ReissueSchema.safeParse(body)
+  if (!parsed.success) throw new ValidationError("Invalid input", parsed.error.flatten().fieldErrors)
+
+  const { tier, expiresAt, reason } = parsed.data
+
+  const prov = await findProvisioningBySlug(slug)
+  if (!prov) throw new NotFoundError("provisioning", slug)
+
+  if (prov.reissue_status === "in_progress") {
+    return c.json({ ok: false, error: "A reissue is already in progress for this customer" }, 409)
+  }
+  if (prov.status !== "active") {
+    return c.json({ ok: false, error: `Cannot reissue license: provisioning is '${prov.status}' (must be 'active')` }, 422)
+  }
+
+  // Determine caller identity from the verified JWT (already checked in middleware)
+  const authHeader = c.req.header("Authorization")!
+  const { verifyJwt } = await import("../../auth/jwt.js")
+  const caller = verifyJwt(authHeader.slice("Bearer ".length))
+
+  const reissue = await createLicenseReissue({
+    provisioning_id:     prov.id,
+    performed_by:        caller.sub,
+    previous_tier:       prov.license_tier ?? prov.plan,
+    new_tier:            tier,
+    previous_expires_at: prov.license_expires_at ?? null,
+    new_expires_at:      new Date(expiresAt),
+    reason,
+  })
+
+  await updateProvisioning(prov.id, { reissue_status: "in_progress" })
+
+  const boss = await getBoss()
+  const jobId = await boss.send(LICENSE_REISSUE_JOB, {
+    reissueId:      reissue.id,
+    provisioningId: prov.id,
+    slug,
+    newTier:        tier,
+    newExpiresAt:   expiresAt,
+  }, {
+    singletonKey: `reissue:${prov.id}:${Date.now()}`,
+  })
+
+  logger.info({ slug, tier, reissueId: reissue.id }, "Owner: license reissue queued")
+  return c.json({ ok: true, jobId, reissueId: reissue.id }, 202)
+})
+
+// POST /owner/fleet/reissue-license-bulk
+const BulkReissueSchema = z.object({
+  slugs:     z.array(z.string()).min(1).max(50, "Cannot bulk reissue more than 50 customers at once"),
+  expiresAt: z.string().datetime({ message: "expiresAt must be an ISO 8601 datetime" }),
+  reason:    z.string().min(10, "Reason must be at least 10 characters"),
+})
+
+ownerRouter.post("/fleet/reissue-license-bulk", async (c) => {
+  let body: unknown
+  try { body = await c.req.json() } catch { throw new ValidationError("Invalid JSON body") }
+
+  const parsed = BulkReissueSchema.safeParse(body)
+  if (!parsed.success) {
+    const flat = parsed.error.flatten()
+    // Return 422 specifically for the >50 slugs case
+    const hasMaxError = flat.fieldErrors.slugs?.some((e) => e.includes("50"))
+    return c.json({ ok: false, error: "Invalid input", details: flat.fieldErrors }, hasMaxError ? 422 : 400)
+  }
+
+  const { slugs, expiresAt, reason } = parsed.data
+
+  const authHeader = c.req.header("Authorization")!
+  const { verifyJwt } = await import("../../auth/jwt.js")
+  const caller = verifyJwt(authHeader.slice("Bearer ".length))
+
+  const boss = await getBoss()
+  const jobIds: string[] = []
+
+  for (const slug of slugs) {
+    const prov = await findProvisioningBySlug(slug)
+    if (!prov || prov.status !== "active" || prov.reissue_status === "in_progress") continue
+
+    const reissue = await createLicenseReissue({
+      provisioning_id:     prov.id,
+      performed_by:        caller.sub,
+      previous_tier:       prov.license_tier ?? prov.plan,
+      new_tier:            prov.license_tier ?? prov.plan,  // bulk = same tier, new expiry
+      previous_expires_at: prov.license_expires_at ?? null,
+      new_expires_at:      new Date(expiresAt),
+      reason,
+    })
+
+    await updateProvisioning(prov.id, { reissue_status: "in_progress" })
+
+    const jobId = await boss.send(LICENSE_REISSUE_JOB, {
+      reissueId:      reissue.id,
+      provisioningId: prov.id,
+      slug,
+      newTier:        (prov.license_tier ?? prov.plan) as "starter" | "growth" | "scale",
+      newExpiresAt:   expiresAt,
+    }, {
+      singletonKey: `reissue:${prov.id}:${Date.now()}`,
+    })
+
+    if (jobId) jobIds.push(jobId)
+  }
+
+  logger.info({ count: jobIds.length }, "Owner: bulk license reissue queued")
+  return c.json({ ok: true, queued: jobIds.length, jobIds }, 202)
+})
+
+// GET /owner/fleet/:slug/license-history
+ownerRouter.get("/fleet/:slug/license-history", async (c) => {
+  const slug = c.req.param("slug")
+  const prov = await findProvisioningBySlug(slug)
+  if (!prov) throw new NotFoundError("provisioning", slug)
+
+  const history = await listLicenseReissues(prov.id)
+  return c.json({ ok: true, data: history })
+})
+
+// GET /owner/fleet/:slug/license-jwt-download
+ownerRouter.get("/fleet/:slug/license-jwt-download", async (c) => {
+  const slug = c.req.param("slug")
+  const prov = await findProvisioningBySlug(slug)
+  if (!prov) throw new NotFoundError("provisioning", slug)
+
+  // Find the most recent failed reissue with a pending_jwt
+  const history = await listLicenseReissues(prov.id, 1)
+  const latest  = history[0]
+  if (!latest || latest.status !== "failed" || !latest.pending_jwt) {
+    return c.json({ ok: false, error: "No downloadable JWT available" }, 404)
+  }
+
+  const jwt = await findFailedPendingJwt(latest.id)
+  if (!jwt) return c.json({ ok: false, error: "No downloadable JWT available" }, 404)
+
+  // Clear pending_jwt after first download
+  await clearPendingJwt(latest.id)
+
+  const filename = `${slug}-license-${new Date().toISOString().slice(0, 10)}.jwt`
+  return new Response(jwt, {
+    status: 200,
+    headers: {
+      "Content-Type":        "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${filename}"`,
+    },
+  })
 })

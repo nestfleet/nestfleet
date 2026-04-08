@@ -39,6 +39,10 @@ export interface ProvisioningRow {
   last_health_check_at:   Date | null
   last_health_status:     string | null
   error_message:          string | null
+  // FEAT-012: license lifecycle tracking
+  license_tier:           string | null
+  license_expires_at:     Date | null
+  reissue_status:         "idle" | "in_progress" | "failed"
   created_at:             Date
   updated_at:             Date
 }
@@ -58,6 +62,9 @@ export type ProvisioningPatch = Partial<Pick<
   | "last_health_check_at"
   | "last_health_status"
   | "error_message"
+  | "license_tier"
+  | "license_expires_at"
+  | "reissue_status"
 >>
 
 // ── signup_intents ─────────────────────────────────────────────────────────────

@@ -64,6 +64,7 @@
 |----|-------|------|----------|--------|--------|------|
 | FEAT-002 | Onboarding & Channels Hub Refactor | L | Medium | ✅ Done | `feat/FEAT-002-onboarding-channels-hub-refactor` | [spec](specs/FEAT-002-onboarding-channels-hub-refactor.md) |
 | FEAT-003 | Channel Richness Gap & Architecture | S | Low | ✅ Done | `feat/FEAT-003-channel-richness-gap` | [spec](specs/FEAT-003-channel-richness-gap.md) |
+| FEAT-012 | Owner Fleet — Reissue License | L | P1 | todo | — | [spec](specs/FEAT-012-reissue-license.md) |
 | NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
 
 ### UX Improvements
