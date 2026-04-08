@@ -26,6 +26,13 @@ import { getOuUsage } from "../../billing/ou-tracker.js"
 
 export const licenseRouter = new Hono<{ Variables: AuthVariables }>()
 
+// ── GET /api/v1/license/tier — public, minimal; used by reissue worker poller ─
+
+licenseRouter.get("/license/tier", async (c) => {
+  const tier = getLicenseTier() ?? "community"
+  return c.json({ ok: true, data: { tier } })
+})
+
 // ── GET /api/v1/license/status ────────────────────────────────────────────────
 
 licenseRouter.get("/license/status", requireAuth(), requireRole("admin"), async (c) => {
