@@ -78,5 +78,6 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=
             NEXT_PUBLIC_PRODUCT_ID=
+            NEXT_PUBLIC_SHOW_LANDING=true
           cache-from: type=gha
           cache-to: type=gha,mode=max
