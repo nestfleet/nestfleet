@@ -14,6 +14,8 @@
  * NF-UNIT-CLINIT-11  LLM_PROVIDER=google and LLM_MODEL=gemini-2.5-flash-lite are injected
  * NF-UNIT-CLINIT-12  S3 vars appear in .env when opts include them
  * NF-UNIT-CLINIT-13  S3 vars are empty strings (not "undefined") when opts omit them
+ * NF-UNIT-CLINIT-14  LICENSE_FILE_PATH env var is set to /opt/nestfleet/license.jwt
+ * NF-UNIT-CLINIT-15  write_files contains /opt/nestfleet/license.jwt entry with the token
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
@@ -29,6 +31,9 @@ const mockReadFile = readFile as ReturnType<typeof vi.fn>
 // Import after mocking
 const { generateCloudInit, _resetCloudInitCache } = await import("../../../src/provisioning/cloud-init.js")
 
+// Use a realistic-looking dummy JWT string — no need to actually sign for cloud-init tests
+const DUMMY_LICENSE_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhY21lIn0.dummysignature"
+
 const BASE_OPTS = {
   slug:                   "acme",
   baseDomain:             "nestfleet.dev",
@@ -36,6 +41,7 @@ const BASE_OPTS = {
   jwtSecret:              "bbccdd001122334455667788990011223344556677889900112233445566778800",
   encryptionKey:          "ccddee001122334455667788990011223344556677889900112233445566778800",
   licenseSecret:          "ddee00112233445566778899001122334455667788990011223344556677880000",
+  licenseToken:           DUMMY_LICENSE_TOKEN,
   bundledLlmApiKey:       "sk-google-test-key",
   bundledEmbeddingApiKey: "sk-google-embedding-key",
   opsPublicKey:           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA ops@nestfleet.dev",
@@ -139,5 +145,16 @@ describe("generateCloudInit", () => {
     expect(yaml).toContain("BACKUP_S3_SECRET_KEY=\n")
     expect(yaml).toContain("BACKUP_S3_BUCKET=nestfleet-backups")
     expect(yaml).not.toContain("undefined")
+  })
+
+  it("NF-UNIT-CLINIT-14: LICENSE_FILE_PATH env var is set to /opt/nestfleet/license.jwt", async () => {
+    const yaml = await generateCloudInit(BASE_OPTS)
+    expect(yaml).toContain("LICENSE_FILE_PATH=/opt/nestfleet/license.jwt")
+  })
+
+  it("NF-UNIT-CLINIT-15: write_files contains /opt/nestfleet/license.jwt entry with the token", async () => {
+    const yaml = await generateCloudInit(BASE_OPTS)
+    expect(yaml).toContain("path: /opt/nestfleet/license.jwt")
+    expect(yaml).toContain(DUMMY_LICENSE_TOKEN)
   })
 })

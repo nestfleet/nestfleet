@@ -73,6 +73,12 @@
 | UX-01 | Text search in Cases, Queue, Approvals, PR Drafts, and Notifications | S | P2 | ✅ Done (2026-04-07) | Client-side keyword filter input on list pages — filters visible rows by case title / subject / email. |
 | UX-02 | Hide "Add Product" button when product limit reached (community tier = 1) | XS | P2 | ✅ Done | Button visible even when limit is hit; confusing for single-product tier users. |
 
+### SaaS Provisioning: Fleet Update Management (OPS-FLEET-02)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| OPS-FLEET-02 | Fleet Update Management — controlled push of new images to customer VPS fleet, per-instance rollback, Owner Console UI + CLI script | L | P1 | Not Started | No Watchtower. Update API on customer VPS (`/system/update`, `/system/version`) authenticated by LICENSE_SECRET. pg-boss `fleet_update_instance` job with 5-parallel concurrency. SHA-based rollback via `previous_image_sha`. Owner Console: per-row Update/Rollback buttons + Update All. CLI fallback script for emergencies. See [spec](specs/OPS-FLEET-02-fleet-update-management.md). |
+
 ### SaaS Provisioning: Docker Registry (OPS-IMAGE-01)
 
 | ID | Title | Size | Priority | Status | Notes |

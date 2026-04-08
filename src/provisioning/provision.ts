@@ -34,6 +34,7 @@ import { createHetznerClient } from "./hetzner-client.js"
 import { createCloudflareClient } from "./cloudflare-client.js"
 import { generateCloudInit, type CloudInitOpts } from "./cloud-init.js"
 import { pollUntilHealthy } from "./health-poller.js"
+import { issueLicenseToken } from "../license/issuer.js"
 
 // ── Secrets ───────────────────────────────────────────────────────────────────
 
@@ -138,6 +139,15 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
     logger.info({ slug }, "ProvisioningSaga: secrets generated and stored")
   }
 
+  // Generate license JWT for this customer's plan.
+  // Signed with the per-instance licenseSecret so the VPS can self-verify it.
+  const licenseToken = issueLicenseToken({
+    slug,
+    plan:          intent.plan,
+    licenseSecret: secrets.licenseSecret,
+    customerEmail: prov.customer_email,
+  })
+
   // ── Step 3: Create Hetzner VPS (skip if already created) ────────────────────
 
   if (!prov.hetzner_server_id) {
@@ -150,6 +160,7 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
       jwtSecret:              secrets.jwtSecret,
       encryptionKey:          secrets.encryptionKey,
       licenseSecret:          secrets.licenseSecret,
+      licenseToken,
       bundledLlmApiKey:       config.BUNDLED_LLM_API_KEY ?? "",
       bundledEmbeddingApiKey: config.BUNDLED_EMBEDDING_API_KEY ?? "",
       opsPublicKey:           config.OPS_SSH_PUBLIC_KEY ?? "",
