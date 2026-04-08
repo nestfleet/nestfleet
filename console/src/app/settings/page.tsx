@@ -31,7 +31,6 @@ import {
   getBillingStatusApi,
   billingCheckoutApi,
   billingPortalApi,
-  ApiError,
   type BillingStatus,
   type PlanInterval,
   type SettingsResponse,
@@ -1834,7 +1833,9 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
   );
   const billing: BillingStatus | null = billingData?.data ?? null;
   // When BILLING_ENABLED=false the API returns 404 — billing self-service is not available.
-  const billingEnabled = !(billingError instanceof ApiError && billingError.status === 404);
+  // Use direct status property check (more reliable than instanceof across Next.js chunks).
+  // billingDisabled is only true once the error is confirmed; undefined = still loading.
+  const billingDisabled = (billingError as { status?: number } | undefined)?.status === 404;
 
   useEffect(() => {
     if (!stripeReturn || stripeReturnHandledRef.current) return;
@@ -1997,8 +1998,8 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
         )}
       </div>
 
-      {/* Upgrade CTAs — shown only when billing is enabled and higher-tier plans are available */}
-      {!isPaid && availableUpgrades.length > 0 && !billingEnabled && (
+      {/* Contact admin — shown when BILLING_ENABLED=false (API returns 404) */}
+      {!isPaid && availableUpgrades.length > 0 && billingDisabled && (
         <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-center space-y-1">
           <p className="text-sm font-medium text-gray-700">Want to upgrade?</p>
           <p className="text-xs text-gray-500">
@@ -2006,7 +2007,8 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
           </p>
         </div>
       )}
-      {!isPaid && availableUpgrades.length > 0 && billingEnabled && (
+      {/* Upgrade CTAs — shown only when billing is confirmed active (billingData returned) */}
+      {!isPaid && availableUpgrades.length > 0 && !billingDisabled && billingData !== undefined && (
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h3 className="text-sm font-medium text-gray-700">Upgrade your plan</h3>
