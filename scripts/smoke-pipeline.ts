@@ -203,15 +203,15 @@ console.log(`[smoke] triage_output keys: ${Object.keys(matchedCase.triage_output
 
 // ── Step 4: best-effort cleanup — resolve the canary case ─────────────────────
 
-const resolveUrl = `${baseUrl}/api/v1/products/${productId}/cases/${matchedCase.case_id}`
+const resolveUrl = `${baseUrl}/api/v1/products/${productId}/cases/${matchedCase.case_id}/resolve`
 try {
   const cleanupResult = await safeFetch(resolveUrl, {
-    method:  "PATCH",
+    method:  "POST",
     headers: {
       "Content-Type":  "application/json",
       "Authorization": `Bearer ${apiToken}`,
     },
-    body: JSON.stringify({ status: "resolved" }),
+    body: JSON.stringify({ resolution: "Smoke test canary — auto-resolved" }),
   })
   if (cleanupResult.ok) {
     console.log(`[smoke] cleanup: canary case ${matchedCase.case_id} resolved`)
