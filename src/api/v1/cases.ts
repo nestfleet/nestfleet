@@ -26,6 +26,7 @@ import { findCaseById, findCasesByProduct, updateCase, CaseStatusSchema, CaseSev
 import { transitionCase } from "../../domain/case-state-machine.js"
 import { transitionAndDispatch } from "../../domain/transactional-dispatch.js"
 import { createAuditEvent, createChangeRequest } from "../../infra/db/repositories/index.js"
+import { findChangeRequestsByCase } from "../../infra/db/repositories/change-requests.js"
 import { findSignalsByCaseId, createSignal } from "../../infra/db/repositories/signals.js"
 import { findProductById } from "../../infra/db/repositories/products.js"
 import { NotificationService } from "../../notifications/index.js"
@@ -875,16 +876,40 @@ casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requ
       return c.json({ error: `Case must be in processing-failed status to retry (current: ${caseRow.status})` }, 400)
     }
 
-    // Transition processing-failed → enriching and clear the error record
-    await transitionCase(caseId, "processing-failed", "enriching", {
-      current_persona:   "frontline",
-      processing_error:  null,
-    })
-    await touchCase(caseId)
+    const failedJobName = caseRow.processing_error?.jobName
 
-    // Dispatch a fresh triage job
-    const jobId = newId("job_")
-    await dispatch({ actionType: "triage", productId, caseId, jobId })
+    let jobId: string
+    let afterStatus: string
+
+    if (failedJobName === "pr_draft_prep") {
+      // Case failed during PR drafting — stay in-change, re-dispatch pr_draft_prep
+      // Find the approved CR to get changeRequestId for the payload
+      const crs = await findChangeRequestsByCase(caseId)
+      const approvedCr = crs.find((cr) => cr.status === "approved")
+      if (!approvedCr) {
+        return c.json({ error: "No approved change request found — cannot retry pr_draft_prep" }, 400)
+      }
+
+      await transitionCase(caseId, "processing-failed", "in-change", {
+        processing_error: null,
+      })
+      await touchCase(caseId)
+
+      jobId = newId("job_")
+      afterStatus = "in-change"
+      await dispatch({ actionType: "pr_draft_prep", productId, caseId, jobId, payload: { changeRequestId: approvedCr.change_request_id } })
+    } else {
+      // Default: re-enter at triage (enriching)
+      await transitionCase(caseId, "processing-failed", "enriching", {
+        current_persona:  "frontline",
+        processing_error: null,
+      })
+      await touchCase(caseId)
+
+      jobId = newId("job_")
+      afterStatus = "enriching"
+      await dispatch({ actionType: "triage", productId, caseId, jobId })
+    }
 
     await createAuditEvent({
       product_id:   productId,
@@ -894,11 +919,11 @@ casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requ
       actor_ref:    actor.email,
       action:       "case.retried",
       before_state: { status: "processing-failed" },
-      after_state:  { status: "enriching" },
-      metadata:     { retriedBy: actor.email, jobId },
+      after_state:  { status: afterStatus },
+      metadata:     { retriedBy: actor.email, jobId, retriedJob: failedJobName ?? "triage" },
     })
 
-    logger.info({ caseId, productId, jobId, actor: actor.email }, "Case re-dispatched after processing failure")
+    logger.info({ caseId, productId, jobId, retriedJob: failedJobName ?? "triage", afterStatus, actor: actor.email }, "Case re-dispatched after processing failure")
     return c.json({ ok: true })
   } catch (err) {
     logger.error({ err, productId, caseId }, "Failed to retry case")

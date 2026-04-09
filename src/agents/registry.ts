@@ -76,8 +76,8 @@ export const AGENT_REGISTRY: Readonly<Record<ActionType, AgentDefinition>> = {
     modelTier: "fast",
     tools: ["lookupKnownIssue", "lookupSeverityPolicy"],
     tokenBudget: {
-      phase1MaxInput:  6_000, phase1MaxOutput: 1_500,
-      phase2MaxInput:  8_000, phase2MaxOutput: 1_500,
+      phase1MaxInput: 10_000, phase1MaxOutput: 1_500,
+      phase2MaxInput: 12_000, phase2MaxOutput: 1_500,
     },
     timeoutMs: 90_000,
     strategy: "single-phase",

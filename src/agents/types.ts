@@ -174,8 +174,8 @@ export function getMaxInputTokens(b: TokenBudget): number {
 export const TOKEN_BUDGETS: Record<ActionType, TokenBudget> = {
   // ── Simple agents: single-phase (SLICE-16B) ──────────────────────────────
   triage: {
-    phase1MaxInput: 6_000, phase1MaxOutput: 1_500,
-    phase2MaxInput: 8_000, phase2MaxOutput: 1_500,
+    phase1MaxInput: 10_000, phase1MaxOutput: 1_500,
+    phase2MaxInput: 12_000, phase2MaxOutput: 1_500,
     phasingStrategy: "single-phase",
   },
   auto_reply: {
