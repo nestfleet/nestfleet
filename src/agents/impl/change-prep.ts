@@ -125,23 +125,35 @@ export async function runChangePrepAgent(
     ? `${problemStatement}\n\n${signalText}`.slice(0, 512)
     : problemStatement.slice(0, 512)
 
-  const { embedding: queryEmbedding } = await embedText(queryText, productId)
-
-  const evidencePack = await retrieve({
-    productId,
-    queryText,
-    queryEmbedding,
-    actionType: "change_prep",
-    audience: "internal",
-    contentTypes: ["prose", "code", "structured"],
-    topK: 20,
-    topN: 6,
-  })
+  // Embedding failure and no_results are non-fatal — proceed with tools only.
+  let evidencePack: Awaited<ReturnType<typeof retrieve>> = {
+    chunks: [], tierSummary: { 1: 0, 2: 0, 3: 0, 4: 0 }, minFreshness: 0,
+    avgFreshness: 0, hasConflicts: false, abstain: false, abstainReason: null,
+  }
+  try {
+    const { embedding: queryEmbedding } = await embedText(queryText, productId)
+    evidencePack = await retrieve({
+      productId,
+      queryText,
+      queryEmbedding,
+      actionType: "change_prep",
+      audience: "internal",
+      contentTypes: ["prose", "code", "structured"],
+      topK: 20,
+      topN: 6,
+    })
+  } catch (err) {
+    logger.warn({ err, productId, caseId, changeRequestId }, "change_prep: embedding/retrieval failed — proceeding without RAG context")
+  }
 
   // ── Abstain: hard conditions → PolicyViolationError ────────────────────────
-  // insufficient_tier is a soft abstain — proceed without pre-retrieved evidence,
-  // LLM will use tools only. All other abstain reasons are hard stops.
-  if (evidencePack.abstain && evidencePack.abstainReason !== "insufficient_tier") {
+  // insufficient_tier and no_results are soft — proceed with LLM + tools only.
+  // Hard stops: audience_violation, stale_evidence, knowledge_conflict.
+  if (
+    evidencePack.abstain &&
+    evidencePack.abstainReason !== "insufficient_tier" &&
+    evidencePack.abstainReason !== "no_results"
+  ) {
     logger.warn(
       { productId, caseId, changeRequestId, abstainReason: evidencePack.abstainReason },
       "change_prep agent hard abstain",
