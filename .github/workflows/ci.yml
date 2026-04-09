@@ -134,6 +134,7 @@ jobs:
             cd /opt/nestfleet
             git fetch origin main
             git reset --hard origin/main
+            docker image prune -a --force
             docker compose -f docker-compose.prod.yml pull api console
             docker compose -f docker-compose.prod.yml up -d --no-deps api console
           '

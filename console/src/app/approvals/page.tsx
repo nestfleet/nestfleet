@@ -14,6 +14,7 @@ import {
   getPendingApprovalsApi,
   approveChangeRequestApi,
   rejectChangeRequestApi,
+  escalateCaseApi,
 } from "@/lib/api";
 import type { ChangeRequest } from "@/lib/types";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
@@ -23,12 +24,13 @@ import { SearchInput } from "@/components/SearchInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ModalMode = "approve" | "reject";
+type ModalMode = "approve" | "reject" | "escalate";
 
 interface ActiveModal {
   mode:    ModalMode;
   crId:    string;
   crTitle: string;
+  caseId?: string;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -83,9 +85,10 @@ export default function ApprovalsPage() {
   const [reason,      setReason]      = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const openApprove = (cr: ChangeRequest) => { setNote("");   setActiveModal({ mode: "approve", crId: cr.change_request_id, crTitle: cr.title }); };
-  const openReject  = (cr: ChangeRequest) => { setReason(""); setActiveModal({ mode: "reject",  crId: cr.change_request_id, crTitle: cr.title }); };
-  const closeModal  = () => { if (!isSubmitting) setActiveModal(null); };
+  const openApprove  = (cr: ChangeRequest) => { setNote("");   setActiveModal({ mode: "approve",  crId: cr.change_request_id, crTitle: cr.title }); };
+  const openReject   = (cr: ChangeRequest) => { setReason(""); setActiveModal({ mode: "reject",   crId: cr.change_request_id, crTitle: cr.title }); };
+  const openEscalate = (cr: ChangeRequest) => {               setActiveModal({ mode: "escalate", crId: cr.change_request_id, crTitle: cr.title, caseId: cr.case_id }); };
+  const closeModal   = () => { if (!isSubmitting) setActiveModal(null); };
 
   const handleApprove = async () => {
     if (!activeModal) return;
@@ -111,6 +114,19 @@ export default function ApprovalsPage() {
       await mutate();
     } catch (err) {
       toast(`Rejection failed: ${(err as Error).message}`, "error");
+    } finally { setIsSubmitting(false); }
+  };
+
+  const handleEscalate = async () => {
+    if (!activeModal?.caseId) return;
+    setIsSubmitting(true);
+    try {
+      await escalateCaseApi(productId, activeModal.caseId);
+      toast("Case escalated to Lead", "info");
+      setActiveModal(null);
+      await mutate();
+    } catch (err) {
+      toast(`Escalation failed: ${(err as Error).message}`, "error");
     } finally { setIsSubmitting(false); }
   };
 
@@ -220,6 +236,7 @@ export default function ApprovalsPage() {
                       onViewDetail={() => router.push(`${basePath}/approvals/${cr.change_request_id}`)}
                       onApprove={() => openApprove(cr)}
                       onReject={() => openReject(cr)}
+                      onEscalate={() => openEscalate(cr)}
                       canApprove={canApprove}
                       truncate={truncate}
                       waitingTime={waitingTime}
@@ -311,6 +328,29 @@ export default function ApprovalsPage() {
           </div>
         )}
       </Modal>
+
+      {/* ── Escalate to Lead modal (UX-06) ── */}
+      <Modal isOpen={activeModal?.mode === "escalate"} onClose={closeModal} title="Escalate to Lead">
+        {activeModal?.mode === "escalate" && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              This will move the originating case back to Lead review — the change request will remain pending.
+            </p>
+            <p className="text-sm text-gray-600">
+              Change request: <span className="font-medium text-gray-900">{activeModal.crTitle}</span>
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleEscalate} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+                {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
+                Escalate to Lead
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </AppLayout>
   );
 }
@@ -323,12 +363,13 @@ interface ApprovalRowProps {
   onViewDetail:     () => void;
   onApprove:        () => void;
   onReject:         () => void;
+  onEscalate:       () => void;
   canApprove:       boolean;
   truncate:         (text: string | null, max?: number) => string;
   waitingTime:      (createdAt: string) => string;
 }
 
-function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, canApprove, truncate, waitingTime }: ApprovalRowProps) {
+function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, onEscalate, canApprove, truncate, waitingTime }: ApprovalRowProps) {
   const productId = useProductIdWithFallback();
   const router = useRouter();
   const productCtx = useProductSafe();
@@ -433,6 +474,15 @@ function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, c
               >
                 Reject
               </button>
+              {cr.case_id && (
+                <button
+                  onClick={onEscalate}
+                  className="rounded-md bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors"
+                  title="Send case back to Lead review"
+                >
+                  Escalate
+                </button>
+              )}
             </>
           )}
           <button

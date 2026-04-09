@@ -53,6 +53,8 @@ import { ingestExternalSignal } from "../../../src/ingress/external-ingress.js"
 import * as repo from "../../../src/infra/db/repositories/index.js"
 import * as identityRepo from "../../../src/infra/db/repositories/identities.js"
 import { dispatch } from "../../../src/agents/dispatcher.js"
+import { notifyNewCase } from "../../../src/email/sender.js"
+import { transitionCase } from "../../../src/domain/case-state-machine.js"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -214,5 +216,47 @@ describe("external-ingress (FEAT-003)", () => {
     const result = await ingestExternalSignal(PRODUCT_ID, makePayload({ threadId: "my-thread-007" }))
 
     expect(result.channelThreadId).toBe("my-thread-007")
+  })
+
+  // ── QE-07 Smoke canary tests ──────────────────────────────────────────────
+
+  it("NF-UNIT-EXT-08: senderName='smoke-test' → dispatch NOT called", async () => {
+    await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    expect(dispatch).not.toHaveBeenCalled()
+  })
+
+  it("NF-UNIT-EXT-09: senderName='smoke-test' → result.canary is true", async () => {
+    const result = await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    expect(result.canary).toBe(true)
+  })
+
+  it("NF-UNIT-EXT-10: channelContext.source='smoke-test' → dispatch NOT called", async () => {
+    await ingestExternalSignal(
+      PRODUCT_ID,
+      makePayload({ channelContext: { source: "smoke-test" } }),
+    )
+
+    expect(dispatch).not.toHaveBeenCalled()
+  })
+
+  it("NF-UNIT-EXT-11: smoke canary → notifyNewCase NOT called", async () => {
+    await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    expect(notifyNewCase).not.toHaveBeenCalled()
+  })
+
+  it("NF-UNIT-EXT-12: smoke canary → case is still created (for traceability)", async () => {
+    await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    expect(repo.createCase).toHaveBeenCalled()
+  })
+
+  it("NF-UNIT-EXT-13: smoke canary → transitionCase reaches 'resolved'", async () => {
+    await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    const calls = vi.mocked(transitionCase).mock.calls.map((c) => ({ from: c[1], to: c[2] }))
+    expect(calls).toContainEqual(expect.objectContaining({ to: "resolved" }))
   })
 })

@@ -50,6 +50,8 @@ export interface ExternalWebhookPayload {
 export interface ExternalIngestResult extends IngestResult {
   /** The channel_thread_id stored on the signal (= threadId). */
   channelThreadId: string
+  /** True when the signal was a smoke-test canary — case auto-resolved, no triage dispatched. */
+  canary?: true
 }
 
 /**
@@ -209,6 +211,28 @@ export async function ingestExternalSignal(
 
     await transitionCase(caseId, "new", "enriching")
     logger.info({ caseId, productId, conversationId }, "Case created from external signal")
+
+    // ── 5b. Smoke canary — auto-resolve without triage ────────────────────────
+    if (isSmokeCanary(payload)) {
+      logger.info({ caseId, productId }, "Smoke canary detected — auto-resolving case")
+      await transitionCase(caseId, "enriching", "triaged")
+      await transitionCase(caseId, "triaged", "resolved")
+      await updateSignal(signalId, {
+        identity_id:       identityId,
+        conversation_id:   conversationId,
+        case_id:           caseId,
+        processing_status: "linked",
+      })
+      return {
+        signalId,
+        conversationId,
+        caseId,
+        identityId,
+        duplicate: false,
+        channelThreadId: payload.threadId,
+        canary: true,
+      }
+    }
   }
 
   // ── 6. Link signal ────────────────────────────────────────────────────────
@@ -298,4 +322,11 @@ function dedupe(arr: string[]): string[] {
 function getSupportLeadEmail(leadAssignments: Record<string, unknown>): string | null {
   const lead = leadAssignments["support_lead"]
   return typeof lead === "string" && lead.includes("@") ? lead : null
+}
+
+function isSmokeCanary(payload: ExternalWebhookPayload): boolean {
+  return (
+    payload.senderName === "smoke-test" ||
+    payload.channelContext?.["source"] === "smoke-test"
+  )
 }

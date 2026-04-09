@@ -23,7 +23,7 @@ vi.mock("../../src/email/sender.js", () => ({
   sendReply:     vi.fn().mockResolvedValue(undefined),
 }))
 
-import { describe, it, expect, beforeAll, afterAll } from "vitest"
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
 import type { TestDbContext } from "./helpers/db.js"
 import { setupTestDb } from "./helpers/db.js"
 import { createProduct } from "../../src/infra/db/repositories/products.js"
@@ -32,6 +32,7 @@ import { ingestExternalSignal } from "../../src/ingress/external-ingress.js"
 import { getDb } from "../../src/infra/db/client.js"
 import { encryptSecret } from "../../src/shared/crypto.js"
 import { app } from "../../src/api/index.js"
+import { dispatch } from "../../src/agents/dispatcher.js"
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -145,6 +146,37 @@ describe("external webhook (integration)", () => {
 
     const casesAfterDup = await findCasesByProduct(productId)
     expect(casesAfterDup.length).toBe(casesAfterFirst.length)
+  }, 30_000)
+
+  // ── QE-07 Smoke canary integration tests ─────────────────────────────────
+
+  beforeEach(() => { vi.clearAllMocks() })
+
+  it("NF-INT-EXT-10: senderName='smoke-test' → case status is 'resolved' in DB", async () => {
+    const result = await ingestExternalSignal(productId, makePayload({ senderName: "smoke-test" }))
+
+    expect(result.canary).toBe(true)
+    const db  = getDb()
+    const rows = await db`SELECT status FROM cases WHERE case_id = ${result.caseId}`
+    expect(rows[0]?.status).toBe("resolved")
+  }, 30_000)
+
+  it("NF-INT-EXT-11: channelContext.source='smoke-test' → case status is 'resolved' in DB", async () => {
+    const result = await ingestExternalSignal(
+      productId,
+      makePayload({ channelContext: { source: "smoke-test" } }),
+    )
+
+    expect(result.canary).toBe(true)
+    const db   = getDb()
+    const rows = await db`SELECT status FROM cases WHERE case_id = ${result.caseId}`
+    expect(rows[0]?.status).toBe("resolved")
+  }, 30_000)
+
+  it("NF-INT-EXT-12: smoke canary → dispatch (triage) not called", async () => {
+    await ingestExternalSignal(productId, makePayload({ senderName: "smoke-test" }))
+
+    expect(dispatch).not.toHaveBeenCalled()
   }, 30_000)
 
   // ── HTTP endpoint tests ───────────────────────────────────────────────────

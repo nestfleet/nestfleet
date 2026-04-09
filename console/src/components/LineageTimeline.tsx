@@ -211,7 +211,7 @@ function nodeRowBg(actorType: LineageNode["actorType"], type: LineageNodeType): 
 
 // ─── Modal state ──────────────────────────────────────────────────────────────
 
-type ModalMode = "approve" | "reject";
+type ModalMode = "approve" | "reject" | "resolve";
 
 interface ActiveModal {
   mode: ModalMode;
@@ -611,13 +611,25 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
     }
   };
 
-  const handleResolve = async (_nodeId: string) => {
+  const [resolveNote, setResolveNote] = useState("");
+
+  const handleResolve = (_nodeId: string) => {
+    setResolveNote("");
+    setActiveModal({ mode: "resolve", crId: "", crTitle: response.caseId });
+  };
+
+  const handleResolveSubmit = async () => {
+    setIsSubmitting(true);
     try {
-      await resolveCaseApi(productId, response.caseId, "Resolved by operator");
+      const note = resolveNote.trim() || "Resolved by operator";
+      await resolveCaseApi(productId, response.caseId, note);
       toast("Case marked as resolved", "success");
+      setActiveModal(null);
       onActionComplete();
     } catch (err) {
       toast(`Resolve failed: ${(err as Error).message}`, "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -665,22 +677,67 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
 
   const openModal = (modal: ActiveModal) => {
     if (modal.mode === "approve") setNote("");
+    else if (modal.mode === "resolve") setResolveNote("");
     else setReason("");
     setActiveModal(modal);
   };
 
+  const RESOLVABLE_STATUSES = ["triaged", "awaiting-lead", "in-resolution", "in-change", "pr-drafting"]
+
   if (response.nodes.length === 0) {
+    const canResolveFromEmpty = RESOLVABLE_STATUSES.includes(response.currentStatus)
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl bg-white py-16 shadow-sm ring-1 ring-black/5">
-        <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-          <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+      <>
+        <div className="flex flex-col items-center justify-center rounded-xl bg-white py-16 shadow-sm ring-1 ring-black/5">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-gray-900">No events yet</p>
+          <p className="mt-1 text-xs text-gray-400">The agent is processing — events will appear here shortly.</p>
+          {canResolveFromEmpty ? (
+            <button
+              onClick={() => handleResolve("")}
+              className="mt-5 flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
+            >
+              Mark Resolved
+            </button>
+          ) : (
+            <div className="mt-4 h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" aria-hidden="true" />
+          )}
         </div>
-        <p className="text-sm font-medium text-gray-900">No events yet</p>
-        <p className="mt-1 text-xs text-gray-400">The agent is processing — events will appear here shortly.</p>
-        <div className="mt-4 h-5 w-5 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" aria-hidden="true" />
-      </div>
+        {/* Resolve modal must render even in empty state so state updates work */}
+        <Modal isOpen={activeModal?.mode === "resolve"} onClose={closeModal} title="Resolve Case">
+          {activeModal?.mode === "resolve" && (
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label htmlFor="resolve-note-empty" className="block text-sm font-medium text-gray-700">
+                  Resolution note <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <textarea
+                  id="resolve-note-empty"
+                  rows={3}
+                  value={resolveNote}
+                  onChange={(e) => setResolveNote(e.target.value)}
+                  placeholder="What was done to resolve this? Leave blank to use default."
+                  disabled={isSubmitting}
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
+                />
+              </div>
+              <div className="flex items-center justify-end gap-3 pt-1">
+                <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+                  Cancel
+                </button>
+                <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+                  {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
+                  Mark Resolved
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+      </>
     );
   }
 
@@ -835,6 +892,37 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
                 )}
                 Reject
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* ── Resolve modal (UX-09) ── */}
+      <Modal isOpen={activeModal?.mode === "resolve"} onClose={closeModal} title="Resolve Case">
+        {activeModal?.mode === "resolve" && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label htmlFor="resolve-note-timeline" className="block text-sm font-medium text-gray-700">
+                Resolution note <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <textarea
+                id="resolve-note-timeline"
+                rows={3}
+                value={resolveNote}
+                onChange={(e) => setResolveNote(e.target.value)}
+                placeholder="What was done to resolve this? Leave blank to use default."
+                disabled={isSubmitting}
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-3 pt-1">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+                Cancel
+              </button>
+              <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+                {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
+                Mark Resolved
               </button>
             </div>
           </div>
