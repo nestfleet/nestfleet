@@ -92,6 +92,7 @@ function primaryAction(c: CaseRow): "route" | "resolve" | "forward" {
   if (c.type === "user_feedback")                       return "resolve";
   const category = (c.triage_output?.category as string | undefined) ?? "";
   if (NON_ENG_CATEGORIES.has(category))                 return "forward";
+  if (c.status === "awaiting-lead")                     return "resolve";
   return "route";
 }
 

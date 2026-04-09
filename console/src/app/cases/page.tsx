@@ -105,8 +105,12 @@ export default function CasesPage() {
   const productCtx = useProductSafe();
   const basePath = productCtx ? `/p/${productCtx.product.slug}` : "";
 
-  const [statusFilter, setStatusFilter]         = useState<string>("");
-  const [severityFilter, setSeverityFilter]     = useState<string>("");
+  const [statusFilter, setStatusFilter]         = useState<string>(() =>
+    typeof window !== "undefined" ? (sessionStorage.getItem("nf:cases:statusFilter") ?? "") : ""
+  );
+  const [severityFilter, setSeverityFilter]     = useState<string>(() =>
+    typeof window !== "undefined" ? (sessionStorage.getItem("nf:cases:severityFilter") ?? "") : ""
+  );
   const [pendingHandoffFilter, setPendingHandoffFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -213,8 +217,8 @@ export default function CasesPage() {
             <FilterPopover
               statusFilter={statusFilter}
               severityFilter={severityFilter}
-              onStatusChange={setStatusFilter}
-              onSeverityChange={setSeverityFilter}
+              onStatusChange={(v) => { setStatusFilter(v); sessionStorage.setItem("nf:cases:statusFilter", v); }}
+              onSeverityChange={(v) => { setSeverityFilter(v); sessionStorage.setItem("nf:cases:severityFilter", v); }}
               statuses={ALL_STATUSES}
               severities={ALL_SEVERITIES}
             />
@@ -235,7 +239,7 @@ export default function CasesPage() {
             {statusFilter && (
               <span className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
                 {"Status: " + statusFilter.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
-                <button onClick={() => setStatusFilter("")} className="ml-0.5 hover:text-indigo-900" aria-label="Remove status filter">
+                <button onClick={() => { setStatusFilter(""); sessionStorage.setItem("nf:cases:statusFilter", ""); }} className="ml-0.5 hover:text-indigo-900" aria-label="Remove status filter">
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </span>
@@ -243,12 +247,12 @@ export default function CasesPage() {
             {severityFilter && (
               <span className="inline-flex items-center gap-1 rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
                 {"Severity: " + severityFilter.charAt(0).toUpperCase() + severityFilter.slice(1)}
-                <button onClick={() => setSeverityFilter("")} className="ml-0.5 hover:text-indigo-900" aria-label="Remove severity filter">
+                <button onClick={() => { setSeverityFilter(""); sessionStorage.setItem("nf:cases:severityFilter", ""); }} className="ml-0.5 hover:text-indigo-900" aria-label="Remove severity filter">
                   <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </span>
             )}
-            <button onClick={() => { setStatusFilter(""); setSeverityFilter(""); setPendingHandoffFilter(false); }} className="text-xs text-gray-400 hover:text-gray-600">
+            <button onClick={() => { setStatusFilter(""); setSeverityFilter(""); setPendingHandoffFilter(false); sessionStorage.setItem("nf:cases:statusFilter", ""); sessionStorage.setItem("nf:cases:severityFilter", ""); }} className="text-xs text-gray-400 hover:text-gray-600">
               Clear all
             </button>
           </div>

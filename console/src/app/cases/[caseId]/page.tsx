@@ -530,6 +530,7 @@ export default function CaseDetailPage({ params }: PageProps) {
   );
 
   const isAwaitingLead  = caseRow?.status === "awaiting-lead";
+  const isInResolution  = caseRow?.status === "in-resolution";
   const isEmailCase     = messages.length > 0 && !messages.some((m) => m.source_type === "chat");
   const isProcessingFailed = caseRow?.status === "processing-failed";
 
@@ -603,6 +604,7 @@ export default function CaseDetailPage({ params }: PageProps) {
                 <h1 className="text-xl font-semibold text-gray-900 leading-snug">
                   {lineage.signal?.subject ||
                     (lineage.nodes.find((n) => n.type === "case_created")?.metadata?.subject as string | undefined) ||
+                    caseRow?.title ||
                     `Case ${lineage.caseId}`}
                 </h1>
 
@@ -785,12 +787,12 @@ export default function CaseDetailPage({ params }: PageProps) {
             />
           )}
 
-          {/* ── Email draft reply panel (DEFERRED-24) ── */}
-          {/* Only shown when there is an actual draft to review; hidden once draft is cleared after sending */}
-          {isAwaitingLead && isEmailCase && caseRow?.draft_reply && (
+          {/* ── Email draft reply panel (DEFERRED-24 / BEF-33) ── */}
+          {/* Shown for awaiting-lead (with or without draft) and in-resolution (manual reply when agent abstained) */}
+          {(isAwaitingLead || isInResolution) && isEmailCase && (
             <EmailReplyPanel
               caseId={caseId}
-              draft={caseRow.draft_reply}
+              draft={caseRow?.draft_reply ?? null}
               onSent={() => { mutate(); mutateCase(); mutateConversation(); }}
             />
           )}

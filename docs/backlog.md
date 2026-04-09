@@ -79,6 +79,9 @@
 | UX-03 | Billing Plan card: show "Manage Subscription" + contact administrator link for all tiers when BILLING_ENABLED=false — was showing Stripe upgrade cards (non-functional on customer VPSes) | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
 | UX-04 | ReissueLicenseDialog: exclude current tier from dropdown — reissue is a tier change, not a renewal; default to first available option | XS | P1 | ✅ Done (2026-04-08) | `main` | — |
 | UX-05 | Owner Console — Deprovision confirm dialog too wide; confirmation text overflows the modal frame | XS | P3 | ✅ Done (2026-04-08) | Deprovision confirm dialog: max-w-xs (was max-w-sm), break-all on slug. main. |
+| UX-06 | Change Queue: add "Escalate to Lead" action inline (currently only available from Case details) | XS | P2 | Not Started | Avoids extra navigation when a CR needs human handling without approve/reject |
+| UX-07 | Case list: show subject/title instead of case ID in header when navigating from a filtered list | XS | P2 | Not Started | Case ID shown as title inside case detail when coming from filtered list view |
+| UX-08 | Preserve active filter state when navigating back from case detail to case list | XS | P2 | Not Started | Filter resets on back navigation — forces user to re-apply filter each time |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 
@@ -157,6 +160,8 @@
 | BEF-29 | Settings LLM — Google embedding validation calls wrong API URL and wrong API version | S | P1 | ✅ Done (2026-04-09) | `testEmbeddingConnection` used the OpenAI-compatible `/v1/embeddings` endpoint for all providers including Google. Google requires `generativelanguage.googleapis.com/v1beta/models/{model}:embedContent?key={apiKey}` with a different request body shape. Fix: added Google-specific branch in `testEmbeddingConnection` with the correct URL, auth scheme, and request body (`content.parts[].text` instead of `input[]`). Added Anthropic + Self-hosted warning callouts in console embedding advanced section. Added `ollama pull nomic-embed-text` reminder for self-hosted. |
 | BEF-30 | Settings LLM — 404 on embedding model blocks save even when LLM key is valid | XS | P1 | ✅ Done (2026-04-09) | Google `text-embedding-004` returned 404 for projects where the model is not enabled — hard-blocked the save even though the LLM key was valid and the LLM test passed. Fix: 404 from either Google or OpenAI-compat embedding endpoint is treated as `modelNotFound: true` — save proceeds with a backend warning log. Only auth failures (401/403) and network errors are hard blocks. `EmbeddingTestResult` extended with optional `modelNotFound` flag. |
 | BEF-31 | Integration tests broken by QE-06 LLM validation (fake keys now trigger real HTTP calls) | XS | P1 | ✅ Done (2026-04-09) | `settings-api.test.ts` (NF-INT-103) and `provisioning/new-org-happy-path.test.ts` (NF-INT-524) started returning 422 after QE-06 added real HTTP validation — tests used fake keys like `sk-ant-xyz5678`. Fix: added `vi.stubGlobal("fetch", ...)` at module level in both test files so LLM/embedding validation calls return mocked success. NF-INT-515 also fixed: `beforeEach` deleted all test users, leaving DB empty → `isRegistrationOpen()` returned true (first-run mode) despite `REGISTRATION_ENABLED=false`. Fix: register a seed user inside the test before setting the env var. |
+| BEF-32 | Lead role dead-end: awaiting-lead UI only shows "Route to Eng" — Resolve action missing despite being valid in state machine | XS | P1 | Not Started | `awaiting-lead → resolved` is a valid transition in case-state-machine.ts but the console does not surface it. UI-only fix. Workaround: reject CR from Change queue → returns to awaiting-lead → resolve from Case details. |
+| BEF-33 | in-resolution cases: agent abstains from auto-reply but no "Send Reply" action surfaced for Lead to respond manually | S | P1 | Not Started | When auto_reply agent abstains, case sits in-resolution with only "Mark Resolved" and "Escalate to Lead" — no way to compose and send a manual reply from the console. Seen on NF-09 (Postmark SMTP) and NF-11 (upgrade process). |
 
 ### QE — Quality Engineering
 
@@ -184,6 +189,7 @@
 | NF-PLAT-01-DB | DB Persistence for Plan-Lock Loop (`writePlan` callback) | S | Pending PlatformCloud deploy; activate when PC is live |
 | SLICE-23 | Compare-Roles UI (permission studio diff view) | M | Deferred post-v1; low ROI until RBAC matures |
 | CHAT-UX-01 | AI Confidence Threshold for Auto-Close | S | Decision pending on threshold value and after-hours logic |
+| QE-07 | Auto-resolve smoke canary cases at webhook ingestion | XS | Smoke cases (senderName="smoke-test" / channelContext.source="smoke-test") bypass triage and are immediately resolved; prevents agent pipeline from acting on canary signals |
 
 ---
 
