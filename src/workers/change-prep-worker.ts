@@ -67,8 +67,10 @@ export class ChangePrepWorker extends AbstractAgentWorker {
       caseRow?.title ??
       ""
 
-    // ── 3. Transition CR: draft → analysis (via state machine guard) ──────────
-    await transitionChangeRequest(changeRequestId, "draft", "analysis")
+    // ── 3. Transition CR: draft → analysis (idempotent — skip if already in analysis on retry) ──
+    if (cr.status === "draft") {
+      await transitionChangeRequest(changeRequestId, "draft", "analysis")
+    }
 
     await createAuditEvent({
       product_id:   productId,
