@@ -133,14 +133,22 @@ export async function runTriageAgent(input: TriageInput): Promise<AgentResult<Tr
     logger.warn({ err, productId, caseId }, "Embedding/retrieval failed — triaging without RAG context")
   }
 
-  if (evidencePack.abstain && evidencePack.abstainReason !== "insufficient_tier") {
-    // Hard abstain (no results, audience violation, stale, conflict)
-    // Caller (worker) checks abstain before calling this function; this is a safety fallback
+  if (
+    evidencePack.abstain &&
+    evidencePack.abstainReason !== "insufficient_tier" &&
+    evidencePack.abstainReason !== "no_results"
+  ) {
+    // Hard abstain for audience violation, stale evidence, or knowledge conflicts.
+    // no_results and insufficient_tier are soft: triage continues on signal text alone.
     logger.warn({ productId, caseId, abstainReason: evidencePack.abstainReason }, "Triage agent hard abstain")
     throw new PolicyViolationError(
       `Triage abstained: ${evidencePack.abstainReason}`,
       `abstain:${evidencePack.abstainReason}`,
     )
+  }
+
+  if (evidencePack.abstain && evidencePack.abstainReason === "no_results") {
+    logger.info({ productId, caseId }, "Triage: no memory chunks found — proceeding with signal text only")
   }
 
   // Format evidence pack as context
