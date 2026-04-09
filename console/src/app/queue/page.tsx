@@ -151,7 +151,7 @@ export default function QueuePage() {
     { refreshInterval: 10_000, revalidateOnFocus: true }
   );
 
-  const allLeadCases: CaseRow[] = leadData?.data ?? [];
+  const allLeadCases: CaseRow[] = (leadData?.data ?? []).filter((c) => !TERMINAL_STATUSES.has(c.status));
   const pendingHandoffCases: CaseRow[] = (handoffData?.data ?? []).filter(
     (c) => c.last_event_action === "case.forwarded_to_team",
   );
