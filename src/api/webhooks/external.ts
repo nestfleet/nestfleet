@@ -106,6 +106,7 @@ externalWebhookRouter.post("/:productId", async (c) => {
       caseId:         result.caseId,
       conversationId: result.conversationId,
       channelThreadId: result.channelThreadId,
+      ...(result.canary ? { canary: true } : {}),
     }, 200)
   } catch (err) {
     logger.error({ err, productId }, "External webhook ingestion failed")
