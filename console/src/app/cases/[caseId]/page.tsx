@@ -531,7 +531,8 @@ export default function CaseDetailPage({ params }: PageProps) {
 
   const isAwaitingLead  = caseRow?.status === "awaiting-lead";
   const isInResolution  = caseRow?.status === "in-resolution";
-  const isEmailCase     = messages.length > 0 && !messages.some((m) => m.source_type === "chat");
+  const isEmailCase     = messages.some((m) => m.source_type === "email");
+  const isWebhookCase   = !isEmailCase && messages.length > 0 && !messages.some((m) => m.source_type === "chat");
   const isProcessingFailed = caseRow?.status === "processing-failed";
 
   const relativeUpdated = lineage
@@ -795,6 +796,17 @@ export default function CaseDetailPage({ params }: PageProps) {
               draft={caseRow?.draft_reply ?? null}
               onSent={() => { mutate(); mutateCase(); mutateConversation(); }}
             />
+          )}
+
+          {/* ── Webhook case reply notice ── */}
+          {/* Webhook cases have no email recipient — reply must be sent via the original channel */}
+          {(isAwaitingLead || isInResolution) && isWebhookCase && (
+            <div className="rounded-xl bg-amber-50 ring-1 ring-amber-200 px-4 py-3 text-sm text-amber-800 flex items-start gap-2">
+              <svg className="h-4 w-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+              <span>This case came via webhook — reply manually through the original channel, then resolve.</span>
+            </div>
           )}
 
           {/* ── Conversation thread (only shown for non-chat cases with >1 message) ── */}
