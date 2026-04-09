@@ -370,8 +370,8 @@ casesRouter.post("/products/:productId/cases/:caseId/send-draft-reply", requireA
     if (!caseRow || caseRow.product_id !== productId) {
       return c.json({ error: "Case not found" }, 404)
     }
-    if (caseRow.status !== "awaiting-lead") {
-      return c.json({ error: "Case must be in awaiting-lead status to send a draft reply" }, 400)
+    if (!["awaiting-lead", "in-resolution"].includes(caseRow.status)) {
+      return c.json({ error: "Case must be in awaiting-lead or in-resolution status to send a reply" }, 400)
     }
 
     const replyText = parsed.data.reply_text.trim()
@@ -440,8 +440,8 @@ casesRouter.post("/products/:productId/cases/:caseId/send-draft-reply", requireA
       actor_type:   "lead",
       actor_ref:    actor.email,
       action:       "case.draft_reply_sent",
-      before_state: { status: "awaiting-lead" },
-      after_state:  { status: "awaiting-lead" },
+      before_state: { status: caseRow.status },
+      after_state:  { status: caseRow.status },
       metadata:     { recipientEmail, sentBy: actor.email, replyLength: replyText.length },
     })
 
