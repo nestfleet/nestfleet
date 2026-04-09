@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { AppLayout } from "@/components/AppLayout";
 import { StatusDot, SeverityDot } from "@/components/Badge";
 import { SearchInput } from "@/components/SearchInput";
-import { getCasesApi } from "@/lib/api";
+import { getCasesApi, retryCaseApi } from "@/lib/api";
 import { useProductIdWithFallback, useProductSafe } from "@/lib/product-context";
 import { usePendingNotificationRefs } from "@/lib/usePendingNotificationRefs";
 import type { CaseRow, CaseStatus, CaseSeverity } from "@/lib/types";
@@ -49,6 +49,7 @@ function lastEventLabel(action: string | null | undefined): string {
     case "case.reopened":       return "Reopened";
     case "case.followup_sent":  return "Follow-up sent";
     case "case.closed":         return "Closed";
+    case "case.retried":        return "Retry dispatched";
     case "agent.triage_complete":      return "Triage complete";
     case "agent.change_prep_complete": return "Change prep done";
     case "agent.abstained":            return "Agent abstained";
@@ -91,6 +92,7 @@ function personaLabel(persona: string | null): string | null {
 const ALL_STATUSES: CaseStatus[] = [
   "new", "enriching", "triaged", "in-resolution",
   "awaiting-lead", "in-change", "resolved", "closed",
+  "processing-failed",
 ];
 
 const ALL_SEVERITIES: CaseSeverity[] = ["critical", "high", "normal", "low"];
@@ -108,7 +110,7 @@ export default function CasesPage() {
   const [pendingHandoffFilter, setPendingHandoffFilter] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading, mutate } = useSWR(
     productId ? ["cases", productId, statusFilter, severityFilter] : null,
     () => getCasesApi(productId, {
       status:   statusFilter   || undefined,
@@ -308,7 +310,9 @@ export default function CasesPage() {
                       key={c.case_id}
                       caseItem={c}
                       hasPendingNotif={pendingRefs.has(c.case_id)}
+                      productId={productId}
                       onClick={() => router.push(`${basePath}/cases/${c.case_id}`)}
+                      onRetried={() => mutate()}
                     />
                   ))}
                 </tbody>
@@ -330,10 +334,12 @@ export default function CasesPage() {
 interface CaseTableRowProps {
   caseItem:          CaseRow;
   hasPendingNotif:   boolean;
+  productId:         string;
   onClick:           () => void;
+  onRetried:         () => void;
 }
 
-function CaseTableRow({ caseItem, hasPendingNotif, onClick }: CaseTableRowProps) {
+function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried }: CaseTableRowProps) {
   const lastEventAtRaw = caseItem.last_event_at ?? caseItem.updated_at;
 
   const lastEventAtStr = (() => {
@@ -358,10 +364,28 @@ function CaseTableRow({ caseItem, hasPendingNotif, onClick }: CaseTableRowProps)
     persona,
   ].filter(Boolean);
 
+  const isFailed = caseItem.status === "processing-failed";
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+
+  async function handleRetry(e: React.MouseEvent) {
+    e.stopPropagation();
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      await retryCaseApi(productId, caseItem.case_id);
+      onRetried();
+    } catch (err) {
+      setRetryError(err instanceof Error ? err.message : "Failed to retry");
+    } finally {
+      setRetrying(false);
+    }
+  }
+
   return (
     <tr
       onClick={onClick}
-      className={`cursor-pointer hover:bg-gray-50/80 transition-colors ${freshness === "hot" ? "bg-amber-50/20" : ""}`}
+      className={`cursor-pointer hover:bg-gray-50/80 transition-colors ${freshness === "hot" ? "bg-amber-50/20" : ""} ${isFailed ? "bg-red-50/30" : ""}`}
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}
       role="button"
@@ -423,6 +447,38 @@ function CaseTableRow({ caseItem, hasPendingNotif, onClick }: CaseTableRowProps)
             </span>
           ))}
         </div>
+
+        {/* QE-05: Retry button for failed cases */}
+        {isFailed && (
+          <div className="mt-1.5 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-red-400"
+              aria-label="Retry processing"
+            >
+              {retrying ? (
+                <>
+                  <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Retrying…
+                </>
+              ) : (
+                <>
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Retry
+                </>
+              )}
+            </button>
+            {retryError && (
+              <span className="text-[10px] text-red-600">{retryError}</span>
+            )}
+          </div>
+        )}
       </td>
 
       {/* Status — dot + text */}

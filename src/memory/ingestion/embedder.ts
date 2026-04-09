@@ -43,7 +43,14 @@ async function resolveEmbeddingConfig(productId?: string): Promise<EmbeddingConf
 
         return {
           provider: embProvider,
-          apiKey: decryptSecret(llm.apiKey as string | undefined) ?? envConfig.EMBEDDING_API_KEY,
+          apiKey: (() => {
+            // anthropic and azure-openai have no native embedding API — use a separate OpenAI key
+            if (provider === "anthropic" || provider === "azure-openai") {
+              return decryptSecret(llm.embeddingApiKey as string | undefined)
+                ?? envConfig.EMBEDDING_API_KEY
+            }
+            return decryptSecret(llm.apiKey as string | undefined) ?? envConfig.EMBEDDING_API_KEY
+          })(),
           model: llm.embeddingModel as string,
           dimensions: (llm.embeddingDimensions as number | undefined) ?? envConfig.EMBEDDING_DIMENSIONS,
           baseUrl: (llm.baseUrl as string | undefined) ?? envConfig.EMBEDDING_BASE_URL,

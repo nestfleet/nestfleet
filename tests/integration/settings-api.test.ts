@@ -10,6 +10,15 @@ vi.mock("../../src/agents/dispatcher.js", () => ({
 }))
 
 import { describe, it, expect, beforeAll, afterAll } from "vitest"
+
+// Stub fetch so PUT /settings LLM validation does not make real network calls.
+// testLlmConnection and testEmbeddingConnection use fetch internally.
+vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+  ok: true,
+  status: 200,
+  json: async () => ({ choices: [{ message: { content: "OK" } }] }),
+  text: async () => JSON.stringify({ choices: [{ message: { content: "OK" } }] }),
+}))
 import type { TestDbContext } from "./helpers/db.js"
 import { setupTestDb } from "./helpers/db.js"
 import { app } from "../../src/api/index.js"

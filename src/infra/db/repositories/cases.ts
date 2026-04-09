@@ -8,6 +8,10 @@
  *                            → awaiting-user → enriching
  *                            → awaiting-lead → in-resolution | in-change
  *                            → in-change → pr-drafting → resolved
+ *
+ * QE-05: "processing-failed" added as a terminal error state. Jobs exhausting
+ * all pg-boss retries land here so operators see a visible failure rather than
+ * a silently-stuck case. Recovery path: processing-failed → enriching (re-triage).
  */
 
 import { z } from "zod"
@@ -27,6 +31,8 @@ export const CaseStatusSchema = z.enum([
   "pr-drafting",
   "resolved",
   "closed",
+  // QE-05: visible failure state when a pg-boss job exhausts all retries
+  "processing-failed",
 ])
 export type CaseStatus = z.infer<typeof CaseStatusSchema>
 
@@ -55,6 +61,14 @@ export const LeadRoleSchema = z.enum([
   "knowledge_lead",
 ])
 export type LeadRole = z.infer<typeof LeadRoleSchema>
+
+/** QE-05: shape stored in processing_error JSONB column. */
+export const ProcessingErrorSchema = z.object({
+  jobName: z.string(),
+  jobId:   z.string(),
+  error:   z.string(),
+})
+export type ProcessingError = z.infer<typeof ProcessingErrorSchema>
 
 export const CaseRowSchema = z.object({
   case_id:               z.string(),
@@ -85,6 +99,8 @@ export const CaseRowSchema = z.object({
   // DEFERRED-24: AI draft reply stored when auto-send gates fail → awaiting-lead
   draft_reply:           z.string().nullable().optional(),
   draft_metadata:        z.record(z.unknown()).nullable().optional(),
+  // QE-05: failure context written by DLQ handler; null when not in processing-failed state
+  processing_error:      ProcessingErrorSchema.nullable().optional(),
 })
 export type CaseRow = z.infer<typeof CaseRowSchema>
 
@@ -124,6 +140,8 @@ export const CaseUpdateSchema = z.object({
   resolved_at:          z.date().optional(),
   closed_at:            z.date().optional(),
   draft_reply:          z.string().nullable().optional(),
+  // QE-05: failure context; pass null to clear after recovery
+  processing_error:     ProcessingErrorSchema.nullable().optional(),
 })
 export type CaseUpdate = z.infer<typeof CaseUpdateSchema>
 
@@ -291,6 +309,10 @@ export async function updateCase(
   if (v.resolved_at !== undefined)          updates["resolved_at"]          = v.resolved_at
   if (v.closed_at !== undefined)            updates["closed_at"]            = v.closed_at
   if (v.draft_reply !== undefined)          updates["draft_reply"]          = v.draft_reply
+  // QE-05: processing_error — null clears the field, undefined skips it
+  if (v.processing_error !== undefined)     updates["processing_error"]     = v.processing_error === null
+                                                                               ? null
+                                                                               : db.json(pgJson(v.processing_error))
 
   if (Object.keys(updates).length === 0) return findCaseById(caseId)
 

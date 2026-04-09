@@ -57,8 +57,9 @@ export async function apiFetch<T>(
   if (!response.ok) {
     let message = `API error ${response.status}`;
     try {
-      const errBody = await response.json() as { message?: string; error?: string };
-      message = errBody.message ?? errBody.error ?? message;
+      const errBody = await response.json() as { message?: string; error?: string; detail?: string };
+      const base = errBody.message ?? errBody.error ?? message;
+      message = errBody.detail ? `${base}: ${errBody.detail}` : base;
     } catch {
       // ignore parse errors
     }
@@ -191,6 +192,16 @@ export async function sendChatReplyApi(
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
+}
+
+// QE-05: Re-dispatch a processing-failed case for re-triage.
+export async function retryCaseApi(
+  productId: string,
+  caseId: string,
+): Promise<{ ok: true }> {
+  return apiFetch(`/api/v1/products/${productId}/cases/${caseId}/retry`, {
+    method: "POST",
+  });
 }
 
 // ─── Change Requests ─────────────────────────────────────────────────────────
@@ -390,6 +401,7 @@ export interface SettingsResponse {
     model: string | null;
     baseUrl: string | null;
     apiKeyLast4: string | null;
+    embeddingApiKeyLast4: string | null;
     configured: boolean;
     embeddingModel: string | null;
     embeddingDimensions: number;

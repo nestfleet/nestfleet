@@ -10,20 +10,25 @@
  *   agent → write routing decision → dispatch critical notifications
  *
  * CRITICAL FALLBACK (ADR-029):
- *   On abstain or any error from LLM → THROW PolicyViolationError.
+ *   On hard abstain or any error from LLM → THROW PolicyViolationError.
  *   The caller (worker) is responsible for escalating to all leads.
  *   This agent does NOT handle fallback internally.
+ *
+ * Abstain semantics (via buildEvidencePack):
+ *   - Embedding/retrieval failure       → proceed without RAG (non-fatal, QE-01 fix)
+ *   - abstainReason "no_results"        → proceed without RAG (new products, QE-01 fix)
+ *   - abstainReason "insufficient_tier" → proceed without RAG (soft)
+ *   - any other abstain reason          → PolicyViolationError (hard stop, ADR-029)
  */
 
 import { z } from "zod"
 import { logger } from "../../shared/logger.js"
-import { retrieve } from "../../memory/retrieval/retrieval-service.js"
-import { embedText } from "../../memory/ingestion/embedder.js"
 import { getLlmProviderForProduct } from "../llm-provider.js"
 import { withTone } from "../tone.js"
 import { runAgent } from "../run-agent.js"
 import { getToolSet } from "../tool-sets.js"
 import { prepareUserContent } from "../sanitize.js"
+import { buildEvidencePack } from "../evidence.js"
 import { PolicyViolationError, type AgentResult } from "../types.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
@@ -83,8 +88,12 @@ const SYSTEM_PROMPT = `You are a critical infrastructure steward. An active outa
 /**
  * Run the outage_routing agent.
  *
- * @throws PolicyViolationError on abstain or LLM error — the caller (worker) handles fallback.
+ * @throws PolicyViolationError on hard abstain or LLM error — the caller (worker) handles fallback.
  * Per ADR-029: this agent never handles fallback internally.
+ *
+ * Embedding or retrieval failure is non-fatal (QE-01 fix): the LLM is still called
+ * using the outage description text and its available tools. Only hard abstain reasons
+ * (audience_violation, stale_evidence, knowledge_conflict) propagate as PolicyViolationError.
  */
 export async function runOutageRoutingAgent(
   input: OutageRoutingInput,
@@ -92,12 +101,13 @@ export async function runOutageRoutingAgent(
   const { productId, caseId, jobId, outageDescription, reportedAt, productVersion } = input
 
   // ── Retrieve evidence pack (abstain check) ───────────────────────────────
-  const { embedding: queryEmbedding } = await embedText(outageDescription.slice(0, 512), productId)
-
-  const evidencePack = await retrieve({
+  // buildEvidencePack handles:
+  //   - embedding/retrieval errors → EMPTY_EVIDENCE_PACK (non-fatal)
+  //   - no_results / insufficient_tier → soft, returns pack (caller proceeds)
+  //   - hard abstain reasons → throws PolicyViolationError (ADR-029 compliant)
+  const evidencePack = await buildEvidencePack({
     productId,
     queryText: outageDescription,
-    queryEmbedding,
     actionType: "outage_routing",
     audience: "internal",
     topK: 15,
@@ -105,16 +115,11 @@ export async function runOutageRoutingAgent(
     ...(productVersion ? { productVersion } : {}),
   })
 
-  // ── Abstain: throw — caller escalates to all leads (ADR-029) ─────────────
-  if (evidencePack.abstain) {
-    const abstainReason = evidencePack.abstainReason ?? "unknown"
+  // Log when we had no results so operators can track corpus gaps
+  if (evidencePack.abstain && evidencePack.abstainReason === "no_results") {
     logger.warn(
-      { productId, caseId, abstainReason },
-      "outage_routing abstained — caller must escalate to all leads (ADR-029)",
-    )
-    throw new PolicyViolationError(
-      `outage_routing abstained: ${abstainReason}`,
-      `abstain:${abstainReason}`,
+      { productId, caseId },
+      "outage_routing: no runbook/routing docs found in corpus — LLM will rely on tools and description only",
     )
   }
 

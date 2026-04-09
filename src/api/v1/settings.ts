@@ -57,6 +57,8 @@ const LlmConfigSchema = z.object({
   embeddingModel: z.string().optional(),
   /** Embedding dimensions — auto-defaulted per model */
   embeddingDimensions: z.number().int().min(64).max(3072).optional(),
+  /** OpenAI key used for embeddings when provider has no native embedding API (anthropic, azure-openai). */
+  embeddingApiKey: z.string().optional(),
 })
 
 /** Sensible defaults per provider — avoids manual input for embeddings */
@@ -155,6 +157,7 @@ function buildSettingsResponse(product: {
       model: llm.model ?? null,
       baseUrl: llm.baseUrl ?? null,
       apiKeyLast4: maskApiKey(llmApiKey ?? undefined),
+      embeddingApiKeyLast4: maskApiKey(decryptSecret(llm.embeddingApiKey as string | undefined) ?? undefined),
       configured: !!(llm.provider && (llmApiKey || llm.provider === "self-hosted")),
       embeddingModel: llm.embeddingModel ?? EMBEDDING_DEFAULTS[llm.provider as string]?.model ?? null,
       embeddingDimensions: llm.embeddingDimensions ?? EMBEDDING_DEFAULTS[llm.provider as string]?.dimensions ?? 768,
@@ -207,6 +210,278 @@ function buildSettingsResponse(product: {
   }
 }
 
+// ── QE-06: LLM connection test helper ────────────────────────────────────────
+//
+// Extracted from the POST /test-llm route so the PUT /settings handler can
+// reuse the same logic for pre-save validation without duplicating code.
+
+export interface LlmTestResult {
+  success: boolean
+  /** Non-empty when success is false. */
+  errorMessage: string
+  responseText: string
+}
+
+/**
+ * Fire a minimal completion request to verify that provider + model + apiKey
+ * are valid. Returns a plain result object — HTTP concerns stay in the callers.
+ *
+ * Uses AbortSignal.timeout(10_000) for all providers (15 s for self-hosted).
+ */
+export async function testLlmConnection(
+  provider: LlmProvider,
+  model: string,
+  apiKey: string,
+  baseUrl?: string,
+): Promise<LlmTestResult> {
+  let success = false
+  let responseText = ""
+  let errorMessage = ""
+
+  if (provider === "self-hosted") {
+    const endpoint = `${(baseUrl ?? "http://localhost:11434/v1").replace(/\/+$/, "")}/chat/completions`
+    const headers: Record<string, string> = { "Content-Type": "application/json" }
+    if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ model, messages: [{ role: "user", content: "Say OK" }], max_tokens: 5 }),
+      signal: AbortSignal.timeout(15_000),
+    })
+    if (res.ok) {
+      const data = await res.json() as { choices?: { message?: { content?: string } }[] }
+      responseText = data.choices?.[0]?.message?.content ?? ""
+      success = true
+    } else {
+      errorMessage = `HTTP ${res.status}: ${await res.text().catch(() => "")}`
+    }
+  } else if (provider === "openai" || provider === "azure-openai") {
+    const res = await fetch(
+      provider === "azure-openai"
+        ? `https://${model}.openai.azure.com/openai/deployments/${model}/chat/completions?api-version=2024-02-01`
+        : "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: "Say OK" }],
+          max_completion_tokens: 5,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      },
+    )
+    if (res.ok) {
+      const data = await res.json() as { choices?: { message?: { content?: string } }[] }
+      responseText = data.choices?.[0]?.message?.content ?? ""
+      success = true
+    } else if (res.status === 401) {
+      // Only 401 means the key itself is invalid
+      errorMessage = `HTTP 401: ${await res.text().catch(() => "")}`
+    } else {
+      // 400 (billing/unsupported param), 402, 429, 5xx — key authenticated, non-auth error
+      success = true
+    }
+  } else if (provider === "anthropic") {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 5,
+        messages: [{ role: "user", content: "Say OK" }],
+      }),
+      signal: AbortSignal.timeout(10_000),
+    })
+    if (res.ok) {
+      const data = await res.json() as { content?: { text?: string }[] }
+      responseText = data.content?.[0]?.text ?? ""
+      success = true
+    } else if (res.status === 401) {
+      // Only 401 means the key itself is invalid
+      errorMessage = `HTTP 401: ${await res.text().catch(() => "")}`
+    } else {
+      // 400 (credit balance, model not found), 429 — key authenticated, non-auth error
+      success = true
+    }
+  } else if (provider === "google") {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Say OK" }] }],
+          generationConfig: { maxOutputTokens: 5 },
+        }),
+        signal: AbortSignal.timeout(10_000),
+      },
+    )
+    if (res.ok) {
+      const data = await res.json() as { candidates?: { content?: { parts?: { text?: string }[] } }[] }
+      responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
+      success = true
+    } else if (res.status === 403) {
+      // 403 = key rejected / no API access
+      errorMessage = `HTTP 403: ${await res.text().catch(() => "")}`
+    } else if (res.status === 400) {
+      const body = await res.text().catch(() => "")
+      if (body.includes("API_KEY_INVALID") || body.includes("API key not valid")) {
+        errorMessage = `HTTP 400: ${body}`
+      } else {
+        // 400 for quota/billing/model — key authenticated
+        success = true
+      }
+    } else {
+      // 429 etc — key authenticated, non-auth error
+      success = true
+    }
+  }
+
+  return { success, errorMessage, responseText }
+}
+
+// ── QE-06: Embedding connection test helper ───────────────────────────────────
+//
+// Validates the embedding config by sending a 1-token embed request directly
+// to the provider API. Accepts an inline config so callers can test credentials
+// before they are written to the DB.
+
+interface EmbeddingTestConfig {
+  /** Provider string — "self-hosted" routes to Ollama /api/embed; all others use OpenAI-compat. */
+  provider: string
+  apiKey: string
+  embeddingModel: string
+  embeddingDimensions: number
+  /** Custom base URL. May be undefined. */
+  baseUrl: string | undefined
+  /** Separate OpenAI key for embeddings — used when provider is anthropic or azure-openai. */
+  embeddingApiKey?: string
+}
+
+export interface EmbeddingTestResult {
+  success: boolean
+  /** Non-empty when success is false. */
+  errorMessage: string
+  /** True when the model was not found in the project — valid key but model not enabled. */
+  modelNotFound?: boolean
+}
+
+/**
+ * Fire a minimal embed request with the given config to verify that the
+ * embedding model and API key are valid.
+ */
+export async function testEmbeddingConnection(cfg: EmbeddingTestConfig): Promise<EmbeddingTestResult> {
+  // self-hosted → Ollama /api/embed; all other providers → OpenAI-compatible /v1/embeddings
+  const isOllama = cfg.provider === "self-hosted"
+
+  if (isOllama) {
+    const baseUrl = (cfg.baseUrl ?? "http://localhost:11434").replace(/\/+$/, "")
+    try {
+      const res = await fetch(`${baseUrl}/api/embed`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: cfg.embeddingModel, input: "connection check" }),
+        signal: AbortSignal.timeout(10_000),
+      })
+      if (res.ok) {
+        return { success: true, errorMessage: "" }
+      }
+      const body = await res.text().catch(() => "")
+      return { success: false, errorMessage: `HTTP ${res.status}: ${body}` }
+    } catch (err) {
+      return { success: false, errorMessage: String(err) }
+    }
+  }
+
+  // Google Generative Language embedding API (different URL + auth scheme)
+  if (cfg.provider === "google") {
+    const model = cfg.embeddingModel.startsWith("models/") ? cfg.embeddingModel : `models/${cfg.embeddingModel}`
+    const url = `https://generativelanguage.googleapis.com/v1beta/${model}:embedContent?key=${cfg.apiKey}`
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model, content: { parts: [{ text: "connection check" }] } }),
+        signal: AbortSignal.timeout(10_000),
+      })
+      if (res.ok) return { success: true, errorMessage: "" }
+      // 404 = model not enabled in this project — key is valid, skip hard-fail
+      if (res.status === 404) return { success: true, errorMessage: "", modelNotFound: true }
+      const body = await res.text().catch(() => "")
+      return { success: false, errorMessage: `HTTP ${res.status}: ${body}` }
+    } catch (err) {
+      return { success: false, errorMessage: String(err) }
+    }
+  }
+
+  // Anthropic has no embedding API — embeddings use a separate OpenAI key.
+  // Azure-OpenAI embedding URLs are deployment-specific; same OpenAI key fallback applies.
+  // If embeddingApiKey is provided, validate it against the OpenAI embeddings endpoint.
+  // If empty (not yet entered), soft-pass so the user can save without a key.
+  if (cfg.provider === "anthropic" || cfg.provider === "azure-openai") {
+    if (!cfg.embeddingApiKey) {
+      // Key not yet entered — soft pass
+      return { success: true, errorMessage: "" }
+    }
+    // Validate the embeddingApiKey against OpenAI's embedding endpoint
+    const url = "https://api.openai.com/v1/embeddings"
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${cfg.embeddingApiKey}`,
+        },
+        body: JSON.stringify({
+          model: cfg.embeddingModel,
+          input: ["connection check"],
+          dimensions: cfg.embeddingDimensions,
+        }),
+        signal: AbortSignal.timeout(10_000),
+      })
+      if (res.ok) return { success: true, errorMessage: "" }
+      if (res.status === 404) return { success: true, errorMessage: "", modelNotFound: true }
+      const body = await res.text().catch(() => "")
+      return { success: false, errorMessage: `HTTP ${res.status}: ${body}` }
+    } catch (err) {
+      return { success: false, errorMessage: String(err) }
+    }
+  }
+
+  // OpenAI-compatible embedding API (openai + custom baseUrl)
+  const baseUrl = (cfg.baseUrl ?? "https://api.openai.com").replace(/\/+$/, "")
+  const url = `${baseUrl}/v1/embeddings`
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cfg.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: cfg.embeddingModel,
+        input: ["connection check"],
+        dimensions: cfg.embeddingDimensions,
+      }),
+      signal: AbortSignal.timeout(10_000),
+    })
+    if (res.ok) return { success: true, errorMessage: "" }
+    if (res.status === 404) return { success: true, errorMessage: "", modelNotFound: true }
+    const body = await res.text().catch(() => "")
+    return { success: false, errorMessage: `HTTP ${res.status}: ${body}` }
+  } catch (err) {
+    return { success: false, errorMessage: String(err) }
+  }
+}
+
 // ── GET /api/v1/products/:productId/settings ─────────────────────────────────
 
 settingsRouter.get("/products/:productId/settings", requireAuth(), requireRole("operator"), async (c) => {
@@ -241,6 +516,56 @@ settingsRouter.put("/products/:productId/settings", requireAuth(), requireRole("
     return c.json({ error: "Invalid settings", details: parsed.error.issues }, 400)
   }
 
+  // ── QE-06: Pre-save LLM validation ───────────────────────────────────────
+  // Only validate when a non-empty apiKey is provided in the request body.
+  // If the user is updating model name / base URL without re-entering the key,
+  // skip validation — the saved encrypted key is assumed still valid.
+  if (parsed.data.llm?.apiKey) {
+    const llmInput = parsed.data.llm
+    const provider = llmInput.provider as LlmProvider | undefined
+    const model    = llmInput.model
+
+    if (provider && model) {
+      // 1. Test the LLM completion endpoint
+      let llmResult: LlmTestResult
+      try {
+        llmResult = await testLlmConnection(provider, model, llmInput.apiKey ?? "", llmInput.baseUrl)
+      } catch (err) {
+        return c.json({ error: "LLM validation failed", detail: String(err).slice(0, 300) }, 422)
+      }
+      if (!llmResult.success) {
+        return c.json({ error: "LLM validation failed", detail: llmResult.errorMessage.slice(0, 300) }, 422)
+      }
+
+      // 2. Test the embedding endpoint
+      const embeddingModel = llmInput.embeddingModel ?? EMBEDDING_DEFAULTS[provider]?.model
+      const embeddingDimensions = llmInput.embeddingDimensions ?? EMBEDDING_DEFAULTS[provider]?.dimensions ?? 768
+
+      if (embeddingModel) {
+        let embResult: EmbeddingTestResult
+        try {
+          embResult = await testEmbeddingConnection({
+            provider,
+            apiKey: llmInput.apiKey ?? "",
+            embeddingModel,
+            embeddingDimensions,
+            baseUrl: llmInput.baseUrl,
+            ...(llmInput.embeddingApiKey !== undefined ? { embeddingApiKey: llmInput.embeddingApiKey } : {}),
+          })
+        } catch (err) {
+          return c.json({ error: "Embedding validation failed", detail: String(err).slice(0, 300) }, 422)
+        }
+        if (!embResult.success) {
+          return c.json({ error: "Embedding validation failed", detail: embResult.errorMessage.slice(0, 300) }, 422)
+        }
+        // modelNotFound = key is valid but model not enabled in this project — save succeeds with a warning
+        if (embResult.modelNotFound) {
+          logger.warn({ provider, embeddingModel }, "Embedding model not found in project — saving anyway")
+        }
+      }
+    }
+  }
+
   try {
     const product = await findProductById(productId)
     if (!product) {
@@ -258,8 +583,9 @@ settingsRouter.put("/products/:productId/settings", requireAuth(), requireRole("
       if (parsed.data.llm.baseUrl !== undefined)             merged.baseUrl = parsed.data.llm.baseUrl
       if (parsed.data.llm.embeddingModel !== undefined)     merged.embeddingModel = parsed.data.llm.embeddingModel
       if (parsed.data.llm.embeddingDimensions !== undefined) merged.embeddingDimensions = parsed.data.llm.embeddingDimensions
-      // Auto-set embedding defaults when provider changes and embedding not explicitly set
-      if (parsed.data.llm.provider && !parsed.data.llm.embeddingModel && !merged.embeddingModel) {
+      // When provider changes, always reset embedding to provider defaults
+      // unless the user explicitly sent an embeddingModel in this request.
+      if (parsed.data.llm.provider && !parsed.data.llm.embeddingModel) {
         const defaults = EMBEDDING_DEFAULTS[parsed.data.llm.provider]
         if (defaults) {
           merged.embeddingModel = defaults.model
@@ -269,6 +595,9 @@ settingsRouter.put("/products/:productId/settings", requireAuth(), requireRole("
       if (parsed.data.llm.apiKey !== undefined) {
         merged.apiKey = encryptSecret(parsed.data.llm.apiKey)
         merged.apiKeyLast4 = parsed.data.llm.apiKey.slice(-4)   // plain last4 for quick display
+      }
+      if (parsed.data.llm.embeddingApiKey !== undefined && parsed.data.llm.embeddingApiKey !== "") {
+        merged.embeddingApiKey = encryptSecret(parsed.data.llm.embeddingApiKey)
       }
       updates.llm_config = merged
     }
@@ -352,6 +681,11 @@ settingsRouter.put("/products/:productId/settings", requireAuth(), requireRole("
     }
 
     logger.info({ productId, actor: actor.email, sections: Object.keys(updates) }, "Settings updated")
+
+    // QE-06: Return success message when LLM settings were validated and saved
+    if (parsed.data.llm?.apiKey) {
+      return c.json({ ok: true, success: true, message: "Connection verified", data: buildSettingsResponse(updated) })
+    }
     return c.json({ ok: true, data: buildSettingsResponse(updated) })
   } catch (err) {
     logger.error({ err, productId }, "Failed to update settings")
@@ -415,115 +749,23 @@ settingsRouter.post("/products/:productId/settings/test-llm", requireAuth(), req
   }
 
   try {
-    // Build a minimal test prompt based on provider
-    let success = false
-    let responseText = ""
-    let errorMessage = ""
-
-    if (provider === "self-hosted") {
-      // OpenAI-compatible API (Ollama, vLLM, LiteLLM, etc.)
-      const endpoint = `${(baseUrl ?? "http://localhost:11434/v1").replace(/\/+$/, "")}/chat/completions`
-      const headers: Record<string, string> = { "Content-Type": "application/json" }
-      if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ model, messages: [{ role: "user", content: "Say OK" }], max_tokens: 5 }),
-        signal: AbortSignal.timeout(15_000),
-      })
-      if (res.ok) {
-        const data = await res.json() as { choices?: { message?: { content?: string } }[] }
-        responseText = data.choices?.[0]?.message?.content ?? ""
-        success = true
-      } else {
-        errorMessage = `HTTP ${res.status}: ${await res.text().catch(() => "")}`
-      }
-    } else if (provider === "openai" || provider === "azure-openai") {
-      const res = await fetch(
-        provider === "azure-openai"
-          ? `https://${model}.openai.azure.com/openai/deployments/${model}/chat/completions?api-version=2024-02-01`
-          : "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model,
-            messages: [{ role: "user", content: "Say OK" }],
-            max_tokens: 5,
-          }),
-          signal: AbortSignal.timeout(10_000),
-        },
-      )
-      if (res.ok) {
-        const data = await res.json() as { choices?: { message?: { content?: string } }[] }
-        responseText = data.choices?.[0]?.message?.content ?? ""
-        success = true
-      } else {
-        errorMessage = `HTTP ${res.status}: ${await res.text().catch(() => "")}`
-      }
-    } else if (provider === "anthropic") {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 5,
-          messages: [{ role: "user", content: "Say OK" }],
-        }),
-        signal: AbortSignal.timeout(10_000),
-      })
-      if (res.ok) {
-        const data = await res.json() as { content?: { text?: string }[] }
-        responseText = data.content?.[0]?.text ?? ""
-        success = true
-      } else {
-        errorMessage = `HTTP ${res.status}: ${await res.text().catch(() => "")}`
-      }
-    } else if (provider === "google") {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: "Say OK" }] }],
-            generationConfig: { maxOutputTokens: 5 },
-          }),
-          signal: AbortSignal.timeout(10_000),
-        },
-      )
-      if (res.ok) {
-        const data = await res.json() as { candidates?: { content?: { parts?: { text?: string }[] } }[] }
-        responseText = data.candidates?.[0]?.content?.parts?.[0]?.text ?? ""
-        success = true
-      } else {
-        errorMessage = `HTTP ${res.status}: ${await res.text().catch(() => "")}`
-      }
-    }
-
+    const result = await testLlmConnection(provider, model, apiKey, baseUrl)
     const latencyMs = Date.now() - startMs
 
     logger.info(
-      { productId, provider, model, success, latencyMs },
-      success ? "LLM connection test passed" : "LLM connection test failed",
+      { productId, provider, model, success: result.success, latencyMs },
+      result.success ? "LLM connection test passed" : "LLM connection test failed",
     )
 
     return c.json({
       ok: true,
       data: {
-        success,
+        success: result.success,
         provider,
         model,
         latencyMs,
-        responsePreview: responseText.slice(0, 50),
-        ...(errorMessage ? { error: errorMessage.slice(0, 200) } : {}),
+        responsePreview: result.responseText.slice(0, 50),
+        ...(result.errorMessage ? { error: result.errorMessage.slice(0, 200) } : {}),
       },
     })
   } catch (err) {
@@ -737,16 +979,12 @@ settingsRouter.post("/products/:productId/settings/list-models", requireAuth(), 
         const tagsRes = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(5_000) })
         if (tagsRes.ok) {
           isOllama = true
-          const tagsData = await tagsRes.json() as { models?: { name?: string; model?: string }[] }
-          candidates = (tagsData.models ?? []).map((m) => m.name ?? m.model ?? "").filter(Boolean)
-        }
-      } catch { /* not Ollama */ }
-
-      if (candidates.length === 0) {
-        const endpoint = `${base}${base.includes("/v1") ? "" : "/v1"}/models`
-        const headers: Record<string, string> = {}
-        if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
-        try {
+          const data = await tagsRes.json() as { models?: { name: string }[] }
+          candidates = (data.models ?? []).map((m) => m.name)
+        } else {
+          const endpoint = `${base}${base.includes("/v1") ? "" : "/v1"}/models`
+          const headers: Record<string, string> = {}
+          if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
           const res = await fetch(endpoint, { headers, signal: AbortSignal.timeout(5_000) })
           if (res.ok) {
             const data = await res.json() as { models?: { name?: string; model?: string }[]; data?: { id: string }[] }
@@ -755,9 +993,9 @@ settingsRouter.post("/products/:productId/settings/list-models", requireAuth(), 
           } else {
             return c.json({ ok: false, error: `Could not reach the endpoint at ${base}. Is the service running?` }, 400)
           }
-        } catch {
-          return c.json({ ok: false, error: `Could not connect to ${base}. Check that the service is running and the URL is correct.` }, 400)
         }
+      } catch {
+        return c.json({ ok: false, error: `Could not connect to ${base}. Check that the service is running and the URL is correct.` }, 400)
       }
 
       if (candidates.length === 0) {

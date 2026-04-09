@@ -22,11 +22,20 @@ export type CaseStatus =
   | "awaiting-lead"
   | "in-change"
   | "resolved"
-  | "closed";
+  | "closed"
+  // QE-05: visible failure state when a pg-boss job exhausts all retries
+  | "processing-failed";
 
 export type CaseSeverity = "critical" | "high" | "normal" | "low";
 
 export type CaseType = string;
+
+/** QE-05: shape stored in the processing_error JSONB column. */
+export interface ProcessingError {
+  jobName: string;
+  jobId:   string;
+  error:   string;
+}
 
 export interface CaseRow {
   case_id: string;
@@ -46,6 +55,8 @@ export interface CaseRow {
   ai_resolved?: boolean;
   /** DEFERRED-24: AI draft reply held for Lead review when auto-send gates fail */
   draft_reply?: string | null;
+  /** QE-05: failure context written by DLQ handler; null when not in processing-failed state */
+  processing_error?: ProcessingError | null;
 }
 
 // ─── Change Request ───────────────────────────────────────────────────────────

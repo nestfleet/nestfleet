@@ -9,7 +9,7 @@
  *   - execute(job): the agent invocation logic
  *
  * The base class provides:
- *   - Worker registration with pg-boss
+ *   - Worker registration with pg-boss (with DLQ linkage — QE-02)
  *   - Dead-letter handling + operator notification
  *   - OTel parent span (agent.run.{actionType})
  *   - Abstain pre-check before calling the agent
@@ -17,7 +17,7 @@
 
 import type { Job } from "pg-boss"
 import { context, trace, SpanStatusCode } from "@opentelemetry/api"
-import { getBoss } from "../infra/queue/boss.js"
+import { getBoss, AGENT_DLQ_NAME } from "../infra/queue/boss.js"
 import { logger } from "../shared/logger.js"
 import type { AgentJobData } from "./dispatcher.js"
 import type { ActionType, AgentRunRecord, AgentOutcome } from "./types.js"
@@ -71,13 +71,19 @@ export abstract class AbstractAgentWorker {
 
   /**
    * Register this worker with pg-boss. Call once at server startup.
+   * The queue is created with `deadLetter: AGENT_DLQ_NAME` so jobs that exhaust
+   * all retries are copied to the shared DLQ for observability (QE-02).
    */
   async register(): Promise<void> {
     const boss = await getBoss()
     const concurrency = WORKER_CONCURRENCY[this.actionType]
 
-    // pg-boss v12: queues must be created before work() or send() can use them.
-    await boss.createQueue(this.actionType)
+    // pg-boss v12: the DLQ queue must exist before any queue that references it
+    // as deadLetter. createQueue is idempotent — safe to call on every registration.
+    await boss.createQueue(AGENT_DLQ_NAME)
+    // deadLetter: failed jobs (after all retries) are routed to the shared DLQ
+    // where registerDeadLetterHandler() logs them at error level (QE-02).
+    await boss.createQueue(this.actionType, { deadLetter: AGENT_DLQ_NAME })
 
     // pg-boss v12: WorkHandler receives Job<T>[] (batch). We process each individually.
     await boss.work<AgentJobData>(
@@ -99,6 +105,11 @@ export abstract class AbstractAgentWorker {
    *   3. Calling runAgent() with the tool set from getToolSet()
    *   4. Post-validation (confidence thresholds, forbidden phrases, etc.)
    *   5. Writing any domain state (triage record, draft reply, etc.)
+   *
+   * @remarks Every concrete worker MUST check the current entity state at the top of execute()
+   * before calling any state transition. If the entity is already past the expected entry state,
+   * return `{ outcome: "abstain" }` — do not throw. This makes workers safe for pg-boss retries.
+   * Reference implementation: ChangePrepWorker (src/workers/change-prep-worker.ts).
    */
   protected abstract execute(ctx: WorkerExecuteContext): Promise<WorkerExecuteResult>
 

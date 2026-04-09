@@ -152,6 +152,23 @@ export class StewardWorker extends AbstractAgentWorker {
       throw new Error(`StewardWorker: case not found: ${caseId}`)
     }
 
+    // ── Idempotency guard (QE-02) ─────────────────────────────────────────────
+    // pg-boss retries re-deliver the job. If the case already advanced past
+    // "triaged" a previous execution completed — skip.
+    if (caseRow.status !== "triaged") {
+      logger.info(
+        { caseId, status: caseRow.status },
+        "StewardWorker: case already past triaged — skipping (idempotent retry)",
+      )
+      return {
+        outcome:             "abstain",
+        abstainReason:       "already_past_entry_state",
+        modelId:             "none",
+        outputSchemaVersion: KNOWN_ISSUE_MATCH_SCHEMA_VERSION,
+        outputValid:         false,
+      }
+    }
+
     const productId = caseRow.product_id
 
     // ── 2. Get signal text — prefer authoritative cases.signal_text (SA #7 fix)

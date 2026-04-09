@@ -112,7 +112,10 @@ describe("POST /api/v1/auth/register (integration)", () => {
   })
 
   it("NF-INT-515: REGISTRATION_ENABLED=false → 404 (env check)", async () => {
-    // Temporarily disable
+    // REGISTRATION_ENABLED=false only locks when ≥1 user exists in DB.
+    // beforeEach clears all test users, so we need at least one user first.
+    await register({ email: "seed@test-register.com", password: "SecurePass123" })
+
     process.env.REGISTRATION_ENABLED = "false"
     try {
       const res = await register({ email: "blocked@test-register.com", password: "SecurePass123" })
