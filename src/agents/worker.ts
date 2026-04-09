@@ -81,9 +81,10 @@ export abstract class AbstractAgentWorker {
     // pg-boss v12: the DLQ queue must exist before any queue that references it
     // as deadLetter. createQueue is idempotent — safe to call on every registration.
     await boss.createQueue(AGENT_DLQ_NAME)
-    // deadLetter: failed jobs (after all retries) are routed to the shared DLQ
-    // where registerDeadLetterHandler() logs them at error level (QE-02).
+    // createQueue is idempotent but does NOT update existing queues.
+    // updateQueue ensures deadLetter is set even on queues created before QE-02.
     await boss.createQueue(this.actionType, { deadLetter: AGENT_DLQ_NAME })
+    await boss.updateQueue(this.actionType, { deadLetter: AGENT_DLQ_NAME })
 
     // pg-boss v12: WorkHandler receives Job<T>[] (batch). We process each individually.
     await boss.work<AgentJobData>(
