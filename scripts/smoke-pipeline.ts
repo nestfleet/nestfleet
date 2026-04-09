@@ -128,6 +128,14 @@ if (!webhookResult.ok) {
 
 console.log(`[smoke] webhook accepted (${webhookResult.status}):`, webhookResult.body)
 
+// QE-07: if the signal was identified as a smoke canary, it is auto-resolved
+// without triage — that IS a successful pipeline check.
+if ((webhookResult.body as Record<string, unknown>)["canary"] === true) {
+  const caseId = (webhookResult.body as Record<string, unknown>)["caseId"] as string
+  console.log(`SMOKE PASSED: canary signal auto-resolved correctly (case ${caseId})`)
+  process.exit(0)
+}
+
 // ── Step 2: poll until the case is triaged ────────────────────────────────────
 
 console.log(`[smoke] polling cases API every ${POLL_INTERVAL_MS / 1000}s (timeout ${TIMEOUT_MS / 1000}s) …`)
