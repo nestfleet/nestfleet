@@ -13,6 +13,11 @@
  * all leads (routing failure is itself an escalation trigger per ADR-029).
  *
  * Uses independent OTel span — not a child of the steward span.
+ *
+ * Idempotency (QE-02): The outage routing worker is a side-effect actor (audit
+ * events + notifications) — it does not own a state transition. The idempotency
+ * guard skips execution when the case has reached a terminal state (resolved or
+ * closed), indicating a previous run or human action has already handled it.
  */
 
 import { AbstractAgentWorker, type WorkerExecuteContext, type WorkerExecuteResult } from "../agents/worker.js"
@@ -38,6 +43,26 @@ export class OutageRoutingWorker extends AbstractAgentWorker {
     const caseRow = await findCaseById(caseId)
     if (!caseRow) {
       throw new Error(`OutageRoutingWorker: case not found: ${caseId}`)
+    }
+
+    // ── Idempotency guard (QE-02) ─────────────────────────────────────────────
+    // OutageRoutingWorker is a side-effect actor (audit + notifications) and does
+    // not own a state transition. Skip if the case is already in a terminal state —
+    // a previous execution or human action has already handled resolution.
+    const TERMINAL_STATES = ["resolved", "closed"] as const
+    type TerminalState = (typeof TERMINAL_STATES)[number]
+    if ((TERMINAL_STATES as readonly string[]).includes(caseRow.status)) {
+      logger.info(
+        { caseId, status: caseRow.status },
+        "OutageRoutingWorker: case already in terminal state — skipping (idempotent retry)",
+      )
+      return {
+        outcome:             "abstain",
+        abstainReason:       "case_in_terminal_state",
+        modelId:             "none",
+        outputSchemaVersion: OUTAGE_ROUTING_SCHEMA_VERSION,
+        outputValid:         false,
+      }
     }
 
     const productId    = caseRow.product_id

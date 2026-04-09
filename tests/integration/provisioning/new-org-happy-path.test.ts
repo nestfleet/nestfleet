@@ -15,6 +15,14 @@ vi.mock("../../../src/agents/dispatcher.js", () => ({
   dispatchInTransaction: vi.fn().mockResolvedValue("mock-job-id"),
 }))
 
+// Stub fetch so PUT /settings LLM validation does not make real network calls.
+vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+  ok: true,
+  status: 200,
+  json: async () => ({ choices: [{ message: { content: "OK" } }] }),
+  text: async () => JSON.stringify({ choices: [{ message: { content: "OK" } }] }),
+}))
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest"
 import type { TestDbContext } from "../helpers/db.js"
 import { setupTestDb }       from "../helpers/db.js"

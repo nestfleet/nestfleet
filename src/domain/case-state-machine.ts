@@ -7,6 +7,11 @@
  *
  * Pattern: read current state → validate from→to → delegate to updateCase().
  * Throws InvalidStateTransitionError on illegal transitions.
+ *
+ * QE-05: "processing-failed" added as a visible error state.
+ *   Entry: DLQ handler writes this directly via updateCase() (bypasses the
+ *          state machine — the job has already failed, no prior state is known).
+ *   Exit:  processing-failed → enriching (re-triage), resolved, or closed.
  */
 
 import type { CaseStatus, CaseUpdate } from "../infra/db/repositories/cases.js"
@@ -27,19 +32,23 @@ export class InvalidStateTransitionError extends Error {
   }
 }
 
-// ── Allowed transitions (§5.1) ───────────────────────────────────────────────
+// ── Allowed transitions (§5.1 + QE-05) ──────────────────────────────────────
 
 const CASE_TRANSITIONS: Record<CaseStatus, readonly CaseStatus[]> = {
-  "new":            ["enriching", "closed"],
-  "enriching":      ["triaged", "awaiting-user", "in-resolution", "closed"],
-  "triaged":        ["in-resolution", "awaiting-lead", "in-change", "resolved"],
-  "awaiting-user":  ["enriching", "resolved", "closed"],
-  "awaiting-lead":  ["in-resolution", "in-change", "resolved", "closed"],
-  "in-resolution":  ["resolved", "awaiting-user", "awaiting-lead", "in-change"],
-  "in-change":      ["pr-drafting", "awaiting-lead", "resolved", "closed"],
-  "pr-drafting":    ["resolved", "awaiting-lead", "closed"],
-  "resolved":       ["closed", "awaiting-user", "awaiting-lead"],
-  "closed":         [],
+  "new":                ["enriching", "closed"],
+  "enriching":          ["triaged", "awaiting-user", "in-resolution", "closed"],
+  "triaged":            ["in-resolution", "awaiting-lead", "in-change", "resolved"],
+  "awaiting-user":      ["enriching", "resolved", "closed"],
+  "awaiting-lead":      ["in-resolution", "in-change", "resolved", "closed"],
+  "in-resolution":      ["resolved", "awaiting-user", "awaiting-lead", "in-change"],
+  "in-change":          ["pr-drafting", "awaiting-lead", "resolved", "closed"],
+  "pr-drafting":        ["resolved", "awaiting-lead", "closed"],
+  "resolved":           ["closed", "awaiting-user", "awaiting-lead"],
+  "closed":             [],
+  // QE-05: recovery paths from the dead-letter failure state.
+  // → enriching: re-run triage from scratch.
+  // → resolved/closed: operator manually resolves without re-processing.
+  "processing-failed":  ["enriching", "resolved", "closed"],
 }
 
 /**

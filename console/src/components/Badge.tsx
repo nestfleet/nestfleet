@@ -14,6 +14,8 @@ const STATUS_STYLES: Record<CaseStatus, string> = {
   "in-change": "bg-purple-100 text-purple-700 ring-purple-200",
   resolved: "bg-emerald-100 text-emerald-800 ring-emerald-200",
   closed: "bg-gray-200 text-gray-600 ring-gray-300",
+  // QE-05
+  "processing-failed": "bg-red-100 text-red-700 ring-red-200",
 };
 
 const STATUS_LABELS: Record<CaseStatus, string> = {
@@ -25,6 +27,8 @@ const STATUS_LABELS: Record<CaseStatus, string> = {
   "in-change": "In Change",
   resolved: "Resolved",
   closed: "Closed",
+  // QE-05
+  "processing-failed": "Processing Failed",
 };
 
 interface StatusBadgeProps {
@@ -120,6 +124,8 @@ const STATUS_DOT_COLOR: Record<CaseStatus, string> = {
   "in-change":    "bg-purple-400",
   resolved:       "bg-emerald-500",
   closed:         "bg-gray-300",
+  // QE-05
+  "processing-failed": "bg-red-500",
 };
 
 export function StatusDot({ status, className }: StatusBadgeProps) {

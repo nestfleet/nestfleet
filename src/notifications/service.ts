@@ -247,17 +247,19 @@ export class NotificationService {
     // ── 2. Compute scheduledFor ───────────────────────────────────────────────
     let scheduledFor: Date
 
-    if (event.priority === "critical") {
-      // Critical always fires immediately — bypasses quiet hours
+    if (event.priority === "critical" || event.audienceType !== "end_user") {
+      // Critical and all operator-facing notifications fire immediately.
+      // For operators the console IS the inbox — batch windows don't apply.
+      // Quiet hours are for end-user outbound messages only.
       scheduledFor = now
     } else if (event.priority === "high") {
-      // High gets a 15-minute batch window, then quiet hours check
+      // end_user high: 15-minute batch window, then quiet hours check
       const candidate = new Date(now.getTime() + 15 * 60 * 1000)
       scheduledFor = isInQuietHours(candidate, qh)
         ? quietHoursEndTime(candidate, qh)
         : candidate
     } else {
-      // normal / low → next digest window, then quiet hours check
+      // end_user normal / low → next digest window, then quiet hours check
       const candidate = nextDigestWindow(now)
       scheduledFor = isInQuietHours(candidate, qh)
         ? quietHoursEndTime(candidate, qh)
@@ -373,8 +375,19 @@ export class NotificationService {
               })
             }
           }
+        } else if (event.audienceType !== "end_user") {
+          // Transport not configured, but operator-facing notifications are delivered
+          // via the console inbox the moment they are created — mark as sent.
+          await updateNotification(notif.notification_id, {
+            status:  "sent",
+            sent_at: new Date(),
+          })
+          logger.info(
+            { notificationId: notif.notification_id, kind: event.kind, channel },
+            "Notification transport not configured — marked sent (console inbox delivery)",
+          )
         } else {
-          // Transport not configured — leave as pending, will flush later
+          // end_user transport not configured — leave pending for later flush
           logger.info(
             { notificationId: notif.notification_id, kind: event.kind, channel },
             "Notification skipped (transport not configured) — remains pending",

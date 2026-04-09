@@ -8,7 +8,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { StatusBadge, SeverityBadge } from "@/components/Badge";
 import { LineageTimeline } from "@/components/LineageTimeline";
 import { LineageGraph } from "@/components/lineage-graph";
-import { getLineageApi, getCaseConversationApi, getCaseApi, sendChatReplyApi, sendDraftReplyApi, ApiError } from "@/lib/api";
+import { getLineageApi, getCaseConversationApi, getCaseApi, sendChatReplyApi, sendDraftReplyApi, retryCaseApi, ApiError } from "@/lib/api";
 import { useProductIdWithFallback, useProductBasePath } from "@/lib/product-context";
 import type { ConversationMessage } from "@/lib/api";
 
@@ -377,6 +377,114 @@ function EmailReplyPanel({
   );
 }
 
+// ── Processing Failed Panel (QE-05) ──────────────────────────────────────────
+
+function ProcessingFailedPanel({
+  caseId,
+  processingError,
+  onRetried,
+}: {
+  caseId: string;
+  processingError: { jobName: string; jobId: string; error: string } | null | undefined;
+  onRetried: () => void;
+}) {
+  const productId = useProductIdWithFallback();
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
+  const [retryDone, setRetryDone] = useState(false);
+
+  async function handleRetry() {
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      await retryCaseApi(productId, caseId);
+      setRetryDone(true);
+      onRetried();
+    } catch (err) {
+      setRetryError(err instanceof Error ? err.message : "Failed to retry");
+    } finally {
+      setRetrying(false);
+    }
+  }
+
+  if (retryDone) {
+    return (
+      <div className="rounded-xl bg-emerald-50 ring-1 ring-emerald-200 px-4 py-3 text-sm text-emerald-800 flex items-center gap-2">
+        <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+        Re-triage dispatched. The case is now back in the enriching queue.
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl bg-red-50 ring-1 ring-red-200 shadow-sm px-4 py-4">
+      <div className="flex items-start gap-3">
+        {/* Error icon */}
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">Processing Failed</p>
+              <p className="mt-0.5 text-sm text-red-900 leading-relaxed">
+                This case failed during automated processing and requires manual intervention.
+              </p>
+            </div>
+
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+            >
+              {retrying ? (
+                <>
+                  <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Retrying…
+                </>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                  </svg>
+                  Retry Processing
+                </>
+              )}
+            </button>
+          </div>
+
+          {retryError && (
+            <p className="mt-2 text-xs text-red-600">{retryError}</p>
+          )}
+
+          {/* Error details */}
+          {processingError && (
+            <div className="mt-3 rounded-lg bg-red-100/60 px-3 py-2.5 space-y-1">
+              <p className="text-xs font-semibold text-red-600 uppercase tracking-wide">Failure Details</p>
+              <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs text-red-800">
+                <span className="font-medium text-red-600">Job</span>
+                <span className="font-mono">{processingError.jobName}</span>
+                <span className="font-medium text-red-600">Job ID</span>
+                <span className="font-mono break-all">{processingError.jobId}</span>
+                <span className="font-medium text-red-600">Error</span>
+                <span className="break-words">{processingError.error}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface PageProps {
   params: Promise<{ caseId: string }>;
 }
@@ -421,8 +529,9 @@ export default function CaseDetailPage({ params }: PageProps) {
     { refreshInterval: 15_000, revalidateOnFocus: true }
   );
 
-  const isAwaitingLead = caseRow?.status === "awaiting-lead";
-  const isEmailCase    = messages.length > 0 && !messages.some((m) => m.source_type === "chat");
+  const isAwaitingLead  = caseRow?.status === "awaiting-lead";
+  const isEmailCase     = messages.length > 0 && !messages.some((m) => m.source_type === "chat");
+  const isProcessingFailed = caseRow?.status === "processing-failed";
 
   const relativeUpdated = lineage
     ? (() => {
@@ -544,6 +653,15 @@ export default function CaseDetailPage({ params }: PageProps) {
               </div>
             </div>
           </div>
+
+          {/* ── QE-05: Processing Failed panel ── */}
+          {isProcessingFailed && (
+            <ProcessingFailedPanel
+              caseId={caseId}
+              processingError={caseRow?.processing_error}
+              onRetried={() => { mutate(); mutateCase(); }}
+            />
+          )}
 
           {/* ── Triage summary card ── */}
           {(() => {

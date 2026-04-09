@@ -532,21 +532,38 @@ function LlmSection({
   const [model, setModel] = useState(settings.llm.model ?? "");
 
   const [embeddingModel, setEmbeddingModel] = useState(settings.llm.embeddingModel ?? "");
+  const [embeddingApiKey, setEmbeddingApiKey] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Lock the API key field when a saved key exists — prevents Chrome autofill from overwriting.
   // User must click "Change" to unlock the field for editing.
   const [keyLocked, setKeyLocked] = useState(!!(settings.llm.apiKeyLast4 && settings.llm.provider));
+  const [embeddingKeyLocked, setEmbeddingKeyLocked] = useState(!!(settings.llm.embeddingApiKeyLast4 && settings.llm.provider));
 
   const isSelfHosted = provider === "self-hosted";
 
-  // When the provider changes: lock if switching back to saved provider (key exists), unlock otherwise
+  const EMBEDDING_DEFAULTS: Record<string, string> = {
+    openai:        "text-embedding-3-small",
+    anthropic:     "text-embedding-3-small",
+    google:        "text-embedding-004",
+    "azure-openai": "text-embedding-3-small",
+    "self-hosted":  "nomic-embed-text",
+  };
+
+  // When the provider changes: lock if switching back to saved provider (key exists), unlock otherwise.
+  // Also reset embedding model to the new provider's default.
   useEffect(() => {
     if (provider === savedProvider && settings.llm.apiKeyLast4) {
       setKeyLocked(true);
       setApiKey("");
+      setEmbeddingModel(settings.llm.embeddingModel ?? EMBEDDING_DEFAULTS[provider] ?? "");
+      setEmbeddingKeyLocked(!!(settings.llm.embeddingApiKeyLast4));
+      setEmbeddingApiKey("");
     } else {
       setKeyLocked(false);
+      setEmbeddingModel(EMBEDDING_DEFAULTS[provider] ?? "");
+      setEmbeddingKeyLocked(false);
+      setEmbeddingApiKey("");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [provider]);
@@ -698,8 +715,8 @@ function LlmSection({
               {hasSavedKey && (
                 <span className="text-green-600 font-normal ml-1">({settings.llm.apiKeyLast4})</span>
               )}
-              {!hasSavedKey && provider !== savedProvider && provider !== "self-hosted" && (
-                <span className="text-amber-600 font-normal ml-1">— no key for this provider</span>
+              {!hasSavedKey && provider !== "self-hosted" && (
+                <span className="text-amber-600 font-normal ml-1">— enter API key</span>
               )}
               {isSelfHosted && <span className="text-gray-400 font-normal ml-1">(optional)</span>}
             </label>
@@ -790,6 +807,51 @@ function LlmSection({
             {showAdvanced && (
               <div className="mt-2 p-3 rounded-lg bg-gray-50 space-y-2">
                 <p className="text-[10px] text-gray-400">For product memory semantic search. Auto-defaulted per provider.</p>
+                {(provider === "anthropic" || provider === "azure-openai") && (
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-medium text-gray-600">
+                      OpenAI API Key{" "}
+                      <span className="font-normal text-gray-400">(for embeddings — Anthropic has no embedding API)</span>
+                      {settings.llm.embeddingApiKeyLast4 && provider === savedProvider && (
+                        <span className="text-green-600 font-normal ml-1">({settings.llm.embeddingApiKeyLast4})</span>
+                      )}
+                      {!settings.llm.embeddingApiKeyLast4 && (
+                        <span className="text-amber-600 font-normal ml-1">— required for semantic search</span>
+                      )}
+                    </label>
+                    {embeddingKeyLocked && settings.llm.embeddingApiKeyLast4 && provider === savedProvider ? (
+                      <div className="flex items-center rounded border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-500 select-none">
+                        <span className="flex-1 font-mono tracking-widest">{settings.llm.embeddingApiKeyLast4}</span>
+                        <button
+                          type="button"
+                          onClick={() => { setEmbeddingKeyLocked(false); setEmbeddingApiKey(""); }}
+                          className="ml-2 text-[10px] text-indigo-600 hover:text-indigo-800 font-medium shrink-0"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type="password"
+                        autoComplete="new-password"
+                        value={embeddingApiKey}
+                        onChange={(e) => setEmbeddingApiKey(e.target.value)}
+                        placeholder={settings.llm.embeddingApiKeyLast4 && provider === savedProvider ? "Enter new key to replace saved key" : "Paste your OpenAI API key"}
+                        className="w-full rounded border border-gray-200 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
+                      />
+                    )}
+                  </div>
+                )}
+                {provider === "self-hosted" && (
+                  <div className="flex items-start gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-2">
+                    <svg className="mt-px h-3.5 w-3.5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    <p className="text-[10px] text-amber-800">
+                      Embeddings use <code className="font-mono">nomic-embed-text</code> via your Ollama instance. Make sure it is pulled separately: <code className="font-mono">ollama pull nomic-embed-text</code>
+                    </p>
+                  </div>
+                )}
                 <div className="flex gap-3">
                   <div className="flex-1">
                     <input
@@ -808,6 +870,11 @@ function LlmSection({
 
           {/* Save */}
           <div className="pt-2 border-t border-gray-100">
+            {provider !== savedProvider && savedProvider && (
+              <p className="mb-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2.5 py-1.5">
+                Switching from <strong>{savedProvider}</strong> to <strong>{provider}</strong> will replace your stored API key. You will need to re-enter your {savedProvider} key if you switch back.
+              </p>
+            )}
             <SaveButton
               saving={saving}
               disabled={!provider || !model}
@@ -816,6 +883,7 @@ function LlmSection({
                 if (apiKey) body.apiKey = apiKey;
                 if ((isSelfHosted || provider === "azure-openai") && baseUrl) body.baseUrl = baseUrl;
                 if (embeddingModel) body.embeddingModel = embeddingModel;
+                if (embeddingApiKey) body.embeddingApiKey = embeddingApiKey;
                 onSave("llm", body);
               }}
             />

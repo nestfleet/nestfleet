@@ -139,6 +139,23 @@ export class FrontlineWorker extends AbstractAgentWorker {
       throw new Error(`FrontlineWorker: case not found: ${caseId}`)
     }
 
+    // ── Idempotency guard (QE-02) ─────────────────────────────────────────
+    // pg-boss retries re-deliver the job. If the case already advanced past
+    // "enriching" a previous execution completed or is in progress — skip.
+    if (caseRow.status !== "enriching") {
+      logger.info(
+        { caseId, status: caseRow.status },
+        "FrontlineWorker: case already past enriching — skipping (idempotent retry)",
+      )
+      return {
+        outcome:             "abstain",
+        abstainReason:       "already_past_entry_state",
+        modelId:             "none",
+        outputSchemaVersion: TRIAGE_SCHEMA_VERSION,
+        outputValid:         false,
+      }
+    }
+
     const productId = caseRow.product_id  // authoritative — never trust job.data
 
     // ── 2. Get signal text ────────────────────────────────────────────────

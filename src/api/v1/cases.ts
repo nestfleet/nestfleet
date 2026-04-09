@@ -11,6 +11,7 @@
  *   POST /api/v1/products/:productId/cases/:caseId/triage-manual    — enriching → triaged
  *   POST /api/v1/products/:productId/cases/:caseId/signal-received  — awaiting-user → enriching
  *   POST /api/v1/products/:productId/cases/:caseId/send-draft-reply — Lead sends edited AI draft via email (awaiting-lead email cases)
+ *   POST /api/v1/products/:productId/cases/:caseId/retry            — QE-05 re-dispatch for processing-failed cases
  *   POST /api/v1/internal/send-reminders                            — reminder cron for stale cases
  *
  * Protected by requireAuth — SLICE-05.
@@ -851,6 +852,56 @@ casesRouter.post("/internal/send-reminders", async (c) => {
     return c.json({ ok: true, reminded, total_stale: staleCases.length })
   } catch (err) {
     logger.error({ err, product_id }, "Failed to send reminders")
+    return c.json({ error: "Internal server error" }, 500)
+  }
+})
+
+// ── POST /api/v1/products/:productId/cases/:caseId/retry ──────────────────────
+// QE-05: Operator action — re-dispatch a processing-failed case for re-triage.
+// Transitions processing-failed → enriching and enqueues a fresh triage job.
+
+casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requireRole("operator"), async (c) => {
+  const productId = c.req.param("productId")
+  const caseId    = c.req.param("caseId")
+  const actor     = c.get("user")
+
+  try {
+    const caseRow = await findCaseById(caseId)
+    if (!caseRow || caseRow.product_id !== productId) {
+      return c.json({ error: "Case not found" }, 404)
+    }
+
+    if (caseRow.status !== "processing-failed") {
+      return c.json({ error: `Case must be in processing-failed status to retry (current: ${caseRow.status})` }, 400)
+    }
+
+    // Transition processing-failed → enriching and clear the error record
+    await transitionCase(caseId, "processing-failed", "enriching", {
+      current_persona:   "frontline",
+      processing_error:  null,
+    })
+    await touchCase(caseId)
+
+    // Dispatch a fresh triage job
+    const jobId = newId("job_")
+    await dispatch({ actionType: "triage", productId, caseId, jobId })
+
+    await createAuditEvent({
+      product_id:   productId,
+      entity_type:  "case",
+      entity_ref:   caseId,
+      actor_type:   "lead",
+      actor_ref:    actor.email,
+      action:       "case.retried",
+      before_state: { status: "processing-failed" },
+      after_state:  { status: "enriching" },
+      metadata:     { retriedBy: actor.email, jobId },
+    })
+
+    logger.info({ caseId, productId, jobId, actor: actor.email }, "Case re-dispatched after processing failure")
+    return c.json({ ok: true })
+  } catch (err) {
+    logger.error({ err, productId, caseId }, "Failed to retry case")
     return c.json({ error: "Internal server error" }, 500)
   }
 })

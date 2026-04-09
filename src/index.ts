@@ -36,6 +36,7 @@ import { registerProvisioningWorker } from "./workers/provisioning-worker.js"
 import { registerDeprovisionScheduler } from "./workers/deprovision-scheduler.js"
 import { registerFleetHealthWorker } from "./workers/fleet-health-worker.js"
 import { registerLicenseReissueWorker } from "./workers/license-reissue-worker.js"
+import { registerDeadLetterHandler } from "./infra/queue/boss.js"
 
 async function main(): Promise<void> {
   logger.info({ version: "0.1.0", env: config.NODE_ENV }, "NestFleet starting")
@@ -78,6 +79,10 @@ async function main(): Promise<void> {
 
     await Promise.all(workerRegistrations)
     logger.info("Agent workers registered")
+
+    // Register dead-letter queue handler after all agent queues are created (QE-02).
+    // Logs dead-lettered jobs at error level for alerting and observability.
+    await registerDeadLetterHandler()
   } catch (err) {
     logger.error({ err }, "Agent worker registration failed — aborting startup")
     process.exit(1)
