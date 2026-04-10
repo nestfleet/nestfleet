@@ -25,7 +25,7 @@
 
   # ── Console (Next.js) ────────────────────────────────────────────────────────
   # Everything else goes to the Next.js console.
-  reverse_proxy console:3000
+  reverse_proxy console:3002
 
   # ── Security headers ─────────────────────────────────────────────────────────
   header {

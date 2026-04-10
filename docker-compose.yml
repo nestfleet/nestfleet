@@ -6,7 +6,7 @@
 #   cp .env.example .env   # set JWT_SECRET, ENCRYPTION_KEY, LLM_API_KEY
 #   docker compose up -d
 #
-# Console → http://localhost:3000  (or https://{NESTFLEET_DOMAIN} in production)
+# Console → http://localhost  (or https://{NESTFLEET_DOMAIN} in production)
 
 name: nestfleet
 
