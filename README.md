@@ -27,7 +27,12 @@ Console opens at `http://localhost`. On first visit, register your admin account
 | `LLM_PROVIDER` | `anthropic` \| `openai` \| `ollama` \| `google` | — |
 | `LLM_API_KEY` | API key for your chosen LLM provider | — |
 
-For production, also set `NESTFLEET_DOMAIN` to your public domain (Caddy provisions TLS automatically).
+For production with a custom domain, also set:
+
+| Variable | Description |
+|---|---|
+| `NESTFLEET_DOMAIN` | Your public domain — Caddy provisions TLS automatically |
+| `CONSOLE_ORIGIN` | Public URL of the console, e.g. `https://nestfleet.example.com` (defaults to `http://localhost`) |
 
 See the full [Self-Hosting Guide](docs/self-hosting.md) for all configuration options.
 

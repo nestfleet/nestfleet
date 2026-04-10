@@ -13,7 +13,7 @@ name: nestfleet
 services:
   # ── PostgreSQL ──────────────────────────────────────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     restart: unless-stopped
     environment:
       POSTGRES_DB:       nestfleet
@@ -40,9 +40,12 @@ services:
     env_file: .env
     environment:
       # Internal defaults — override in .env as needed
-      NODE_ENV:     production
-      PORT:         3001
-      DATABASE_URL: postgres://nestfleet:${POSTGRES_PASSWORD:-nestfleet}@postgres:5432/nestfleet
+      NODE_ENV:        production
+      PORT:            3001
+      DATABASE_URL:    postgres://nestfleet:${POSTGRES_PASSWORD:-nestfleet}@postgres:5432/nestfleet
+      # CORS: must match the public URL users open in their browser.
+      # Default works for local installs; set to https://yourdomain.com for production.
+      CONSOLE_ORIGIN:  ${CONSOLE_ORIGIN:-http://localhost}
     # Port 3001 is NOT published externally — traffic goes through Caddy only.
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:3001/health || exit 1"]
