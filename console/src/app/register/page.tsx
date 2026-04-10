@@ -52,9 +52,10 @@ export default function RegisterPage() {
 
     try {
       const res = await registerApi(email.trim(), password, displayName.trim());
-      // Store token and redirect to setup wizard
+      // Store token and hard-navigate to setup so AuthProvider remounts and
+      // picks up the new token from localStorage (soft nav keeps stale context).
       localStorage.setItem(TOKEN_KEY, res.data.token);
-      router.replace("/setup");
+      window.location.href = "/setup";
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 404) {
