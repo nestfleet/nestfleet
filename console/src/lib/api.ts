@@ -1250,3 +1250,22 @@ export async function putNotificationPrefsApi(
     body: prefs,
   });
 }
+
+// ── SaaS signup (FEAT-016) ────────────────────────────────────────────────────
+
+export interface SaasSignupPayload {
+  email: string;
+  slug: string;
+  plan: "starter" | "growth" | "scale";
+  companyName?: string;
+}
+
+export async function saasSignupApi(
+  payload: SaasSignupPayload,
+): Promise<{ ok: boolean; checkoutUrl: string }> {
+  return apiFetch("/api/v1/saas/signup", {
+    method: "POST",
+    body: payload,
+    skipAuth: true,
+  });
+}

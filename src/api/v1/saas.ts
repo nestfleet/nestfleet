@@ -114,8 +114,8 @@ saasRouter.post("/signup", async (c) => {
     },
     success_url: `${config.CONSOLE_ORIGIN ?? "https://nestfleet.dev"}/signup/success?intent=${intent.id}`,
     cancel_url:  `${config.CONSOLE_ORIGIN ?? "https://nestfleet.dev"}/signup?cancelled=1`,
-    // Allow trial if configured on the Stripe price
     subscription_data: {
+      trial_period_days: 14,
       metadata: {
         event_type: "saas_subscription",
         intent_id:  intent.id,
