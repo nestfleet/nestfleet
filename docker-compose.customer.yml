@@ -104,6 +104,7 @@ services:
       - api
     environment:
       NODE_ENV: production
+      INTERNAL_API_URL: http://api:3001
     networks:
       - internal
 
