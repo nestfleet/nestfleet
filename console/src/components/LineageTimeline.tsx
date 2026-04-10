@@ -153,6 +153,13 @@ function NodeIcon({ type, actorType }: { type: LineageNodeType; actorType: Linea
           <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
         </svg>
       );
+    // FEAT-015: triage correction — pencil/edit icon
+    case "triage_corrected":
+      return (
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+        </svg>
+      );
     default:
       // system_event
       return (
@@ -184,6 +191,8 @@ function nodeIconClasses(type: LineageNodeType, actorType: LineageNode["actorTyp
     case "escalated":             return "bg-red-100 text-red-600";
     case "chat_thread":           return "bg-green-100 text-green-600";
     case "notification_sent":     return "bg-sky-100 text-sky-600";
+    // FEAT-015: triage correction — amber to match warning color semantics
+    case "triage_corrected":      return "bg-amber-100 text-amber-600";
     // SLICE-13: CI / deploy nodes
     case "pr_merged":             return "bg-violet-100 text-violet-600";
     case "ci_passed":             return "bg-emerald-100 text-emerald-600";
@@ -196,8 +205,10 @@ function nodeIconClasses(type: LineageNodeType, actorType: LineageNode["actorTyp
 
 // Row background tint
 function nodeRowBg(actorType: LineageNode["actorType"], type: LineageNodeType): string {
-  if (type === "approved")       return "border-l-2 border-green-400";
-  if (type === "rejected")       return "border-l-2 border-red-400";
+  if (type === "approved")         return "border-l-2 border-green-400";
+  if (type === "rejected")         return "border-l-2 border-red-400";
+  // FEAT-015: amber left-border for triage corrections
+  if (type === "triage_corrected") return "border-l-2 border-amber-400";
   // SLICE-13: CI / deploy visual treatment
   if (type === "ci_passed")      return "border-l-2 border-emerald-400";
   if (type === "ci_failed")      return "border-l-2 border-red-400";
@@ -336,6 +347,64 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
 
         {/* Summary */}
         <p className="px-3 pb-1.5 text-xs text-gray-600 leading-relaxed">{node.summary}</p>
+
+        {/* FEAT-015: triage_corrected — rich diff display */}
+        {(node.type === "triage_corrected" || node.action === "case.triage_corrected" || node.action === "triage_corrected") && (() => {
+          const meta = node.metadata;
+          const oldType     = typeof meta.oldType     === "string" ? meta.oldType     : null;
+          const newType     = typeof meta.newType     === "string" ? meta.newType     : null;
+          const oldSeverity = typeof meta.oldSeverity === "string" ? meta.oldSeverity : null;
+          const newSeverity = typeof meta.newSeverity === "string" ? meta.newSeverity : null;
+          const reason      = typeof meta.reason      === "string" ? meta.reason      : null;
+          const crCancelled = meta.crCancelled === true;
+
+          const typeLabel = (v: string) =>
+            v === "bug_report"    ? "Bug"      :
+            v === "user_request"  ? "Request"  :
+            v === "outage_report" ? "Outage"   :
+            v === "user_feedback" ? "Feedback" :
+            v === "sales_inquiry" ? "Sales"    :
+            v.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+          const sevLabel = (v: string) =>
+            v.charAt(0).toUpperCase() + v.slice(1);
+
+          return (
+            <div className="mx-3 mb-2 rounded-md bg-amber-50 px-3 py-2 space-y-1.5 ring-1 ring-amber-100">
+              {oldType && newType && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-800">
+                  <span className="font-medium text-amber-600">Type:</span>
+                  <span className="rounded bg-amber-100 px-1.5 py-0.5">{typeLabel(oldType)}</span>
+                  <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                  <span className="rounded bg-amber-200 px-1.5 py-0.5 font-medium">{typeLabel(newType)}</span>
+                </div>
+              )}
+              {oldSeverity && newSeverity && (
+                <div className="flex items-center gap-1.5 text-xs text-amber-800">
+                  <span className="font-medium text-amber-600">Severity:</span>
+                  <span className="rounded bg-amber-100 px-1.5 py-0.5">{sevLabel(oldSeverity)}</span>
+                  <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                  <span className="rounded bg-amber-200 px-1.5 py-0.5 font-medium">{sevLabel(newSeverity)}</span>
+                </div>
+              )}
+              {reason && (
+                <p className="text-xs text-amber-800">
+                  <span className="font-medium text-amber-600">Reason:</span>{" "}
+                  <span className="italic">&ldquo;{reason}&rdquo;</span>
+                </p>
+              )}
+              {crCancelled && (
+                <p className="text-xs font-medium text-amber-700">
+                  CR cancelled — pipeline restarted
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Human actor ref */}
         {node.actorType === "human" && node.actorRef && (

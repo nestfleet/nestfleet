@@ -930,3 +930,58 @@ casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requ
     return c.json({ error: "Internal server error" }, 500)
   }
 })
+
+// ── POST /api/v1/products/:productId/cases/:caseId/correct-triage ─────────────
+// FEAT-015: Operator action — correct a misclassified case's type and/or severity.
+// Cancels any active CR, resets case to triaged, re-dispatches pipeline with hint.
+
+const CorrectTriageBodySchema = z.object({
+  type:     CaseTypeSchema.optional(),
+  severity: CaseSeveritySchema.optional(),
+  reason:   z.string().min(1).max(200),
+}).refine(
+  (body) => body.type !== undefined || body.severity !== undefined,
+  { message: "At least one of type or severity must be provided" },
+)
+
+casesRouter.post("/products/:productId/cases/:caseId/correct-triage", requireAuth(), requireRole("support_lead", "product_lead", "change_lead"), async (c) => {
+  const productId = c.req.param("productId")
+  const caseId    = c.req.param("caseId")
+  const actor     = c.get("user")
+
+  let body: unknown
+  try { body = await c.req.json() } catch {
+    return c.json({ error: "Invalid JSON body" }, 400)
+  }
+
+  const parsed = CorrectTriageBodySchema.safeParse(body)
+  if (!parsed.success) {
+    return c.json({ error: "Invalid body", details: parsed.error.issues }, 400)
+  }
+
+  try {
+    const { correctTriage } = await import("../../domain/correct-triage.js")
+
+    const result = await correctTriage({
+      caseId,
+      productId,
+      actorRef:  actor.sub,
+      actorName: actor.email,
+      reason:    parsed.data.reason,
+      ...(parsed.data.type     !== undefined ? { newType:     parsed.data.type }     : {}),
+      ...(parsed.data.severity !== undefined ? { newSeverity: parsed.data.severity } : {}),
+    })
+
+    logger.info({ caseId, productId, actor: actor.email, crCancelled: result.crCancelled }, "Triage correction applied")
+    return c.json({ ok: true, correction: result })
+  } catch (err) {
+    if (err && typeof err === "object" && "statusCode" in err) {
+      const triageErr = err as { statusCode: number; message: string }
+      if (triageErr.statusCode === 409) return c.json({ error: triageErr.message }, 409)
+      if (triageErr.statusCode === 404) return c.json({ error: triageErr.message }, 404)
+      if (triageErr.statusCode === 400) return c.json({ error: triageErr.message }, 400)
+    }
+    logger.error({ err, productId, caseId }, "Failed to apply triage correction")
+    return c.json({ error: "Internal server error" }, 500)
+  }
+})

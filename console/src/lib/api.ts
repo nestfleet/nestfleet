@@ -365,6 +365,29 @@ export async function forwardToTeamApi(
   );
 }
 
+// ── Correct Triage (FEAT-015) ─────────────────────────────────────────────────
+
+export interface CorrectTriageCorrection {
+  caseId: string;
+  oldType: string;
+  newType: string;
+  oldSeverity: string;
+  newSeverity: string;
+  reason: string;
+  crCancelled: boolean;
+}
+
+export async function correctTriageApi(
+  productId: string,
+  caseId: string,
+  body: { type?: string; severity?: string; reason: string }
+): Promise<{ ok: true; correction: CorrectTriageCorrection }> {
+  return apiFetch(
+    `/api/v1/products/${productId}/cases/${caseId}/correct-triage`,
+    { method: "POST", body }
+  );
+}
+
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 import type { Notification } from "./types";

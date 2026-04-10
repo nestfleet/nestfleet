@@ -11,11 +11,14 @@
  *
  * The Frontline persona owns the new → enriching → triaged path in SLICE-01.
  * Steward persona (known-issue match, change routing) is added in SLICE-02+.
+ *
+ * FEAT-015: reads triage_hint from job payload and passes it to runTriageAgent()
+ * so the agent does not reclassify a corrected case.
  */
 
 import { AbstractAgentWorker, type WorkerExecuteContext, type WorkerExecuteResult } from "../agents/worker.js"
 import { newId } from "../infra/db/id.js"
-import { runTriageAgent, TRIAGE_SCHEMA_VERSION } from "../agents/impl/triage.js"
+import { runTriageAgent, TRIAGE_SCHEMA_VERSION, type TriageHint } from "../agents/impl/triage.js"
 import { findCaseById, createAuditEvent, findSignalById, findProductById } from "../infra/db/repositories/index.js"
 import { transitionCase } from "../domain/case-state-machine.js"
 import { transitionAndDispatch } from "../domain/transactional-dispatch.js"
@@ -33,7 +36,8 @@ const CATEGORY_TO_CASE_TYPE: Record<string, CaseType> = {
   "capability question":  "user_request",
   "integration question": "user_request",
   "webhook question":     "user_request",
-  // BEF-35: explicit error/crash categories → bug_report
+  // BEF-35: explicit error/crash/bug categories → bug_report
+  bug:             "bug_report",
   error:           "bug_report",
   crash:           "bug_report",
   "runtime error": "bug_report",
@@ -85,7 +89,7 @@ export function inferCaseType(category: string): CaseType {
 const CONFIG_CATEGORY_KEYS    = ["configuration", "how-to", "setup", "question", "feature request", "feature-request"]
 const CONFIG_LABEL_KEYS       = ["how-to", "configuration", "question", "feature-request", "setup"]
 // BEF-35: error/crash categories are never config questions — exempt from Rule 1 downgrade cap.
-const ERROR_CATEGORY_KEYS     = ["error", "crash", "runtime error", "exception"]
+const ERROR_CATEGORY_KEYS     = ["bug", "error", "crash", "runtime error", "exception"]
 
 const ENTERPRISE_CATEGORY_KEYS = ["sales", "sales_inquiry", "sales inquiry", "pre-sales", "presales"]
 const ENTERPRISE_LABEL_KEYS    = ["enterprise", "soc2", "on-premise", "on-prem", "sso", "okta", "compliance", "hipaa", "gdpr", "sla"]
@@ -141,6 +145,23 @@ function mapSeverity(s: string): CaseSeverity {
   return "low"
 }
 
+/**
+ * Parse a triage_hint from an unknown payload value.
+ * Returns null if the value is missing or malformed.
+ */
+function parseTriageHint(raw: unknown): TriageHint | undefined {
+  if (!raw || typeof raw !== "object") return undefined
+  const r = raw as Record<string, unknown>
+  if (typeof r["type"] !== "string" || typeof r["severity"] !== "string" || typeof r["reason"] !== "string") {
+    return undefined
+  }
+  return {
+    type:     r["type"],
+    severity: r["severity"],
+    reason:   r["reason"],
+  }
+}
+
 export class FrontlineWorker extends AbstractAgentWorker {
   readonly actionType = "triage" as const
 
@@ -182,6 +203,9 @@ export class FrontlineWorker extends AbstractAgentWorker {
     const signalId   = payload["signalId"] as string | undefined
     const sessionId  = payload["sessionId"] as string | undefined   // CHAT-UX-01 (a)
 
+    // FEAT-015: extract operator triage hint if present (from correctTriage() re-dispatch)
+    const triageHint = parseTriageHint(payload["triage_hint"])
+
     if (!signalText) {
       throw new Error(`FrontlineWorker: no signal text available for case ${caseId}`)
     }
@@ -192,6 +216,7 @@ export class FrontlineWorker extends AbstractAgentWorker {
       caseId,
       jobId:      job.data.jobId,
       signalText,
+      ...(triageHint ? { triageHint } : {}),
     })
 
     const { severity: rawSeverity, confidenceScore, category, labels, routingTeam, reasoning } = result.output
@@ -245,7 +270,8 @@ export class FrontlineWorker extends AbstractAgentWorker {
       before_state: { status: "enriching" },
       after_state:  { status: "triaged", severity: domainSeverity, type: domainType },
       metadata:     { confidence: confidenceScore, category, labels, routingTeam, reasoning,
-                      ...(overrideReason ? { severityOverride: overrideReason } : {}) },
+                      ...(overrideReason ? { severityOverride: overrideReason } : {}),
+                      ...(triageHint ? { triageHintApplied: true } : {}) },
     })
 
     // ── 6. Post-triage operator notification (best-effort) ────────────────

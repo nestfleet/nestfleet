@@ -724,10 +724,10 @@ function LiveChatRow({ c, onOpen }: LiveChatRowProps) {
   return (
     <tr className="hover:bg-gray-50/80 transition-colors">
       {/* Case: title + subtitle (ID · type) */}
-      <td className="px-4 py-3 max-w-sm">
+      <td className="px-4 py-3 max-w-sm min-w-0">
         <button
           onClick={onOpen}
-          className="truncate font-medium text-gray-900 hover:text-teal-600 transition-colors text-left block focus:outline-none focus:underline"
+          className="w-full truncate font-medium text-gray-900 hover:text-teal-600 transition-colors text-left block focus:outline-none focus:underline"
         >
           {c.title}
         </button>
@@ -819,10 +819,10 @@ function QueueRow({ c, onViewCase, onSendToChange, onResolve, onForward }: Queue
     <tr className="hover:bg-gray-50/80 transition-colors">
 
       {/* Case: title + subtitle (ID · type · severity) */}
-      <td className="px-4 py-3 max-w-sm">
+      <td className="px-4 py-3 max-w-sm min-w-0">
         <button
           onClick={onViewCase}
-          className="truncate font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left block focus:outline-none focus:underline"
+          className="w-full truncate font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left block focus:outline-none focus:underline"
         >
           {c.title}
         </button>

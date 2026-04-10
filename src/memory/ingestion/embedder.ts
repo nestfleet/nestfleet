@@ -41,6 +41,13 @@ async function resolveEmbeddingConfig(productId?: string): Promise<EmbeddingConf
         const embProvider: "openai" | "ollama" =
           (provider === "self-hosted" || provider === "ollama") ? "ollama" : "openai"
 
+        // text-embedding-004 only works via the native Gemini API, not the OpenAI-compat
+        // base URL (/v1beta/openai). Normalize to the compat-friendly equivalent.
+        const rawModel = llm.embeddingModel as string
+        const model = (provider === "google" && rawModel === "text-embedding-004")
+          ? "gemini-embedding-001"
+          : rawModel
+
         return {
           provider: embProvider,
           apiKey: (() => {
@@ -51,7 +58,7 @@ async function resolveEmbeddingConfig(productId?: string): Promise<EmbeddingConf
             }
             return decryptSecret(llm.apiKey as string | undefined) ?? envConfig.EMBEDDING_API_KEY
           })(),
-          model: llm.embeddingModel as string,
+          model,
           dimensions: (llm.embeddingDimensions as number | undefined) ?? envConfig.EMBEDDING_DIMENSIONS,
           baseUrl: (llm.baseUrl as string | undefined) ?? envConfig.EMBEDDING_BASE_URL,
         }

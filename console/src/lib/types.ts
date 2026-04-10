@@ -141,7 +141,9 @@ export type LineageNodeType =
   | "resolved"
   | "chat_thread"
   | "notification_sent"
-  | "system_event";
+  | "system_event"
+  // FEAT-015: manual triage correction by a lead/admin
+  | "triage_corrected";
 
 export type LineageActionType =
   | "approve"

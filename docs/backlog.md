@@ -36,7 +36,7 @@
 | ORGA-01-S5 | GitHub org `nestfleet` + private repo (public flip deferred to v0.1.0) + deploy token | XS | P0 | ✅ Done | [spec §5](ORGA-01-Launch-Setup.md#step-5) |
 | ORGA-01-S6 | GitHub App `NestFleet` (App ID 3297524, under org, PAT removed) | S | P0 | ✅ Done | [spec §6](ORGA-01-Launch-Setup.md#step-6) |
 | ORGA-01-S8 | Prod infra: main Hetzner CX23 VPS, DNS A records, first deploy, deploy workflow | M | P0 | ✅ Done — main VPS live at nestfleet.dev, CI/CD running, GHCR images public | [spec §8](ORGA-01-Launch-Setup.md#step-8) |
-| ORGA-01-S9 | Stripe live keys + webhook endpoint + live price IDs | XS | P0 | Not Started (before first real customer) | [spec §9](ORGA-01-Launch-Setup.md#step-9) |
+| ORGA-01-S9 | Stripe live keys + webhook endpoint + live price IDs | XS | P0 | ⏸ Postponed (FREE track focus) | [spec §9](ORGA-01-Launch-Setup.md#step-9) |
 
 ### Infrastructure
 
@@ -70,6 +70,7 @@
 | FEAT-012 | Owner Fleet — Reissue License | L | P1 | ✅ Done (2026-04-08) | `main` | [spec](specs/FEAT-012-reissue-license.md) |
 | NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
 | FEAT-014 | Notification Preferences — per-event email vs console-only control | M | P2 | ✅ Done (2026-04-10) | `main` | [spec](specs/FEAT-014-notification-preferences.md) |
+| FEAT-015 | Correct Triage — operator inline override for case type and severity | M | P2 | Not Started | — | [spec](specs/FEAT-015-correct-triage.md) |
 
 ### UX Improvements
 
@@ -91,13 +92,13 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| FEAT-013 | Stripe-Integrated License Reissue — sync tier changes with Stripe subscriptions | M | P1 | Not Started | Owner-initiated reissue currently updates JWT + DB only — no Stripe event. Need to call `stripe.subscriptions.update()` with the new price ID so Stripe reflects the upgrade/downgrade in money (proration charged or credited automatically on the stored payment method — no card details needed from owner). Two paths: (1) existing subscription → `subscriptions.update()` + prorate; (2) no subscription yet → send customer a Stripe Payment Link, reissue JWT only after payment confirmed via webhook. Downgrade: same `subscriptions.update()` call, Stripe credits the balance to the next invoice. Add "Bill via Stripe" toggle to ReissueLicenseDialog — when enabled, fires Stripe update before JWT deploy. |
+| FEAT-013 | Stripe-Integrated License Reissue — sync tier changes with Stripe subscriptions | M | P1 | ⏸ Postponed (FREE track focus) | Owner-initiated reissue currently updates JWT + DB only — no Stripe event. Need to call `stripe.subscriptions.update()` with the new price ID so Stripe reflects the upgrade/downgrade in money (proration charged or credited automatically on the stored payment method — no card details needed from owner). Two paths: (1) existing subscription → `subscriptions.update()` + prorate; (2) no subscription yet → send customer a Stripe Payment Link, reissue JWT only after payment confirmed via webhook. Downgrade: same `subscriptions.update()` call, Stripe credits the balance to the next invoice. Add "Bill via Stripe" toggle to ReissueLicenseDialog — when enabled, fires Stripe update before JWT deploy. |
 
 ### SaaS Provisioning: Fleet Update Management (OPS-FLEET-02)
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| OPS-FLEET-02 | Fleet Update Management — controlled push of new images to customer VPS fleet, per-instance rollback, Owner Console UI + CLI script | L | P1 | Not Started | No Watchtower. Update API on customer VPS (`/system/update`, `/system/version`) authenticated by LICENSE_SECRET. pg-boss `fleet_update_instance` job with 5-parallel concurrency. SHA-based rollback via `previous_image_sha`. Owner Console: per-row Update/Rollback buttons + Update All. CLI fallback script for emergencies. See [spec](specs/OPS-FLEET-02-fleet-update-management.md). |
+| OPS-FLEET-02 | Fleet Update Management — controlled push of new images to customer VPS fleet, per-instance rollback, Owner Console UI + CLI script | L | P1 | ⏸ Postponed (FREE track focus) | No Watchtower. Update API on customer VPS (`/system/update`, `/system/version`) authenticated by LICENSE_SECRET. pg-boss `fleet_update_instance` job with 5-parallel concurrency. SHA-based rollback via `previous_image_sha`. Owner Console: per-row Update/Rollback buttons + Update All. CLI fallback script for emergencies. See [spec](specs/OPS-FLEET-02-fleet-update-management.md). |
 
 ### SaaS Provisioning: Docker Registry (OPS-IMAGE-01)
 
@@ -166,6 +167,8 @@
 | BEF-31 | Integration tests broken by QE-06 LLM validation (fake keys now trigger real HTTP calls) | XS | P1 | ✅ Done (2026-04-09) | `settings-api.test.ts` (NF-INT-103) and `provisioning/new-org-happy-path.test.ts` (NF-INT-524) started returning 422 after QE-06 added real HTTP validation — tests used fake keys like `sk-ant-xyz5678`. Fix: added `vi.stubGlobal("fetch", ...)` at module level in both test files so LLM/embedding validation calls return mocked success. NF-INT-515 also fixed: `beforeEach` deleted all test users, leaving DB empty → `isRegistrationOpen()` returned true (first-run mode) despite `REGISTRATION_ENABLED=false`. Fix: register a seed user inside the test before setting the env var. |
 | BEF-32 | Lead role dead-end: awaiting-lead UI only shows "Route to Eng" — Resolve action missing despite being valid in state machine | XS | P1 | ✅ Done (2026-04-09) | `awaiting-lead → resolved` is a valid transition in case-state-machine.ts but the console did not surface it. Fixed: `primaryAction()` in queue/page.tsx now returns "resolve" for awaiting-lead cases. |
 | BEF-33 | in-resolution cases: agent abstains from auto-reply but no "Send Reply" action surfaced for Lead to respond manually | S | P1 | ✅ Done (2026-04-09) | Fixed: EmailReplyPanel shown for in-resolution + awaiting-lead email cases even without draft. Backend send-draft-reply now accepts in-resolution status. Webhook cases show amber "reply via original channel" notice. isEmailCase corrected to check source_type="email" explicitly. |
+| BEF-34 | Triage misclassification — "webhook" keyword in support questions triggers Change flow | S | P2 | ✅ Done (2026-04-10) | Observed in FREE community simulation (2026-04-10): Zapier integration question ("do you have a webhook I can use?") triaged as Bug/Change instead of general question. Root cause: triage prompt pattern-matches on "webhook" as a change indicator regardless of sentence context. Fix: tighten the Change classification signal — require intent markers (e.g. "please add", "we need", "feature request") not just nouns. No KB context was loaded, which amplifies misclassification risk on fresh instances. |
+| BEF-35 | Triage misclassification — production crash with stack trace classified as Request | S | P2 | ✅ Done (2026-04-10) | Observed in FREE community simulation (2026-04-10): "Getting a 500 error... TypeError: Cannot read properties of undefined" classified as Request/Steward instead of Bug. Stack trace and "production blocker" language should be strong Bug signals. Fix: add stack trace detection (TypeError/Error: pattern) and "production blocker" phrase as hard Bug overrides in the triage prompt. |
 
 ### QE — Quality Engineering
 

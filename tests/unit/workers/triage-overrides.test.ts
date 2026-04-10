@@ -187,6 +187,10 @@ describe("inferCaseType — category → CaseType mapping", () => {
     expect(inferCaseType("error")).toBe("bug_report")
   })
 
+  it("NF-UNIT-FLTW-30b: maps 'bug' category to bug_report (BEF-35 — LLM output variant)", () => {
+    expect(inferCaseType("bug")).toBe("bug_report")
+  })
+
   it("NF-UNIT-FLTW-31: maps 'crash' category to bug_report (BEF-35)", () => {
     expect(inferCaseType("crash")).toBe("bug_report")
   })

@@ -10,6 +10,8 @@ import { LineageTimeline } from "@/components/LineageTimeline";
 import { LineageGraph } from "@/components/lineage-graph";
 import { getLineageApi, getCaseConversationApi, getCaseApi, sendChatReplyApi, sendDraftReplyApi, retryCaseApi, ApiError } from "@/lib/api";
 import { useProductIdWithFallback, useProductBasePath } from "@/lib/product-context";
+import { useAuth } from "@/lib/auth";
+import { CorrectTriageModal } from "@/components/CorrectTriageModal";
 import type { ConversationMessage } from "@/lib/api";
 
 // ── Chat Reply Panel ──────────────────────────────────────────────────────────
@@ -494,6 +496,17 @@ export default function CaseDetailPage({ params }: PageProps) {
   const router = useRouter();
   const productId = useProductIdWithFallback();
   const basePath  = useProductBasePath();
+  const { user }  = useAuth();
+
+  // FEAT-015: Correct Triage modal state
+  const [correctTriageOpen, setCorrectTriageOpen] = useState(false);
+
+  // Role gate: only leads and admins can correct triage
+  const canCorrectTriage =
+    user?.roles?.some((r) =>
+      ["support_lead", "product_lead", "change_lead", "admin"].includes(r)
+    ) ?? false;
+
   const [viewMode, setViewMode] = useState<"timeline" | "graph">(() => {
     if (typeof window !== "undefined") {
       return (localStorage.getItem("nestfleet:lineage-view") as "timeline" | "graph") ?? "timeline";
@@ -646,16 +659,68 @@ export default function CaseDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              <div className="shrink-0 flex flex-col items-end gap-1">
+              <div className="shrink-0 flex flex-col items-end gap-2">
                 <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono text-gray-500 break-all">
                   {lineage.caseId}
                 </code>
                 {relativeUpdated && (
                   <span className="text-xs text-gray-400">Updated {relativeUpdated}</span>
                 )}
+                {/* FEAT-015: Correct Triage action — leads and admins only */}
+                {canCorrectTriage && (() => {
+                  const isTerminal =
+                    caseRow?.status === "resolved" ||
+                    caseRow?.status === "processing-failed";
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setCorrectTriageOpen(true)}
+                      disabled={isTerminal}
+                      title={isTerminal ? "Not available for resolved cases" : "Correct the AI triage classification"}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg
+                        className="h-3.5 w-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
+                        />
+                      </svg>
+                      Correct Triage
+                    </button>
+                  );
+                })()}
               </div>
             </div>
           </div>
+
+          {/* FEAT-015: Correct Triage modal */}
+          {canCorrectTriage && correctTriageOpen && (() => {
+            const triageNode   = lineage.nodes.find((n) => n.type === "triage");
+            const currentType  = (triageNode?.metadata?.type  as string | undefined) ?? caseRow?.type  ?? "bug_report";
+            const currentSev   = (triageNode?.metadata?.severity as string | undefined) ?? caseRow?.severity ?? "normal";
+            const hasCr = caseRow?.status === "in-change";
+            return (
+              <CorrectTriageModal
+                open={correctTriageOpen}
+                onClose={() => setCorrectTriageOpen(false)}
+                onSuccess={() => { mutate(); mutateCase(); }}
+                productId={productId}
+                caseId={caseId}
+                currentType={currentType}
+                currentSeverity={currentSev}
+                caseStatus={caseRow?.status ?? ""}
+                hasCr={hasCr}
+              />
+            );
+          })()}
 
           {/* ── QE-05: Processing Failed panel ── */}
           {isProcessingFailed && (
