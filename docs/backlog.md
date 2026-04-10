@@ -68,7 +68,7 @@
 | FEAT-002 | Onboarding & Channels Hub Refactor | L | Medium | ✅ Done | `feat/FEAT-002-onboarding-channels-hub-refactor` | [spec](specs/FEAT-002-onboarding-channels-hub-refactor.md) |
 | FEAT-003 | Channel Richness Gap & Architecture | S | Low | ✅ Done | `feat/FEAT-003-channel-richness-gap` | [spec](specs/FEAT-003-channel-richness-gap.md) |
 | FEAT-012 | Owner Fleet — Reissue License | L | P1 | ✅ Done (2026-04-08) | `main` | [spec](specs/FEAT-012-reissue-license.md) |
-| NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
+| NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | ✅ Done | `main` | 21 pages: quickstart, user-guide (cases, auto-reply, change-requests, KB, notifications, roles, settings), self-hosting (docker, env, github-app, backup, upgrading), developer (api-reference, architecture, contributing, testing). In-app doc links in setup, knowledge, analytics pages. |
 | FEAT-014 | Notification Preferences — per-event email vs console-only control | M | P2 | ✅ Done (2026-04-10) | `main` | [spec](specs/FEAT-014-notification-preferences.md) |
 | FEAT-015 | Correct Triage — operator inline override for case type and severity | M | P2 | ✅ Done (2026-04-10) | `main` | [spec](specs/FEAT-015-correct-triage.md) |
 | FEAT-016 | SaaS Signup Form + 14-day Trial — self-service signup path, Stripe redirect, trial_period_days | S | P1 | ✅ Done (2026-04-10) | `main` | — |
