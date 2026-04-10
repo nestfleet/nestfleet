@@ -1251,6 +1251,25 @@ export async function putNotificationPrefsApi(
   });
 }
 
+// ── Waitlist / pre-launch interest capture (FEAT-019) ────────────────────────
+
+export interface WaitlistPayload {
+  email:    string;
+  name?:    string;
+  company?: string;
+  plan?:    "starter" | "growth" | "scale";
+}
+
+export async function waitlistApi(
+  payload: WaitlistPayload,
+): Promise<{ ok: boolean }> {
+  return apiFetch("/api/v1/waitlist", {
+    method: "POST",
+    body: payload,
+    skipAuth: true,
+  });
+}
+
 // ── SaaS signup (FEAT-016) ────────────────────────────────────────────────────
 
 export interface SaasSignupPayload {

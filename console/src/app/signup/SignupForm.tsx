@@ -4,7 +4,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
-import { registerApi, saasSignupApi, ApiError } from "@/lib/api";
+import { registerApi, saasSignupApi, waitlistApi, ApiError } from "@/lib/api";
+import { WAITLIST_MODE } from "@/lib/flags";
 
 const PLAN_LABELS: Record<string, string> = {
   starter: "Starter — 14-day free trial",
@@ -316,6 +317,136 @@ function SaasSignupForm({ plan }: { plan: string }) {
   );
 }
 
+// ── Waitlist signup (shown instead of Stripe form when WAITLIST_MODE=true) ────
+
+function WaitlistSignupForm({ plan }: { plan: string }) {
+  const [email,      setEmail]      = useState("");
+  const [name,       setName]       = useState("");
+  const [company,    setCompany]    = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done,       setDone]       = useState(false);
+  const [error,      setError]      = useState<string | null>(null);
+
+  const planLabel = PLAN_LABELS[plan] ?? plan;
+  const planKey   = (plan === "starter" || plan === "growth" || plan === "scale") ? plan : undefined;
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      await waitlistApi({ email: email.trim(), name: name.trim() || undefined, company: company.trim() || undefined, plan: planKey });
+      setDone(true);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || "Something went wrong. Please try again.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (done) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white px-8 py-10 shadow-sm text-center">
+        <div className="mb-4 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
+          <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <h1 className="text-xl font-bold text-gray-900 mb-2">You&apos;re on the list!</h1>
+        <p className="text-sm text-gray-500">
+          We&apos;ve saved your interest in the <span className="font-semibold text-indigo-600">{planLabel.split("—")[0]?.trim()}</span> plan.
+          We&apos;ll email you at <span className="font-medium">{email}</span> the moment managed hosting launches.
+        </p>
+        <Link href="/" className="mt-6 inline-flex items-center text-sm text-indigo-600 hover:underline">
+          ← Back to homepage
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-sm">
+      <h1 className="text-xl font-bold text-gray-900 mb-1">Reserve your spot</h1>
+      <p className="text-sm text-gray-500 mb-1">{planLabel}</p>
+      <p className="text-xs text-gray-400 mb-5">
+        Managed hosting is getting ready. Be first in line.
+      </p>
+
+      <div className="rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-2.5 text-xs text-indigo-700 mb-5">
+        Leave your details and we&apos;ll email you the moment <span className="font-semibold">managed hosting launches</span> — no spam, one email.
+      </div>
+
+      <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4" noValidate>
+        <div>
+          <label htmlFor="wl-email" className="block text-xs font-medium text-gray-700 mb-1">
+            Work email <span className="text-red-500">*</span>
+          </label>
+          <input
+            id="wl-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="wl-name" className="block text-xs font-medium text-gray-700 mb-1">
+            Name <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="wl-name"
+            type="text"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Alex Smith"
+            maxLength={100}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="wl-company" className="block text-xs font-medium text-gray-700 mb-1">
+            Company <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="wl-company"
+            type="text"
+            autoComplete="organization"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            placeholder="Acme Corp"
+            maxLength={200}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+          />
+        </div>
+
+        {error && (
+          <p className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting || !email}
+          className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 transition-colors"
+        >
+          {submitting ? "Saving…" : "Reserve my spot →"}
+        </button>
+      </form>
+    </div>
+  );
+}
+
 // ── Root component — branches on plan query param ────────────────────────────
 
 export default function SignupForm() {
@@ -335,7 +466,12 @@ export default function SignupForm() {
       </Link>
 
       <div className="w-full max-w-sm">
-        {isSaasFlow ? <SaasSignupForm plan={plan} /> : <CommunitySignupForm />}
+        {isSaasFlow
+          ? WAITLIST_MODE
+            ? <WaitlistSignupForm plan={plan} />
+            : <SaasSignupForm plan={plan} />
+          : <CommunitySignupForm />
+        }
 
         <p className="mt-5 text-center text-sm text-gray-500">
           Already have an account?{" "}

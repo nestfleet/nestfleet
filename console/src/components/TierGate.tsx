@@ -7,6 +7,8 @@
 
 import { type ProductTier, tierAtLeast } from "@/lib/useLicense";
 import { useProductBasePath } from "@/lib/product-context";
+import { WaitlistButton } from "@/components/WaitlistButton";
+import { WAITLIST_MODE } from "@/lib/flags";
 
 const TIER_LABEL: Record<ProductTier, string> = {
   community: "Community",
@@ -62,7 +64,13 @@ export function TierGate({ currentTier, requiredTier, featureName, children }: T
         </span>
       </p>
 
-      {currentTier === "community" || currentTier === null ? (
+      {WAITLIST_MODE ? (
+        <WaitlistButton
+          planHint={requiredTier === "scale" ? "scale" : requiredTier === "growth" ? "growth" : "starter"}
+          label="Join waitlist →"
+          className="mt-4"
+        />
+      ) : currentTier === "community" || currentTier === null ? (
         <a
           href="https://nestfleet.dev"
           target="_blank"

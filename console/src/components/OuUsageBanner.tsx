@@ -15,6 +15,8 @@ import { useState } from "react";
 import useSWR from "swr";
 import { getLicenseStatusApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { WaitlistButton } from "@/components/WaitlistButton";
+import { WAITLIST_MODE } from "@/lib/flags";
 
 export function OuUsageBanner() {
   const { user } = useAuth();
@@ -81,14 +83,23 @@ export function OuUsageBanner() {
           ? `Monthly Outcome Unit limit reached (${ou.usage} / ${ou.limit}). New case intake is paused.`
           : `You've used ${pct}% of your monthly Outcome Unit limit (${ou.usage} / ${ou.limit}).`}
         {" "}
-        <a
-          href={upgradeHref}
-          target={upgradeTarget}
-          rel={upgradeRel}
-          className={`underline underline-offset-2 hover:opacity-75 transition-opacity ${isBlocked ? "text-red-700" : "text-amber-700"}`}
-        >
-          Upgrade for more capacity →
-        </a>
+        {WAITLIST_MODE ? (
+          <WaitlistButton
+            planHint="growth"
+            label="Join waitlist for more capacity →"
+            variant="link"
+            className={isBlocked ? "text-red-700" : "text-amber-700"}
+          />
+        ) : (
+          <a
+            href={upgradeHref}
+            target={upgradeTarget}
+            rel={upgradeRel}
+            className={`underline underline-offset-2 hover:opacity-75 transition-opacity ${isBlocked ? "text-red-700" : "text-amber-700"}`}
+          >
+            Upgrade for more capacity →
+          </a>
+        )}
       </p>
 
       {/* Dismiss */}

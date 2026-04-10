@@ -9,6 +9,8 @@ import {
   getLockedTeaserFeatures,
   getTierNote,
 } from "@/lib/feature-catalog";
+import { WaitlistButton } from "@/components/WaitlistButton";
+import { WAITLIST_MODE } from "@/lib/flags";
 
 // ── Plan metadata (pricing / limits / CTA — not in FEATURE_CATALOG) ───────────
 
@@ -196,7 +198,18 @@ function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; 
         )}
       </ul>
 
-      {plan.ctaHref.startsWith("http") || plan.ctaHref.startsWith("mailto") ? (
+      {/* Waitlist mode: replace paid plan CTAs with pre-registration button */}
+      {WAITLIST_MODE && (plan.key === "starter" || plan.key === "growth") ? (
+        <WaitlistButton
+          planHint={plan.key}
+          label="Join the waitlist →"
+          className={`block w-full rounded-xl py-3 text-center text-sm font-bold transition-all active:scale-95 ${
+            plan.popular
+              ? "!bg-indigo-600 !text-white hover:!bg-indigo-700 shadow-md shadow-indigo-200"
+              : "!bg-transparent border border-indigo-300 !text-indigo-700 hover:!bg-indigo-50"
+          }`}
+        />
+      ) : plan.ctaHref.startsWith("http") || plan.ctaHref.startsWith("mailto") ? (
         <a
           href={plan.ctaHref}
           target={plan.ctaHref.startsWith("http") ? "_blank" : undefined}

@@ -247,14 +247,14 @@ Use the email address you registered with to log in.
 
 ## 7. Concerns and edge cases
 
-### C1 — Trial cancellation grace period (DECISION NEEDED)
-When a customer cancels during the 14-day free trial, `subscription.deleted` fires immediately. The current deprovisioning flow starts a **30-day grace period** — the VPS stays up for 30 more days. For a trial cancellation, 30 days is very generous (customer paid nothing). Consider: trial cancel → 7-day grace (or immediate). **Requires Stripe webhook to distinguish trial from paid cancel** via `subscription.trial_end` field. Phase 1 acceptable: keep 30-day grace for simplicity, revisit when abuse is observed.
+### C1 — Trial cancellation: no grace period ✅ DECIDED
+When a customer cancels during the 14-day free trial, `subscription.deleted` fires at trial end (Stripe cancels at period end by default when `cancel_at_period_end=true`). **No 30-day grace for trial cancellations.** The 30-day data export window applies only to paid subscriptions (customer has paid at least one invoice). Implementation: inspect `subscription.trial_end` and `subscription.status` in the webhook — if status was `trialing` at cancellation and no invoice was ever paid, set `deprovision_after = trial_end` (not `now() + 30 days`).
 
-### C2 — Re-subscribe with same slug (KNOWN LIMITATION)
-After deprovisioning, the slug is permanently reserved. A returning customer must pick a new slug. This is intentional per FEAT-001 spec (DNS caching confusion). The account page should surface this clearly: "Your instance has been deprovisioned. To return, sign up with a new workspace name at nestfleet.dev/signup."
+### C2 — Re-subscribe with same slug: short reactivation window ✅ DECIDED
+After cancellation is received (deprovisioning status set), allow a **short reactivation window** (7 days) during which the customer can re-subscribe with the same slug. Once `deprovision_after` is reached and deprovisioning runs, slug is permanently retired — VPS deleted, data gone. Implementation: add `reactivation_deadline` column to `provisionings`; set to `now() + 7 days` at cancellation. If customer re-subscribes within 7 days, reset status to `active` and cancel deprovisioning. After 7 days, normal deprovisioning proceeds. Account page shows countdown.
 
-### C3 — Email address change in Stripe
-If a customer changes their email in Stripe, `customer.updated` fires. The `provisionings.customer_email` and magic link auth would become stale. **Not handled in Phase 1.** Mitigation: magic link error message says "contact support@nestfleet.dev if your email changed." Add `customer.updated` webhook handler in Phase 2.
+### C3 — Email address change in Stripe: mirror via webhook ✅ BEST PRACTICE APPLIED
+Handle `customer.updated` Stripe event: if `customer.email` changed, update `provisionings.customer_email` to match. This keeps magic link auth working after an email change. The customer would need to use their new email to request the magic link. No UI change needed — the magic link endpoint already looks up by email.
 
 ### C4 — Stripe Customer Portal must be configured by ops
 Before the portal button works, ops must configure the Stripe Customer Portal in Stripe Dashboard → Settings → Billing → Customer Portal:
@@ -267,8 +267,8 @@ Before the portal button works, ops must configure the Stripe Customer Portal in
 ### C5 — License reissue latency on upgrade
 Between the Stripe plan change and the SSH license deploy (~30–60 seconds), the customer's VPS still shows the old tier. The VPS license endpoint (`GET /api/v1/license/tier`) will return the old tier during this window. Acceptable for Phase 1 — users won't notice a 60-second delay after an upgrade. The reissue worker already handles this transparently.
 
-### C6 — Owner-initiated reissue vs customer self-service (consistency)
-FEAT-012 lets the owner change the tier via SSH without touching Stripe. FEAT-017 makes Stripe the trigger for tier changes. **These must not conflict.** Rule: owner-initiated reissue (FEAT-012) is a break-glass operation. It updates the license JWT and DB but does NOT update Stripe. FEAT-013 (postponed) would add the Stripe sync to the owner path. Until FEAT-013, if the owner changes a tier, the Stripe subscription is out of sync — the next Stripe billing cycle will charge the wrong amount. Document this in the owner console reissue dialog.
+### C6 — Owner-initiated reissue vs customer self-service (consistency) ✅ DECIDED: FEAT-013 IS REQUIRED
+FEAT-012 lets the owner change the tier via SSH without touching Stripe. FEAT-017-D makes Stripe the trigger for customer-initiated changes. **These must be consistent** — the goal is that Stripe is always the source of truth for billing, and the VPS license always reflects the Stripe subscription. Therefore FEAT-013 (owner reissue → Stripe sync) is **not optional** — without it, an owner-initiated tier change leaves Stripe billing the wrong amount. FEAT-013 priority raised from postponed to P1, to be implemented alongside FEAT-017. See FEAT-013 in backlog.
 
 ---
 
