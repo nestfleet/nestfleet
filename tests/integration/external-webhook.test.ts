@@ -152,25 +152,25 @@ describe("external webhook (integration)", () => {
 
   beforeEach(() => { vi.clearAllMocks() })
 
-  it("NF-INT-EXT-10: senderName='smoke-test' → case status is 'resolved' in DB", async () => {
+  it("NF-INT-EXT-10: senderName='smoke-test' → canary=true, no case created in DB", async () => {
     const result = await ingestExternalSignal(productId, makePayload({ senderName: "smoke-test" }))
 
     expect(result.canary).toBe(true)
-    const db  = getDb()
-    const rows = await db`SELECT status FROM cases WHERE case_id = ${result.caseId}`
-    expect(rows[0]?.status).toBe("resolved")
+    expect(result.caseId).toBe("")
+    // Signal should still exist for traceability
+    const db   = getDb()
+    const rows = await db`SELECT signal_id FROM signals WHERE signal_id = ${result.signalId}`
+    expect(rows.length).toBe(1)
   }, 30_000)
 
-  it("NF-INT-EXT-11: channelContext.source='smoke-test' → case status is 'resolved' in DB", async () => {
+  it("NF-INT-EXT-11: channelContext.source='smoke-test' → canary=true, no case created in DB", async () => {
     const result = await ingestExternalSignal(
       productId,
       makePayload({ channelContext: { source: "smoke-test" } }),
     )
 
     expect(result.canary).toBe(true)
-    const db   = getDb()
-    const rows = await db`SELECT status FROM cases WHERE case_id = ${result.caseId}`
-    expect(rows[0]?.status).toBe("resolved")
+    expect(result.caseId).toBe("")
   }, 30_000)
 
   it("NF-INT-EXT-12: smoke canary → dispatch (triage) not called", async () => {

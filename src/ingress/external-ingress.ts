@@ -198,6 +198,26 @@ export async function ingestExternalSignal(
       return { signalId, conversationId, caseId: "", identityId, duplicate: false, channelThreadId: payload.threadId, ouStatus: "blocked" }
     }
 
+    // ── 5b. Smoke canary — return before case creation ────────────────────────
+    // Signal is sufficient for traceability; creating a case would pollute the UI.
+    if (isSmokeCanary(payload)) {
+      logger.info({ productId, signalId }, "Smoke canary detected — returning early, no case created")
+      await updateSignal(signalId, {
+        identity_id:       identityId,
+        conversation_id:   conversationId,
+        processing_status: "linked",
+      })
+      return {
+        signalId,
+        conversationId,
+        caseId:          "",
+        identityId,
+        duplicate:       false,
+        channelThreadId: payload.threadId,
+        canary:          true,
+      }
+    }
+
     const newCase = await createCase({
       product_id:           productId,
       title:                payload.message.slice(0, 200),
@@ -211,28 +231,6 @@ export async function ingestExternalSignal(
 
     await transitionCase(caseId, "new", "enriching")
     logger.info({ caseId, productId, conversationId }, "Case created from external signal")
-
-    // ── 5b. Smoke canary — auto-resolve without triage ────────────────────────
-    if (isSmokeCanary(payload)) {
-      logger.info({ caseId, productId }, "Smoke canary detected — auto-resolving case")
-      await transitionCase(caseId, "enriching", "triaged")
-      await transitionCase(caseId, "triaged", "resolved")
-      await updateSignal(signalId, {
-        identity_id:       identityId,
-        conversation_id:   conversationId,
-        case_id:           caseId,
-        processing_status: "linked",
-      })
-      return {
-        signalId,
-        conversationId,
-        caseId,
-        identityId,
-        duplicate: false,
-        channelThreadId: payload.threadId,
-        canary: true,
-      }
-    }
   }
 
   // ── 6. Link signal ────────────────────────────────────────────────────────

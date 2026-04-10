@@ -247,16 +247,21 @@ describe("external-ingress (FEAT-003)", () => {
     expect(notifyNewCase).not.toHaveBeenCalled()
   })
 
-  it("NF-UNIT-EXT-12: smoke canary → case is still created (for traceability)", async () => {
+  it("NF-UNIT-EXT-12: smoke canary → case NOT created (signal provides traceability, case would pollute UI)", async () => {
     await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
 
-    expect(repo.createCase).toHaveBeenCalled()
+    expect(repo.createCase).not.toHaveBeenCalled()
   })
 
-  it("NF-UNIT-EXT-13: smoke canary → transitionCase reaches 'resolved'", async () => {
+  it("NF-UNIT-EXT-13: smoke canary → transitionCase NOT called (no case created)", async () => {
     await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
 
-    const calls = vi.mocked(transitionCase).mock.calls.map((c) => ({ from: c[1], to: c[2] }))
-    expect(calls).toContainEqual(expect.objectContaining({ to: "resolved" }))
+    expect(transitionCase).not.toHaveBeenCalled()
+  })
+
+  it("NF-UNIT-EXT-14: smoke canary → result.caseId is empty string", async () => {
+    const result = await ingestExternalSignal(PRODUCT_ID, makePayload({ senderName: "smoke-test" }))
+
+    expect(result.caseId).toBe("")
   })
 })
