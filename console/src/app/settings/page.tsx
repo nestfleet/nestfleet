@@ -1073,23 +1073,34 @@ function NotificationsSection({
         />
 
         <div className="space-y-3 mt-3">
-          {/* Email — always on */}
-          <div className="rounded-xl border border-gray-200 p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-indigo-600">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                </svg>
+          {/* Email — always on, with per-event preferences link */}
+          <div className="rounded-xl border border-gray-200 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-indigo-600">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Email</p>
+                  <p className="text-[11px] text-gray-500">Lead role email addresses from Lead Assignments</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-800">Email</p>
-                <p className="text-[11px] text-gray-500">Lead role email addresses from Lead Assignments</p>
-              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full ring-1 ring-emerald-100">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                Active
+              </span>
             </div>
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full ring-1 ring-emerald-100">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Active
-            </span>
+            <button
+              onClick={() => { window.location.href = "/settings/notifications"; }}
+              className="w-full flex items-center justify-between rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 text-xs text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <span>Configure per-event email preferences</span>
+              <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
           </div>
 
           {/* Slack */}
@@ -1248,6 +1259,7 @@ function NotificationsSection({
           </div>
         </div>
       </div>
+
     </div>
   );
 }
@@ -1888,7 +1900,10 @@ interface LicenseSectionProps {
 
 function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionProps) {
   const { license, tier, ouUsage } = useLicense();
+  const { user } = useAuth();
   const { toast } = useToast();
+  // Platform operator account (nestfleet.dev main instance) — billing is not for the owner.
+  const isOwner = user?.roles?.includes("owner") ?? false;
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState<PlanInterval>("monthly");
@@ -2097,8 +2112,17 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
           </p>
         </div>
       )}
-      {/* Upgrade CTAs — shown only when billing is confirmed active (billingData returned) */}
-      {!isPaid && availableUpgrades.length > 0 && !billingDisabled && billingData !== undefined && (
+      {/* Branch D: Platform operator on main instance — no self-upgrade */}
+      {isOwner && !billingDisabled && (
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-1">
+          <p className="text-sm font-medium text-gray-700">Platform operator instance</p>
+          <p className="text-xs text-gray-500">
+            Billing is managed per customer at provisioning time. This account is not subject to a subscription plan.
+          </p>
+        </div>
+      )}
+      {/* Upgrade CTAs — shown only when billing is confirmed active (billingData returned) and not owner */}
+      {!isPaid && availableUpgrades.length > 0 && !billingDisabled && billingData !== undefined && !isOwner && (
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h3 className="text-sm font-medium text-gray-700">Upgrade your plan</h3>
@@ -2185,6 +2209,16 @@ const DOMAIN_ORDER = [
   "approvals", "analytics", "settings", "compliance",
   "memory", "audit", "products",
 ];
+
+/**
+ * Permissions with no direct console button — exercised by the AI pipeline on
+ * behalf of operators. Listed here so admins understand why the permission
+ * exists even though there is no corresponding UI action to find.
+ */
+const PIPELINE_PERMISSIONS: Record<string, string> = {
+  "cases:create":            "Cases are opened automatically when an inbound signal is received — there is no manual 'Create case' button.",
+  "change_requests:create":  "Change requests are drafted by the AI triage agent — there is no manual 'Create CR' button in the console.",
+};
 
 const DOMAIN_LABELS: Record<string, string> = {
   cases: "Cases",
@@ -2611,6 +2645,17 @@ function RolesSection() {
             </div>
           )}
 
+          {/* Badge legend */}
+          <div className="flex items-center gap-3 mb-2 flex-wrap">
+            <span className="text-[10px] text-gray-400">Badges:</span>
+            <span className="px-1 py-px rounded text-[10px] font-medium bg-red-50 text-red-600 ring-1 ring-red-100">destructive</span>
+            <span className="text-[10px] text-gray-400">— permanent, irreversible action</span>
+            <span className="px-1 py-px rounded text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-amber-100">sensitive</span>
+            <span className="text-[10px] text-gray-400">— may expose PII or secrets</span>
+            <span className="px-1 py-px rounded text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100">pipeline</span>
+            <span className="text-[10px] text-gray-400">— exercised by the AI agent, no direct console button</span>
+          </div>
+
           {permsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
@@ -2721,9 +2766,17 @@ function RolesSection() {
                                       sensitive
                                     </span>
                                   )}
+                                  {PIPELINE_PERMISSIONS[perm.id] && (
+                                    <span title={PIPELINE_PERMISSIONS[perm.id]} className="px-1 py-px rounded text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100 cursor-help">
+                                      pipeline
+                                    </span>
+                                  )}
                                 </div>
                                 <p className={`text-[10px] mt-0.5 leading-relaxed ${isGranted ? "text-gray-500" : "text-gray-300"}`}>
                                   {perm.description}
+                                  {PIPELINE_PERMISSIONS[perm.id] && (
+                                    <span className="block mt-0.5 text-sky-600">{PIPELINE_PERMISSIONS[perm.id]}</span>
+                                  )}
                                 </p>
                               </div>
 

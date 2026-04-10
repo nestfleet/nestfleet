@@ -20,7 +20,7 @@
  *   Cases — draft-clarification       ✅      ✅          ✅           ❌            ❌             ❌
  *   Cases — send-to-change            ✅      ❌          ✅           ✅            ✅             ❌
  *   PR Drafts — view list/detail      ✅      ✅          ✅           ✅            ✅             ❌
- *   PR Drafts — complete              ✅      ❌          ❌           ✅            ❌             ❌
+ *   PR Drafts — complete              ✅      ✅          ❌           ✅            ❌             ✅  (operator and knowledge_lead have pr_drafts:push in catalog)
  *   Settings — view                   ✅      ✅          ❌           ❌            ❌             ❌
  *   Settings — edit                   ✅      ❌          ❌           ❌            ❌             ❌
  *   Product Memory — view             ✅      ✅          ❌           ❌            ❌             ✅
@@ -28,7 +28,7 @@
  *   Notifications — view/ack          ✅      ✅          ✅           ✅            ✅             ✅
  *   Lineage — view                    ✅      ✅          ✅           ✅            ✅             ✅
  *   Approvals — view queue            ✅      ✅          ❌           ✅            ✅             ❌
- *   Approvals — approve/reject        ✅      ❌          ❌           ✅            ✅             ❌
+ *   Approvals — approve/reject        ✅      ❌          ❌           ✅            ✅             ✅  (knowledge_lead has change_requests:approve in catalog)
  */
 
 import { vi } from "vitest"
@@ -566,13 +566,13 @@ describe("PR Drafts — complete", () => {
     expect(authPassed(res.status)).toBe(true)
   }, 15_000)
 
-  it("NF-RBAC-39: operator cannot complete a PR draft → 403", async () => {
+  it("NF-RBAC-39: operator can complete a PR draft (has pr_drafts:push in catalog)", async () => {
     const res = await app.request(completeUrl(), {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok(["operator"], productId)}` },
       body,
     })
-    expect(res.status).toBe(403)
+    expect(authPassed(res.status)).toBe(true)
   }, 15_000)
 
   it("NF-RBAC-40: support_lead cannot complete a PR draft → 403", async () => {
@@ -593,13 +593,13 @@ describe("PR Drafts — complete", () => {
     expect(res.status).toBe(403)
   }, 15_000)
 
-  it("NF-RBAC-42: knowledge_lead cannot complete a PR draft → 403", async () => {
+  it("NF-RBAC-42: knowledge_lead can complete a PR draft (has pr_drafts:push in catalog)", async () => {
     const res = await app.request(completeUrl(), {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok(["knowledge_lead"], productId)}` },
       body,
     })
-    expect(res.status).toBe(403)
+    expect(authPassed(res.status)).toBe(true)
   }, 15_000)
 })
 
@@ -939,13 +939,13 @@ describe("Approvals — approve and reject", () => {
     expect(res.status).toBe(403)
   }, 15_000)
 
-  it("NF-RBAC-76: knowledge_lead cannot approve → 403", async () => {
+  it("NF-RBAC-76: knowledge_lead can approve (has change_requests:approve in catalog)", async () => {
     const res = await app.request(approveUrl(), {
       method:  "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok(["knowledge_lead"], productId)}` },
-      body:    JSON.stringify({}),
+      body:    JSON.stringify({ rationale: "Approved by knowledge_lead" }),
     })
-    expect(res.status).toBe(403)
+    expect(authPassed(res.status)).toBe(true)
   }, 15_000)
 
   it("NF-RBAC-77: change_lead can reject", async () => {

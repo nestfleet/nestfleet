@@ -85,6 +85,7 @@
 | UX-08 | Preserve active filter state when navigating back from case detail to case list | XS | P2 | ✅ Done (2026-04-09) | statusFilter and severityFilter lazy-initialized from sessionStorage; setters write through on change |
 | UX-09 | "Mark Resolved" action should accept an optional resolution note inline | XS | P2 | ✅ Done | LineageTimeline "Mark Resolved" now opens a modal with optional note textarea (defaults to "Resolved by operator" if left blank). |
 | UX-10 | Knowledge Base onboarding nudge — wizard "next steps" screen after product creation + amber empty-state nudge when KB empty and cases exist | S | P1 | Not Started | [spec](specs/UX-10-kb-onboarding-nudge.md) |
+| UX-11 | Plan & Billing: owner/platform instance notice — on nestfleet.dev the owner's account (community tier, BILLING_ENABLED=true) incorrectly shows Stripe upgrade cards intended for customers. When the authenticated user has the `owner` role, replace upgrade cards with an "operator instance" notice. | XS | P2 | Not Started | Detected when owner logs into nestfleet.dev; Branch C fires because billingDisabled=false + tier=community. Fix: in LicenseSection, if user has `owner` role → skip Branch C entirely, render "Platform operator instance — billing is managed per customer." No new API calls; role already in JWT decoded by useAuth(). |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 

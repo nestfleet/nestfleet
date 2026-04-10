@@ -15,6 +15,8 @@
  *   operator       → 18  (no destructive / PII / elevated-write)
  *   support_lead   → 12  (read + transition + approval workflows)
  *   knowledge_lead → 16  (change + PR + memory write; no case write or compliance)
+ *   change_lead    → 15  (CR lifecycle + PR push + approvals; no case write or settings)
+ *   product_lead   → 14  (CR approve + case transition + approvals; no PR push or settings)
  */
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -408,6 +410,51 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, readonly PermissionId[]> =
     "audit:read",
     "products:read",
   ],
+
+  /**
+   * change_lead — owns the change request and PR draft lifecycle (15 permissions).
+   * Can approve/reject CRs, push PR drafts, and act on approvals.
+   * No case write, no settings access, no compliance or memory write.
+   */
+  change_lead: [
+    "cases:read",
+    "signals:read",
+    "change_requests:read",
+    "change_requests:create",
+    "change_requests:approve",
+    "change_requests:reject",
+    "change_requests:complete",
+    "pr_drafts:read",
+    "pr_drafts:push",
+    "approvals:read",
+    "approvals:act",
+    "analytics:read",
+    "memory:read",
+    "audit:read",
+    "products:read",
+  ],
+
+  /**
+   * product_lead — senior product oversight role (14 permissions).
+   * Can approve/reject CRs, transition cases (including triage), act on approvals.
+   * No PR push, no settings access, no memory write or compliance write.
+   */
+  product_lead: [
+    "cases:read",
+    "cases:transition",
+    "signals:read",
+    "change_requests:read",
+    "change_requests:approve",
+    "change_requests:reject",
+    "pr_drafts:read",
+    "approvals:read",
+    "approvals:act",
+    "analytics:read",
+    "compliance:read",
+    "memory:read",
+    "audit:read",
+    "products:read",
+  ],
 }
 
 // ── Lookup helpers ────────────────────────────────────────────────────────────
@@ -454,6 +501,8 @@ export function listRolesWithCounts(): Array<{
     operator: "Operator",
     support_lead: "Support Lead",
     knowledge_lead: "Knowledge Lead",
+    change_lead: "Change Lead",
+    product_lead: "Product Lead",
   }
 
   return Object.entries(DEFAULT_ROLE_PERMISSIONS).map(([id, perms]) => ({

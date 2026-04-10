@@ -1,14 +1,18 @@
 /**
  * Auth middleware — SPIKE-07.
  *
- * requireAuth  — validates Bearer JWT, attaches decoded payload to c.var.user
- * requireRole  — checks the authenticated user holds at least one of the given roles
- * requireTier  — checks the active license tier meets the minimum required (SLICE-23)
+ * requireAuth       — validates Bearer JWT, attaches decoded payload to c.var.user
+ * requireRole       — checks the authenticated user holds at least one of the given roles
+ * requirePermission — checks the user's roles grant the given permission id, reading
+ *                     role_permission_overrides from DB when present, else DEFAULT_ROLE_PERMISSIONS
+ * requireTier       — checks the active license tier meets the minimum required (SLICE-23)
  */
 
 import type { Context, MiddlewareHandler, Next } from "hono"
 import { verifyJwt } from "./jwt.js"
 import type { JwtPayload } from "./jwt.js"
+import { DEFAULT_ROLE_PERMISSIONS } from "../infra/db/repositories/permissions.js"
+import { getRolePermissionOverrides } from "../infra/db/repositories/roles-studio.js"
 
 export type AuthVariables = {
   user: JwtPayload
@@ -113,6 +117,65 @@ export function requireRole(...roles: string[]): MiddlewareHandler {
     }
 
     await next()
+  }
+}
+
+/**
+ * Checks whether the authenticated user holds the given atomic permission.
+ *
+ * Resolution order for each role in user.roles:
+ *   1. If role_permission_overrides exist for (role, productId) in DB → use them exclusively.
+ *   2. Otherwise fall back to DEFAULT_ROLE_PERMISSIONS.
+ *
+ * Admin bypasses all permission checks (has all permissions implicitly).
+ * Routes without a :productId param skip the override lookup and use defaults only.
+ *
+ * Returns 401 if no user context, 403 if the permission is not granted.
+ */
+export function requirePermission(permId: string): MiddlewareHandler {
+  return async (c: AuthContext, next: Next) => {
+    const user = c.get("user")
+    if (!user) {
+      return c.json({ error: "UNAUTHORIZED" }, 401)
+    }
+
+    // Admin is superuser — bypasses all permission checks
+    if (user.roles.includes("admin")) {
+      await next()
+      return
+    }
+
+    const productId = c.req.param("productId") ?? null
+
+    for (const role of user.roles) {
+      if (productId) {
+        // Check DB overrides first (custom roles or manually adjusted defaults)
+        let overrides: string[] | null = null
+        try {
+          overrides = await getRolePermissionOverrides(role, productId)
+        } catch {
+          // DB unavailable — fall through to defaults (fail-open for reads)
+        }
+
+        if (overrides !== null) {
+          // An explicit override set exists — use it exclusively for this role
+          if (overrides.includes(permId)) {
+            await next()
+            return
+          }
+          continue
+        }
+      }
+
+      // No override — consult the in-memory golden truth
+      const defaults = DEFAULT_ROLE_PERMISSIONS[role] as readonly string[] | undefined
+      if (defaults?.includes(permId)) {
+        await next()
+        return
+      }
+    }
+
+    return c.json({ error: "FORBIDDEN" }, 403)
   }
 }
 

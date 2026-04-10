@@ -13,7 +13,7 @@
 
 import { Hono } from "hono"
 import { z } from "zod"
-import { requireAuth, requireRole } from "../../auth/middleware.js"
+import { requireAuth, requireRole, requirePermission } from "../../auth/middleware.js"
 import type { AuthVariables } from "../../auth/middleware.js"
 import { logger } from "../../shared/logger.js"
 import {
@@ -52,7 +52,7 @@ const RejectBodySchema = z.object({
 approvalsRouter.post(
   "/products/:productId/change-requests/:crId/approve",
   requireAuth(),
-  requireRole("change_lead", "product_lead"),
+  requirePermission("change_requests:approve"),
   async (c) => {
     const productId = c.req.param("productId")
     const crId      = c.req.param("crId")
@@ -145,7 +145,7 @@ approvalsRouter.post(
 approvalsRouter.post(
   "/products/:productId/change-requests/:crId/reject",
   requireAuth(),
-  requireRole("change_lead", "product_lead"),
+  requirePermission("change_requests:reject"),
   async (c) => {
     const productId = c.req.param("productId")
     const crId      = c.req.param("crId")

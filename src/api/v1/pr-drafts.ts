@@ -13,7 +13,7 @@
  */
 
 import { Hono } from "hono"
-import { requireAuth, requireRole } from "../../auth/middleware.js"
+import { requireAuth, requireRole, requirePermission } from "../../auth/middleware.js"
 import type { AuthVariables } from "../../auth/middleware.js"
 import { logger } from "../../shared/logger.js"
 import {
@@ -95,7 +95,7 @@ prDraftsRouter.get(
 prDraftsRouter.post(
   "/products/:productId/change-requests/:crId/complete",
   requireAuth(),
-  requireRole("change_lead"),
+  requirePermission("pr_drafts:push"),
   async (c) => {
     const productId = c.req.param("productId")
     const crId      = c.req.param("crId")

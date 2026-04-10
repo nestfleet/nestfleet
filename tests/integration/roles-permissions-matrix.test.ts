@@ -98,7 +98,7 @@ describe("Role & Permission Matrix (integration)", () => {
 
   // ── Default role permission counts ────────────────────────────────────────
 
-  it("NF-INT-438: GET /roles lists exactly 4 default roles", async () => {
+  it("NF-INT-438: GET /roles lists exactly 6 default roles", async () => {
     const res = await app.request(`/api/v1/products/${productId}/roles`, {
       headers: { Authorization: `Bearer ${adminToken(productId)}` },
     })
@@ -106,9 +106,9 @@ describe("Role & Permission Matrix (integration)", () => {
     const body = await res.json() as Record<string, unknown>
     const roles = body.data as Array<Record<string, unknown>>
     const defaultRoles = roles.filter((r) => r.type === "default")
-    expect(defaultRoles.length).toBe(4)
+    expect(defaultRoles.length).toBe(6)
     const ids = defaultRoles.map((r) => r.id as string).sort()
-    expect(ids).toEqual(["admin", "knowledge_lead", "operator", "support_lead"])
+    expect(ids).toEqual(["admin", "change_lead", "knowledge_lead", "operator", "product_lead", "support_lead"])
   }, 30_000)
 
   it("NF-INT-439: admin role has all 30 permissions granted", async () => {

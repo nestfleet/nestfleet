@@ -293,6 +293,17 @@ export default function NotificationPreferencesPage() {
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Back link */}
+        <button
+          onClick={() => { window.location.href = "/settings?section=notifications"; }}
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+          Settings
+        </button>
+
         {/* Header */}
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Notification Preferences</h1>

@@ -47,7 +47,7 @@ describe("RBAC Permission Audit API (integration)", () => {
 
   // ── GET /roles ────────────────────────────────────────────────────────────────
 
-  it("NF-INT-400: GET /roles returns the 4 default roles with correct structure", async () => {
+  it("NF-INT-400: GET /roles returns the 6 default roles with correct structure", async () => {
     const token = makeToken(["admin"], productId)
     const res = await app.request(`/api/v1/products/${productId}/roles`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -57,13 +57,15 @@ describe("RBAC Permission Audit API (integration)", () => {
     expect(body.ok).toBe(true)
     const roles = body.data as Array<Record<string, unknown>>
     expect(Array.isArray(roles)).toBe(true)
-    expect(roles.length).toBe(4)
+    expect(roles.length).toBe(6)
 
     const roleIds = roles.map((r) => r.id)
     expect(roleIds).toContain("admin")
     expect(roleIds).toContain("operator")
     expect(roleIds).toContain("support_lead")
     expect(roleIds).toContain("knowledge_lead")
+    expect(roleIds).toContain("change_lead")
+    expect(roleIds).toContain("product_lead")
 
     // Each role must carry a permissionCount
     for (const role of roles) {

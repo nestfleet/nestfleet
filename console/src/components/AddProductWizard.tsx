@@ -42,7 +42,7 @@ const STAGES: { value: Stage; label: string; description: string }[] = [
   },
 ];
 
-type WizardStep = 1 | 2 | 3 | 4;
+type WizardStep = 1 | 2 | 3 | 4 | 5;
 
 interface WizardState {
   name:             string;
@@ -106,12 +106,14 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
   const [form, setForm] = useState<WizardState>({ name: "", stage: "production", enabledChannels: [] });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [createdSlug, setCreatedSlug] = useState<string | null>(null);
 
   const reset = useCallback(() => {
     setStep(1);
     setForm({ name: "", stage: "production", enabledChannels: [] });
     setError(null);
     setIsSubmitting(false);
+    setCreatedSlug(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -172,8 +174,8 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
         localStorage.setItem("nestfleet_token", result.token);
       }
       refreshProducts();
-      handleClose();
-      router.push(`/p/${newSlug}/cases`);
+      setCreatedSlug(newSlug);
+      setStep(5);
     } catch (err) {
       if (err instanceof ApiError && err.status === 402) {
         setError(err.message); // "Product limit reached (N/N). Upgrade your license..."
@@ -192,12 +194,13 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
     2: "Choose a launch stage",
     3: "Enable channels",
     4: "Confirm new product",
+    5: "Product ready",
   };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={stepTitle[step]}>
-      {/* Progress indicator */}
-      <div className="mb-6 flex items-center gap-2">
+      {/* Progress indicator — hidden on step 5 (success screen) */}
+      {step < 5 && <div className="mb-6 flex items-center gap-2">
         {([1, 2, 3, 4] as WizardStep[]).map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div
@@ -228,7 +231,7 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
             )}
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Step 1 — Name */}
       {step === 1 && (
@@ -391,6 +394,70 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
                 </svg>
               )}
               {isSubmitting ? "Creating…" : "Create Product"}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Step 5 — Next steps (product already created) */}
+      {step === 5 && (
+        <div className="space-y-5">
+          <p className="text-sm text-gray-500">
+            Recommended next steps to get the best out of your AI agents:
+          </p>
+
+          {/* Primary CTA — KB sources */}
+          <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-4 flex items-start gap-3">
+            <span className="text-xl leading-none mt-0.5">📚</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900">Add knowledge sources</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Agents answer from your knowledge base — add docs, FAQs, or known issues now for best triage quality.
+              </p>
+            </div>
+            <button
+              onClick={() => { handleClose(); router.push(`/p/${createdSlug}/knowledge`); }}
+              className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700"
+            >
+              Add sources →
+            </button>
+          </div>
+
+          {/* Secondary steps */}
+          <div className="space-y-2">
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 flex items-center gap-3">
+              <span className="text-lg leading-none">👥</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-700">Invite your team</p>
+                <p className="text-xs text-gray-400">Settings → Roles &amp; Permissions</p>
+              </div>
+              <button
+                onClick={() => { handleClose(); router.push(`/settings?section=roles`); }}
+                className="shrink-0 text-xs text-indigo-600 hover:underline"
+              >
+                Go →
+              </button>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 flex items-center gap-3">
+              <span className="text-lg leading-none">🔔</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-700">Configure notifications</p>
+                <p className="text-xs text-gray-400">Settings → Notifications</p>
+              </div>
+              <button
+                onClick={() => { handleClose(); router.push(`/settings?section=notifications`); }}
+                className="shrink-0 text-xs text-indigo-600 hover:underline"
+              >
+                Go →
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-1">
+            <button
+              onClick={() => { handleClose(); router.push(`/p/${createdSlug}/cases`); }}
+              className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+            >
+              Go to Dashboard →
             </button>
           </div>
         </div>

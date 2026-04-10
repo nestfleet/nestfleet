@@ -17,6 +17,7 @@ import {
   ingestMemoryApi,
   deleteMemorySourceApi,
   searchMemoryApi,
+  getCasesApi,
   type KnowledgeAsset,
   type KnowledgeAssetStatus,
   type MemorySource,
@@ -629,15 +630,19 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
   const [showUpload, setShowUpload] = useState(false);
   const [deletingUri, setDeletingUri] = useState<string | null>(null);
 
-  const sourcesKey = productId ? ["memory-sources", productId] : null;
-  const healthKey  = productId ? ["memory-health",  productId] : null;
+  const sourcesKey  = productId ? ["memory-sources", productId] : null;
+  const healthKey   = productId ? ["memory-health",  productId] : null;
+  const casesPeekKey = productId ? ["cases-peek", productId] : null;
 
   const { data: sourcesData, isLoading: sourcesLoading, error: sourcesError } =
     useSWR(sourcesKey, () => getMemorySourcesApi(productId), { refreshInterval: 30_000 });
   const { data: healthData } =
     useSWR(healthKey, () => getMemoryHealthApi(productId), { refreshInterval: 60_000 });
+  const { data: casesPeekData } =
+    useSWR(casesPeekKey, () => getCasesApi(productId), { revalidateOnFocus: false });
 
-  const sources = sourcesData?.data?.sources ?? [];
+  const sources  = sourcesData?.data?.sources ?? [];
+  const hasCases = (casesPeekData?.data?.length ?? 0) > 0;
   const health  = healthData?.data;
 
   async function handleDelete(sourceUri: string) {
@@ -684,14 +689,30 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
         ) : sourcesError ? (
           <div className="py-16 text-center text-sm text-red-500">Failed to load sources.</div>
         ) : sources.length === 0 ? (
-          <div className="py-16 text-center space-y-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-auto h-8 w-8 text-gray-300">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-            </svg>
-            <p className="text-sm text-gray-500">No memory sources yet</p>
-            {isAdmin && (
-              <p className="text-xs text-gray-400">Upload a document to populate the product memory index.</p>
+          <div className="py-10 px-6 space-y-4">
+            {/* Amber nudge — shown when cases exist but KB is empty */}
+            {hasCases && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 flex items-start gap-3">
+                <svg className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-800">Agents are handling cases without product context</p>
+                  <p className="text-xs text-amber-700 mt-0.5">
+                    Add docs, FAQs, or known issues to improve triage accuracy and auto-reply quality.
+                  </p>
+                </div>
+              </div>
             )}
+            <div className="text-center space-y-2 py-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-auto h-8 w-8 text-gray-300">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+              <p className="text-sm text-gray-500">No knowledge sources yet</p>
+              {isAdmin && (
+                <p className="text-xs text-gray-400">Upload a document to populate the product memory index.</p>
+              )}
+            </div>
           </div>
         ) : (
           <table className="w-full text-sm">

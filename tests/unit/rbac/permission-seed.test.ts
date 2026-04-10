@@ -205,4 +205,74 @@ describe("Permission registry (NF-UNIT-90–99)", () => {
     }
   })
 
+  // ── NF-UNIT-100a (seed) ───────────────────────────────────────────────────────
+
+  it("NF-UNIT-100a: change_lead role has correct permission set", () => {
+    const perms = DEFAULT_ROLE_PERMISSIONS["change_lead"]
+    expect(perms).toBeDefined()
+
+    // Must have — CR lifecycle + PR push + approvals
+    expect(perms).toContain("cases:read")
+    expect(perms).toContain("change_requests:read")
+    expect(perms).toContain("change_requests:create")
+    expect(perms).toContain("change_requests:approve")
+    expect(perms).toContain("change_requests:reject")
+    expect(perms).toContain("change_requests:complete")
+    expect(perms).toContain("pr_drafts:read")
+    expect(perms).toContain("pr_drafts:push")
+    expect(perms).toContain("approvals:read")
+    expect(perms).toContain("approvals:act")
+    expect(perms).toContain("analytics:read")
+    expect(perms).toContain("memory:read")
+    expect(perms).toContain("audit:read")
+    expect(perms).toContain("products:read")
+
+    // Must NOT have — no case write, no destructive, no PII, no settings write
+    expect(perms).not.toContain("cases:create")
+    expect(perms).not.toContain("cases:transition")
+    expect(perms).not.toContain("cases:delete")
+    expect(perms).not.toContain("cases:export")
+    expect(perms).not.toContain("settings:write")
+    expect(perms).not.toContain("memory:delete")
+    expect(perms).not.toContain("compliance:dsar_search")
+    expect(perms).not.toContain("compliance:dsar_export")
+    expect(perms).not.toContain("compliance:retention_run")
+    expect(perms).not.toContain("products:create")
+  })
+
+  // ── NF-UNIT-100b (seed) ───────────────────────────────────────────────────────
+
+  it("NF-UNIT-100b: product_lead role has correct permission set", () => {
+    const perms = DEFAULT_ROLE_PERMISSIONS["product_lead"]
+    expect(perms).toBeDefined()
+
+    // Must have — case transition + CR approve/reject + approvals
+    expect(perms).toContain("cases:read")
+    expect(perms).toContain("cases:transition")
+    expect(perms).toContain("signals:read")
+    expect(perms).toContain("change_requests:read")
+    expect(perms).toContain("change_requests:approve")
+    expect(perms).toContain("change_requests:reject")
+    expect(perms).toContain("pr_drafts:read")
+    expect(perms).toContain("approvals:read")
+    expect(perms).toContain("approvals:act")
+    expect(perms).toContain("analytics:read")
+    expect(perms).toContain("compliance:read")
+    expect(perms).toContain("memory:read")
+    expect(perms).toContain("audit:read")
+    expect(perms).toContain("products:read")
+
+    // Must NOT have — no PR push, no destructive, no PII, no settings write
+    expect(perms).not.toContain("pr_drafts:push")
+    expect(perms).not.toContain("cases:delete")
+    expect(perms).not.toContain("cases:export")
+    expect(perms).not.toContain("settings:write")
+    expect(perms).not.toContain("memory:write")
+    expect(perms).not.toContain("memory:delete")
+    expect(perms).not.toContain("compliance:dsar_search")
+    expect(perms).not.toContain("compliance:dsar_export")
+    expect(perms).not.toContain("compliance:retention_run")
+    expect(perms).not.toContain("products:create")
+  })
+
 })
