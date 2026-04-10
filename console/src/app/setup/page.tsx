@@ -14,6 +14,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 import {
   getSetupStatusApi,
   setupCompleteApi,
@@ -491,6 +492,7 @@ function Step5Done({ productName, onGo }: { productName: string; onGo: () => voi
 
 export default function SetupPage() {
   const router = useRouter();
+  const { token, isLoading: authLoading } = useAuth();
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [step, setStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
@@ -517,8 +519,19 @@ export default function SetupPage() {
   const [repoUrl, setRepoUrl] = useState("");
   const [patToken, setPatToken] = useState("");
 
-  // Verify setup is actually needed — if already done, redirect to /cases
+  // Gate 1: wait for auth to resolve, then require login before setup.
+  // On a fresh install the middleware sends everyone to /setup before any account
+  // exists — redirect to /register so the first user can create an admin account.
   useEffect(() => {
+    if (authLoading) return;
+    if (!token) {
+      router.replace("/register");
+    }
+  }, [authLoading, token, router]);
+
+  // Gate 2: if setup is already done, redirect to queue.
+  useEffect(() => {
+    if (authLoading || !token) return;
     getSetupStatusApi()
       .then((res) => {
         if (!res.data.needsSetup) {
@@ -527,7 +540,7 @@ export default function SetupPage() {
       })
       .catch(() => { /* API down — let the wizard render anyway */ })
       .finally(() => setCheckingStatus(false));
-  }, [router]);
+  }, [authLoading, token, router]);
 
   function handleProviderChange(v: string) {
     setProvider(v);

@@ -31,7 +31,7 @@ const API_BASE =
   "http://localhost:3001";
 
 const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots"];
-const BYPASS_EXACT    = ["/setup", "/login", "/signup", "/terms", "/privacy"];
+const BYPASS_EXACT    = ["/setup", "/login", "/register", "/signup", "/terms", "/privacy"];
 
 // Matches /p/<slug> and /p/<slug>/anything
 const PRODUCT_ROUTE_PATTERN = /^\/p\/([^/]+)(\/.*)?$/;
