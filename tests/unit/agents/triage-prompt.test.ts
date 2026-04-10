@@ -150,4 +150,19 @@ describe("SYSTEM_PROMPT severity calibration", () => {
     expect(triageSrc).toMatch(/[Qq]uantitative language|quantitative/i)
     expect(triageSrc).toMatch(/does not raise severity|not.*raise severity/i)
   })
+
+  it("NF-UNIT-TRIAGE-11: prompt classifies capability/existence questions as 'question' category (BEF-34)", () => {
+    // "Do you have a webhook?" / "Is there an integration?" are capability questions,
+    // not integration bugs. The prompt must explicitly distinguish asking about the
+    // existence of a feature from reporting that a feature is broken.
+    expect(triageSrc).toMatch(/do you have|is there|can I use|capability|exist/i)
+    expect(triageSrc).toMatch(/question.*category|category.*question/i)
+  })
+
+  it("NF-UNIT-TRIAGE-12: prompt classifies stack traces and thrown errors as bug category (BEF-35)", () => {
+    // A message containing 'TypeError:', 'Error:', or a stack trace must produce
+    // a bug/error category — not configuration or question.
+    expect(triageSrc).toMatch(/TypeError|stack.?trace|thrown error/i)
+    expect(triageSrc).toMatch(/bug|error.*category|category.*error/i)
+  })
 })

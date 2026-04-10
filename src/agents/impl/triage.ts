@@ -87,6 +87,10 @@ KEY HEURISTIC — distinguish "config question" from "bug report":
 - Example LOW: "nightly rollup is creating 8+ separate issues — can we consolidate?" → user is asking about a configuration option, not reporting a malfunction.
 - Example HIGH: "nightly rollup stopped running entirely — no issues are being created and our team is blocked."
 
+BEF-34 — Capability / existence questions: if the user is asking whether a feature, integration, or capability EXISTS (e.g. "do you have a webhook?", "is there an API for X?", "can I use Zapier with this?"), classify the category as "question" — never "integration" or "bug". The word "webhook" or "integration" in the context of asking about availability is a question, not a broken integration.
+
+BEF-35 — Stack traces and thrown errors: if the user's message contains a JavaScript or server-side error (e.g. "TypeError:", "Error:", "Cannot read properties of", a stack trace, or "production blocker"), classify the category as "error" or "bug" — never "configuration" or "question". An error message is evidence of a malfunction, not a configuration gap.
+
 BEF-05 — Crash / stack-trace context: a crash or error during onboarding, setup, or initial configuration affects only that user's install, not the shared production service. Classify as HIGH (single user blocked), NOT critical. Reserve critical for crashes that have taken the shared production service offline for all tenants.
 
 BEF-07 — Infrastructure / monitoring alerts:

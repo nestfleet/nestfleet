@@ -25,7 +25,19 @@ import { logger } from "../shared/logger.js"
 import type { CaseSeverity, CaseType } from "../infra/db/repositories/cases.js"
 
 // Map triage agent category → domain CaseType (best-effort heuristic)
+// Key ordering matters: more specific keys (e.g. "integration question") are
+// checked before shorter substring matches (e.g. "integration") via the loop.
 const CATEGORY_TO_CASE_TYPE: Record<string, CaseType> = {
+  // BEF-34: capability/existence questions must resolve to user_request BEFORE
+  // the bare "integration" key matches them as bug_report.
+  "capability question":  "user_request",
+  "integration question": "user_request",
+  "webhook question":     "user_request",
+  // BEF-35: explicit error/crash categories → bug_report
+  error:           "bug_report",
+  crash:           "bug_report",
+  "runtime error": "bug_report",
+  // Standard mappings
   export:          "bug_report",
   authentication:  "bug_report",
   auth:            "bug_report",
@@ -72,6 +84,8 @@ export function inferCaseType(category: string): CaseType {
 
 const CONFIG_CATEGORY_KEYS    = ["configuration", "how-to", "setup", "question", "feature request", "feature-request"]
 const CONFIG_LABEL_KEYS       = ["how-to", "configuration", "question", "feature-request", "setup"]
+// BEF-35: error/crash categories are never config questions — exempt from Rule 1 downgrade cap.
+const ERROR_CATEGORY_KEYS     = ["error", "crash", "runtime error", "exception"]
 
 const ENTERPRISE_CATEGORY_KEYS = ["sales", "sales_inquiry", "sales inquiry", "pre-sales", "presales"]
 const ENTERPRISE_LABEL_KEYS    = ["enterprise", "soc2", "on-premise", "on-prem", "sso", "okta", "compliance", "hipaa", "gdpr", "sla"]
@@ -86,9 +100,13 @@ export function applyTriageOverrides(
   const lowerLabels = labels.map(l => l.toLowerCase())
 
   // Rule 1 — config/how-to downgrade cap
-  const isConfigQuestion =
-    CONFIG_CATEGORY_KEYS.some(k => cat.includes(k)) ||
-    lowerLabels.some(l => CONFIG_LABEL_KEYS.includes(l))
+  // BEF-35: never downgrade error/crash categories — a thrown error is not a config question.
+  const isErrorCategory    = ERROR_CATEGORY_KEYS.some(k => cat.includes(k))
+  const isConfigQuestion   =
+    !isErrorCategory && (
+      CONFIG_CATEGORY_KEYS.some(k => cat.includes(k)) ||
+      lowerLabels.some(l => CONFIG_LABEL_KEYS.includes(l))
+    )
 
   if (isConfigQuestion && (severity === "high" || severity === "critical")) {
     return {

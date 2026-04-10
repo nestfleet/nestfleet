@@ -181,4 +181,54 @@ describe("inferCaseType — category → CaseType mapping", () => {
   it("NF-UNIT-FLTW-29: unknown category falls back to user_request", () => {
     expect(inferCaseType("unknown-xyz-category")).toBe("user_request")
   })
+
+  // BEF-35 — stack trace / error categories
+  it("NF-UNIT-FLTW-30: maps 'error' category to bug_report (BEF-35)", () => {
+    expect(inferCaseType("error")).toBe("bug_report")
+  })
+
+  it("NF-UNIT-FLTW-31: maps 'crash' category to bug_report (BEF-35)", () => {
+    expect(inferCaseType("crash")).toBe("bug_report")
+  })
+
+  it("NF-UNIT-FLTW-32: maps 'runtime error' category to bug_report (BEF-35)", () => {
+    expect(inferCaseType("runtime error")).toBe("bug_report")
+  })
+
+  // BEF-34 — capability questions must not route to bug_report
+  it("NF-UNIT-FLTW-33: maps 'capability question' category to user_request (BEF-34)", () => {
+    expect(inferCaseType("capability question")).toBe("user_request")
+  })
+
+  it("NF-UNIT-FLTW-34: maps 'integration question' category to user_request (BEF-34)", () => {
+    expect(inferCaseType("integration question")).toBe("user_request")
+  })
+
+  it("NF-UNIT-FLTW-35: plain 'integration' (broken) still maps to bug_report (BEF-34 no regression)", () => {
+    expect(inferCaseType("integration")).toBe("bug_report")
+  })
+})
+
+// BEF-35 — stack trace override rule
+describe("applyTriageOverrides — Rule 3: stack trace signals are never config-downgraded", () => {
+  it("NF-UNIT-FLTW-36: 'error' category with high severity is NOT downgraded by config cap", () => {
+    // Config cap must not fire for error/crash categories even if labels include 'question'
+    const { severity } = applyTriageOverrides("high", "error", ["question"])
+    expect(severity).toBe("high")
+  })
+
+  it("NF-UNIT-FLTW-37: 'crash' category with critical severity is NOT downgraded by config cap", () => {
+    const { severity } = applyTriageOverrides("critical", "crash", ["setup"])
+    expect(severity).toBe("critical")
+  })
+
+  it("NF-UNIT-FLTW-38: 'runtime error' category with high severity is NOT downgraded", () => {
+    const { severity } = applyTriageOverrides("high", "runtime error", ["configuration"])
+    expect(severity).toBe("high")
+  })
+
+  it("NF-UNIT-FLTW-39: 'configuration' category with high severity IS still downgraded (rule 1 unchanged)", () => {
+    const { severity } = applyTriageOverrides("high", "configuration", [])
+    expect(severity).toBe("normal")
+  })
 })
