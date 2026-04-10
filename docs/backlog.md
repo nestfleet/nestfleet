@@ -14,7 +14,7 @@
 
 | ID | Title | Size | Priority | Status | Branch | Spec |
 |----|-------|------|----------|--------|--------|------|
-| FEAT-001 | SaaS Fleet Provisioning (umbrella) | XL | High | ⚡ Phase B — smoke-test-11 pending Hetzner limit increase approval (requested 2026-04-07) | `feat/FEAT-001-saas-fleet-provisioning` | [spec](specs/FEAT-001-saas-fleet-provisioning.md) |
+| FEAT-001 | SaaS Fleet Provisioning (umbrella) | XL | High | ✅ Done (2026-04-11) | `main` | 5 active customer VPSes provisioned. Hetzner limit approved. All sub-tasks done. [spec](specs/FEAT-001-saas-fleet-provisioning.md) |
 | NF-OPS-03 | One-Time Infra Setup (Cloudflare, Hetzner firewall, SSH key, DNS) | XS | P0 | ✅ Done | `feat/NF-OPS-03-infra-setup` | active-backlog §18 |
 | NF-OPS-04 | docker-compose.prod.yml Verification (health, backup service, smoke test) | XS | P0 | ✅ Done | `feat/NF-OPS-04-compose-verify` | active-backlog §18 |
 | NF-OPS-05 | Stripe Webhook Extension + DB Tables (signup_intents, provisionings, saas/signup) | M | P0 | ✅ Done | `feat/NF-OPS-05-stripe-webhook` | active-backlog §18 |
