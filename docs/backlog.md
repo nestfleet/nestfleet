@@ -70,7 +70,8 @@
 | FEAT-012 | Owner Fleet — Reissue License | L | P1 | ✅ Done (2026-04-08) | `main` | [spec](specs/FEAT-012-reissue-license.md) |
 | NF-PIVOT-11 | User & Developer Guide (docs site, in-app tooltip links) | XL | P2 | Not Started | `feat/NF-PIVOT-11-user-guide` | active-backlog §NF-PIVOT |
 | FEAT-014 | Notification Preferences — per-event email vs console-only control | M | P2 | ✅ Done (2026-04-10) | `main` | [spec](specs/FEAT-014-notification-preferences.md) |
-| FEAT-015 | Correct Triage — operator inline override for case type and severity | M | P2 | Not Started | — | [spec](specs/FEAT-015-correct-triage.md) |
+| FEAT-015 | Correct Triage — operator inline override for case type and severity | M | P2 | ✅ Done (2026-04-10) | `main` | [spec](specs/FEAT-015-correct-triage.md) |
+| FEAT-016 | SaaS Signup Form + 14-day Trial — self-service signup path, Stripe redirect, trial_period_days | S | P1 | ✅ Done (2026-04-10) | `main` | — |
 
 ### UX Improvements
 
@@ -88,11 +89,25 @@
 | UX-10 | Knowledge Base onboarding nudge — wizard "next steps" screen after product creation + amber empty-state nudge when KB empty and cases exist | S | P1 | ✅ Done (2026-04-10) | Wizard step 5 shown after setup completes with 3 CTAs: "Add Knowledge Sources" (primary), "Set Up a Channel", "Go to Queue". KB page amber nudge when cases exist but sources = 0. Both verified in community simulation. |
 | UX-11 | Plan & Billing: owner/platform instance notice — on nestfleet.dev the owner's account incorrectly shows Stripe upgrade cards | XS | P2 | ✅ Done (2026-04-10) | Detected via /owner/me (OWNER_USER_IDS check) not JWT role — `user.roles.includes("owner")` was always false. Fixed: SWR call to /api/v1/owner/me; isOwner=true replaces upgrade cards with "Platform operator instance" notice. |
 
+### Customer Subscription Lifecycle (FEAT-017)
+
+> **Blocking first paying customer.** Customer VPS has no billing. All subscription management runs on nestfleet.dev. Customer authenticates via magic link (email on file), reaches Stripe Customer Portal. Plan changes trigger license reissue on customer VPS via FEAT-012 reissue worker.
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| FEAT-017 | Customer Subscription Lifecycle (umbrella) | M | P1 | Not Started | [spec](specs/FEAT-017-customer-subscription-lifecycle.md) |
+| FEAT-017-A | Store `stripe_customer_id` + `stripe_subscription_id` on `signup_intents` at checkout; copy to `provisionings` row when worker creates it. Migration `0048_signup_intents_stripe_ids.sql`. | XS | P0 | Not Started | Prerequisite for all other FEAT-017 sub-tasks. Currently these IDs are discarded at `webhook.ts:41-62`. |
+| FEAT-017-B | Magic link auth: `POST /api/v1/saas/account/magic-link` (rate-limited 3/email/15min, always 200); magic link email; `GET /account/verify?token=…` console page (validates JWT, sets httpOnly session cookie, redirects to /account). | S | P0 | Not Started | No new table — stateless JWT session. Token = signed JWT (purpose=account_session, exp=15min). Session = 1h cookie. |
+| FEAT-017-C | Customer account page (`/account`): shows plan, status, trial end, instance URL. "Manage →" button calls `POST /api/v1/saas/account/billing-portal` → Stripe Customer Portal session → redirect. Auth gated by session cookie. | S | P0 | Not Started | Portal lets customer cancel, upgrade, downgrade, update card, view invoices. |
+| FEAT-017-D | Extend `customer.subscription.updated` webhook handler: when `event_type=saas_subscription` and plan changes, update `provisionings.plan` + `license_tier` + set `reissue_status=in_progress`. FEAT-012 reissue worker deploys new JWT to VPS within ~60s. | S | P1 | Not Started | Covers upgrade (Starter→Growth) and downgrade (Growth→Starter). See spec §3.3. |
+| FEAT-017-E | Welcome email update: add "Manage your subscription at nestfleet.dev/account" link after login URL. | XS | P0 | Not Started | `src/provisioning/provision.ts:sendWelcomeEmail()` |
+| FEAT-017-F | Ops runbook: Stripe Customer Portal configuration checklist (allow upgrades, allow cancel, set cancellation policy). Non-code task — must be done in Stripe Dashboard before first paying customer. | XS | P0 | Not Started | See spec §7 C4. Owner action required. |
+
 ### Billing-Integrated License Reissue (FEAT-013)
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| FEAT-013 | Stripe-Integrated License Reissue — sync tier changes with Stripe subscriptions | M | P1 | ⏸ Postponed (FREE track focus) | Owner-initiated reissue currently updates JWT + DB only — no Stripe event. Need to call `stripe.subscriptions.update()` with the new price ID so Stripe reflects the upgrade/downgrade in money (proration charged or credited automatically on the stored payment method — no card details needed from owner). Two paths: (1) existing subscription → `subscriptions.update()` + prorate; (2) no subscription yet → send customer a Stripe Payment Link, reissue JWT only after payment confirmed via webhook. Downgrade: same `subscriptions.update()` call, Stripe credits the balance to the next invoice. Add "Bill via Stripe" toggle to ReissueLicenseDialog — when enabled, fires Stripe update before JWT deploy. |
+| FEAT-013 | Stripe-Integrated License Reissue — owner console plan change syncs to Stripe | M | P2 | ⏸ Postponed | Scope: owner changes tier in fleet console → `stripe.subscriptions.update()` called automatically so Stripe charges/credits the delta. Distinct from FEAT-017-D (which is the reverse: Stripe change → VPS license update). Two paths: (1) existing subscription → `subscriptions.update()` + prorate; (2) no subscription → send customer a Stripe Payment Link, reissue JWT only after payment confirmed. Add "Bill via Stripe" toggle to ReissueLicenseDialog. **Warning until FEAT-013 is done:** owner-initiated reissue (FEAT-012) changes the license tier but leaves the Stripe subscription unchanged — customer continues to be billed at the old price. Document this in the reissue dialog. |
 
 ### SaaS Provisioning: Fleet Update Management (OPS-FLEET-02)
 
