@@ -41,13 +41,23 @@ productsRouter.get("/products", requireAuth(), async (c) => {
 
   const db = getDb()
 
-  // Filter by productIds from the JWT — this is always kept fresh by POST /products
-  // which re-issues a JWT with the updated productIds after creating a new product.
-  const jwtProductIds = user.productIds ?? []
+  // Always query from DB, not JWT productIds.
+  // JWT productIds are stale whenever a product is created outside POST /products
+  // (setup wizard, customer VPS provisioning, admin assignment). Using the DB as
+  // the source of truth means no re-login is needed after any product creation path.
+  // Admins see all products; regular users see only their assigned products.
+  const isAdmin = user.roles.includes("admin")
   const rows = await db<{ product_id: string; slug: string; name: string; stage: string; accent_color: string }[]>`
     SELECT product_id, slug, name, stage, accent_color
     FROM products
-    WHERE product_id = ANY(${jwtProductIds})
+    WHERE ${isAdmin
+      ? db`TRUE`
+      : db`product_id = ANY(
+             SELECT unnest(product_ids)
+             FROM operator_users
+             WHERE user_id = ${userId}
+           )`
+    }
     ORDER BY created_at ASC
   `
 
