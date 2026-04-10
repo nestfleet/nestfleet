@@ -68,7 +68,7 @@ const SetupCompleteBodySchema = z.object({
     provider: z.enum(LLM_PROVIDERS),
     model: z.string().min(1),
     apiKey: z.string().optional(),
-    baseUrl: z.string().url().optional(),
+    baseUrl: z.string().optional(),
   }).optional(),
   leads: z.object({
     support_lead: z.string().email().optional(),
@@ -76,7 +76,7 @@ const SetupCompleteBodySchema = z.object({
     product_lead: z.string().email().optional(),
   }).optional(),
   github: z.object({
-    repoUrl: z.string().url().optional(),
+    repoUrl: z.string().optional(),
     patToken: z.string().optional(),
   }).optional(),
 }).strict()
