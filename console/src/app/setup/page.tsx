@@ -597,8 +597,18 @@ export default function SetupPage() {
     }
 
     try {
-      await setupCompleteApi(payload);
-      setStep(5);
+      const res = await setupCompleteApi(payload);
+      // Set nf_last_product cookie immediately so the console knows which product
+      // to load without relying on resolve-product (which uses a stale JWT that
+      // was issued before this product existed and has productIds: []).
+      const slug = res.data.productSlug;
+      if (slug) {
+        const maxAge = 60 * 60 * 24 * 365;
+        document.cookie = `nf_last_product=${encodeURIComponent(slug)}; path=/; SameSite=Lax; max-age=${maxAge}`;
+        router.replace(`/p/${slug}/queue`);
+      } else {
+        setStep(5);
+      }
     } catch (err) {
       setSubmitError((err as Error).message ?? "Setup failed. Please try again.");
     } finally {

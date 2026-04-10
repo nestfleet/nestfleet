@@ -614,7 +614,7 @@ export interface SetupCompletePayload {
 
 export async function setupCompleteApi(
   payload: SetupCompletePayload,
-): Promise<{ data: { productId: string; productName: string } }> {
+): Promise<{ data: { productId: string; productSlug: string; productName: string } }> {
   return apiFetch("/api/v1/setup/complete", {
     method: "POST",
     body: payload,
