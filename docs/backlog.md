@@ -84,6 +84,7 @@
 | UX-07 | Case list: show subject/title instead of case ID in header when navigating from a filtered list | XS | P2 | ✅ Done (2026-04-09) | Added caseRow?.title fallback before Case ${caseId} in detail page header |
 | UX-08 | Preserve active filter state when navigating back from case detail to case list | XS | P2 | ✅ Done (2026-04-09) | statusFilter and severityFilter lazy-initialized from sessionStorage; setters write through on change |
 | UX-09 | "Mark Resolved" action should accept an optional resolution note inline | XS | P2 | ✅ Done | LineageTimeline "Mark Resolved" now opens a modal with optional note textarea (defaults to "Resolved by operator" if left blank). |
+| UX-10 | Knowledge Base onboarding nudge — wizard "next steps" screen after product creation + amber empty-state nudge when KB empty and cases exist | S | P1 | Not Started | [spec](specs/UX-10-kb-onboarding-nudge.md) |
 
 ### Billing-Integrated License Reissue (FEAT-013)
 

@@ -1205,3 +1205,25 @@ export async function getChannelStatusApi(
 ): Promise<{ ok: boolean; channels: Record<string, ChannelStatusInfo> }> {
   return apiFetch(`/api/v1/products/${productId}/channels/status`)
 }
+
+// ── Notification Preferences (FEAT-014) ───────────────────────────────────────
+
+export interface NotificationPreferences {
+  email_disabled_events: string[];
+}
+
+export async function getNotificationPrefsApi(
+  productId: string,
+): Promise<{ data: NotificationPreferences }> {
+  return apiFetch(`/api/v1/products/${productId}/notification-preferences`);
+}
+
+export async function putNotificationPrefsApi(
+  productId: string,
+  prefs: NotificationPreferences,
+): Promise<{ data: NotificationPreferences }> {
+  return apiFetch(`/api/v1/products/${productId}/notification-preferences`, {
+    method: "PUT",
+    body: prefs,
+  });
+}

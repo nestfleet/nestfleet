@@ -41,6 +41,7 @@ import { bridgeRouter } from "./v1/bridge.js"
 import { saasRouter } from "./v1/saas.js"
 import { ownerRouter } from "./v1/owner.js"
 import { telemetryRouter } from "./v1/telemetry.js"
+import { notificationPrefsRouter } from "./v1/notification-prefs.js"
 
 // Fail fast: CONSOLE_ORIGIN must be set in production (an empty string silently
 // breaks all CORS preflight requests, which is harder to debug than a startup crash).
@@ -226,6 +227,7 @@ app.route("/api/v1", dashboardRouter)
 app.route("/api/v1", bridgeRouter)
 app.route("/api/v1/saas",      saasRouter)
 app.route("/api/v1/owner",     ownerRouter)
+app.route("/api/v1", notificationPrefsRouter)
 app.route("/api/v1/telemetry", telemetryRouter)
 
 // ── /.well-known/security.txt (NF-PIVOT-09) ──────────────────────────────────

@@ -8,6 +8,7 @@
  *   - Immediate delivery for notifications scheduled <= now
  *   - Digest flush: groups pending notifications by audienceType and sends one message per group
  *   - Channel routing: "email" (default), "telegram", or "slack" per notification event
+ *   - FEAT-014: Email gate — operator-configurable per-event email suppression
  */
 
 import {
@@ -19,7 +20,7 @@ import {
   type NotificationPriority,
   type NotificationAudienceType,
 } from "../infra/db/repositories/notifications.js"
-import { findProductById } from "../infra/db/repositories/products.js"
+import { findProductById, getNotificationPreferences } from "../infra/db/repositories/products.js"
 import { sendEmail } from "./email-transport.js"
 import { sendTelegram } from "./telegram-transport.js"
 import { sendSlack } from "./slack-transport.js"
@@ -221,6 +222,7 @@ export class NotificationService {
    * Emit a notification event.
    *
    * 1. Checks quiet hours (critical bypasses)
+   * 1b. Loads notification preferences (email gate) — FEAT-014
    * 2. Computes scheduledFor based on priority + quiet hours
    * 3. Creates notification record (23505 → suppressed, returns)
    * 4. Delivers immediately if scheduledFor <= now
@@ -242,6 +244,15 @@ export class NotificationService {
       productSlackWebhookUrl = decryptSecret(rawWebhook) ?? undefined
     } catch (err) {
       logger.warn({ err, productId: event.productId }, "Failed to load product config — using defaults")
+    }
+
+    // ── 1b. Load notification preferences (email gate) ───────────────────────
+    let emailDisabledEvents: string[] = []
+    try {
+      const prefs = await getNotificationPreferences(event.productId)
+      emailDisabledEvents = prefs.email_disabled_events
+    } catch {
+      // non-fatal — default: all events email-enabled
     }
 
     // ── 2. Compute scheduledFor ───────────────────────────────────────────────
@@ -313,6 +324,17 @@ export class NotificationService {
     // ── 5. Deliver immediately if scheduledFor <= now ─────────────────────────
     if (scheduledFor <= now) {
       try {
+        // ── FEAT-014: Email gate — skip email transport if operator has disabled email for this event kind
+        if (channel === "email" && emailDisabledEvents.includes(event.kind)) {
+          // Still mark as sent (console inbox delivery)
+          await updateNotification(notif.notification_id, { status: "sent", sent_at: new Date() })
+          logger.info(
+            { notificationId: notif.notification_id, kind: event.kind },
+            "Email skipped per notification preferences — console delivery only",
+          )
+          return
+        }
+
         // Apply AI disclosure for end-user-facing notifications (CG-01)
         let messageBody = event.body
         if (event.audienceType === "end_user") {

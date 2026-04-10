@@ -32,6 +32,8 @@ export const ProductRowSchema = z.object({
   ci_config:        z.record(z.unknown()),
   // DEFERRED-21 U-06: per-product accent colour (CSS hex string)
   accent_color:     z.string().default("#6366f1"),
+  // FEAT-014: per-product notification preferences
+  notification_preferences: z.record(z.unknown()).optional().default({}),
   created_at:       z.date(),
   updated_at:       z.date(),
 })
@@ -182,4 +184,51 @@ export async function updateProduct(
     RETURNING *
   `
   return row ? ProductRowSchema.parse(row) : null
+}
+
+// ── FEAT-014: Notification Preferences ───────────────────────────────────────
+
+export interface NotificationPreferences {
+  email_disabled_events: string[]
+}
+
+/**
+ * Load notification preferences for a product.
+ * Returns { email_disabled_events: [] } as the default when the column is empty
+ * or the product is not found.
+ */
+export async function getNotificationPreferences(productId: string): Promise<NotificationPreferences> {
+  const db = getDb()
+  const [row] = await db<{ notification_preferences: Record<string, unknown> }[]>`
+    SELECT notification_preferences
+    FROM products
+    WHERE product_id = ${productId}
+  `
+
+  if (!row) {
+    return { email_disabled_events: [] }
+  }
+
+  const prefs = row.notification_preferences ?? {}
+  const disabled = prefs["email_disabled_events"]
+  const emailDisabledEvents = Array.isArray(disabled)
+    ? (disabled as unknown[]).filter((v): v is string => typeof v === "string")
+    : []
+
+  return { email_disabled_events: emailDisabledEvents }
+}
+
+/**
+ * Persist notification preferences for a product.
+ */
+export async function setNotificationPreferences(
+  productId: string,
+  prefs: NotificationPreferences,
+): Promise<void> {
+  const db = getDb()
+  await db`
+    UPDATE products
+    SET notification_preferences = ${db.json(pgJson(prefs as unknown as Record<string, unknown>))}
+    WHERE product_id = ${productId}
+  `
 }
