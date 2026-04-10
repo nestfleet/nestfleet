@@ -1900,10 +1900,15 @@ interface LicenseSectionProps {
 
 function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionProps) {
   const { license, tier, ouUsage } = useLicense();
-  const { user } = useAuth();
   const { toast } = useToast();
-  // Platform operator account (nestfleet.dev main instance) — billing is not for the owner.
-  const isOwner = user?.roles?.includes("owner") ?? false;
+  // Platform operator account: detected via /owner/me (gated by OWNER_USER_IDS config),
+  // NOT by a JWT role — the owner has no "owner" role in their token.
+  const { data: ownerMeData } = useSWR(
+    "owner-me",
+    () => import("@/lib/owner-api").then((m) => m.getOwnerMeApi()).catch(() => null),
+    { revalidateOnFocus: false, shouldRetryOnError: false },
+  );
+  const isOwner = ownerMeData?.isOwner === true;
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState<PlanInterval>("monthly");
