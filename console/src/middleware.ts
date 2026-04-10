@@ -22,8 +22,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// INTERNAL_API_URL is set at runtime in Docker (console → api service on internal network).
+// NEXT_PUBLIC_API_URL is baked at build time (empty = same-origin via Caddy for the browser).
+// Fallback to localhost:3001 for local dev outside Docker.
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  process.env.INTERNAL_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001";
 
 const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots"];
 const BYPASS_EXACT    = ["/setup", "/login", "/signup", "/terms", "/privacy"];

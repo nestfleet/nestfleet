@@ -66,6 +66,9 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      # Server-side API URL for Next.js middleware (not exposed to browser).
+      # Allows the setup guard to reach the API over the internal Docker network.
+      INTERNAL_API_URL: http://api:3001
     networks:
       - nestfleet
 

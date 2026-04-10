@@ -31,7 +31,7 @@ function ResolveProductInner() {
       .then((res) => {
         const list = res.products ?? [];
         if (!list.length) {
-          router.replace("/login");
+          router.replace("/setup");
           return;
         }
         const match = hintId
