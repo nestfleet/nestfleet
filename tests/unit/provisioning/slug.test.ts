@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect } from "vitest"
-import { validateSlugFormat, RESERVED_SLUGS } from "../../../src/provisioning/slug.js"
+import { validateSlugFormat, RESERVED_SLUGS } from "../../../src/fleet/provisioning/slug.js"
 
 describe("validateSlugFormat", () => {
   it("NF-UNIT-SLUG-01: valid slug passes", () => {

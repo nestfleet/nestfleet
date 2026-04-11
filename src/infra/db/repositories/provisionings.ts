@@ -12,12 +12,14 @@ import { getDb } from "../client.js"
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface SignupIntentRow {
-  id:         string
-  email:      string
-  org_slug:   string
-  plan:       string
-  status:     string
-  created_at: Date
+  id:                     string
+  email:                  string
+  org_slug:               string
+  plan:                   string
+  status:                 string
+  stripe_customer_id:     string | null
+  stripe_subscription_id: string | null
+  created_at:             Date
 }
 
 export interface ProvisioningRow {
@@ -43,6 +45,8 @@ export interface ProvisioningRow {
   license_tier:           string | null
   license_expires_at:     Date | null
   reissue_status:         "idle" | "in_progress" | "failed"
+  // FEAT-017-G: short reactivation window after cancellation
+  reactivation_deadline:  Date | null
   created_at:             Date
   updated_at:             Date
 }
@@ -50,6 +54,8 @@ export interface ProvisioningRow {
 export type ProvisioningPatch = Partial<Pick<
   ProvisioningRow,
   | "status"
+  | "customer_email"
+  | "plan"
   | "hetzner_server_id"
   | "hetzner_server_ip"
   | "cloudflare_record_id"
@@ -65,6 +71,7 @@ export type ProvisioningPatch = Partial<Pick<
   | "license_tier"
   | "license_expires_at"
   | "reissue_status"
+  | "reactivation_deadline"
 >>
 
 // ── signup_intents ─────────────────────────────────────────────────────────────
@@ -102,6 +109,21 @@ export async function updateSignupIntentStatus(
   `
 }
 
+/** Store Stripe IDs on the signup_intent at checkout.session.completed (FEAT-017-A). */
+export async function updateSignupIntentStripeIds(
+  id:                     string,
+  stripeCustomerId:       string | null,
+  stripeSubscriptionId:   string | null,
+): Promise<void> {
+  const db = getDb()
+  await db`
+    UPDATE signup_intents
+    SET stripe_customer_id     = ${stripeCustomerId},
+        stripe_subscription_id = ${stripeSubscriptionId}
+    WHERE id = ${id}
+  `
+}
+
 /** Check if a slug is reserved by any signup_intent (all statuses). */
 export async function slugHasSignupIntent(slug: string): Promise<boolean> {
   const db = getDb()
@@ -114,15 +136,23 @@ export async function slugHasSignupIntent(slug: string): Promise<boolean> {
 // ── provisionings ─────────────────────────────────────────────────────────────
 
 export async function createProvisioning(data: {
-  intentId:      string
-  orgSlug:       string
-  customerEmail: string
-  plan:          string
+  intentId:             string
+  orgSlug:              string
+  customerEmail:        string
+  plan:                 string
+  stripeCustomerId?:    string | null
+  stripeSubscriptionId?: string | null
 }): Promise<ProvisioningRow> {
   const db = getDb()
   const [row] = await db<ProvisioningRow[]>`
-    INSERT INTO provisionings (intent_id, org_slug, customer_email, plan)
-    VALUES (${data.intentId}, ${data.orgSlug}, ${data.customerEmail}, ${data.plan})
+    INSERT INTO provisionings (
+      intent_id, org_slug, customer_email, plan,
+      stripe_customer_id, stripe_subscription_id
+    )
+    VALUES (
+      ${data.intentId}, ${data.orgSlug}, ${data.customerEmail}, ${data.plan},
+      ${data.stripeCustomerId ?? null}, ${data.stripeSubscriptionId ?? null}
+    )
     RETURNING *
   `
   if (!row) throw new Error("createProvisioning: INSERT returned no row")
@@ -141,6 +171,34 @@ export async function findProvisioningBySlug(slug: string): Promise<Provisioning
   const db = getDb()
   const [row] = await db<ProvisioningRow[]>`
     SELECT * FROM provisionings WHERE org_slug = ${slug}
+  `
+  return row ?? null
+}
+
+/** Find a provisioning by its Stripe customer ID (FEAT-017-D). */
+export async function findProvisioningByStripeCustomerId(stripeCustomerId: string): Promise<ProvisioningRow | null> {
+  const db = getDb()
+  const [row] = await db<ProvisioningRow[]>`
+    SELECT * FROM provisionings
+    WHERE stripe_customer_id = ${stripeCustomerId}
+    ORDER BY created_at DESC
+    LIMIT 1
+  `
+  return row ?? null
+}
+
+/**
+ * Find the most recent active or deprovisioning provisioning for a customer email.
+ * Used by the magic link endpoint (FEAT-017-B) to look up a customer's instance.
+ */
+export async function findProvisioningByEmail(email: string): Promise<ProvisioningRow | null> {
+  const db = getDb()
+  const [row] = await db<ProvisioningRow[]>`
+    SELECT * FROM provisionings
+    WHERE customer_email = ${email}
+      AND status IN ('active', 'deprovisioning')
+    ORDER BY created_at DESC
+    LIMIT 1
   `
   return row ?? null
 }

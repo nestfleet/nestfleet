@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * SaaS signup API — FEAT-001.
  *
@@ -18,7 +19,7 @@ import { z } from "zod"
 import { config } from "../../shared/config.js"
 import { logger } from "../../shared/logger.js"
 import { ValidationError, NotFoundError } from "../../shared/errors.js"
-import { validateAndCheckSlug } from "../../provisioning/slug.js"
+import { validateAndCheckSlug } from "../provisioning/slug.js"
 import {
   createSignupIntent,
   findSignupIntentById,

@@ -76,7 +76,7 @@ import {
 } from "../../../src/infra/db/repositories/license-reissues.js"
 import { issueLicenseToken } from "../../../src/license/issuer.js"
 import { sshWriteFile, sshExec } from "../../../src/fleet/ssh-exec.js"
-import { executeLicenseReissue } from "../../../src/workers/license-reissue-worker.js"
+import { executeLicenseReissue } from "../../../src/fleet/workers/license-reissue-worker.js"
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
 

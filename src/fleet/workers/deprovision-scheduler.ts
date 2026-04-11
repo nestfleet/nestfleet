@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Deprovisioning nightly scheduler — FEAT-001 (NF-OPS-06).
  *
@@ -8,11 +9,11 @@
  * Each customer is processed independently — one failure does not block others.
  */
 
-import { getBoss } from "../infra/queue/boss.js"
-import { logger } from "../shared/logger.js"
-import { findExpiredDeprovisionings } from "../infra/db/repositories/provisionings.js"
+import { getBoss } from "../../infra/queue/boss.js"
+import { logger } from "../../shared/logger.js"
+import { findExpiredDeprovisionings } from "../../infra/db/repositories/provisionings.js"
 import { deprovisionOne } from "../provisioning/deprovision.js"
-import { config } from "../shared/config.js"
+import { config } from "../../shared/config.js"
 
 const SCHEDULE_NAME = "deprovision_nightly"
 const CRON_UTC_3AM  = "0 3 * * *"

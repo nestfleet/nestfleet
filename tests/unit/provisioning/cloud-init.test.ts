@@ -29,7 +29,7 @@ vi.mock("node:fs/promises", () => ({
 const mockReadFile = readFile as ReturnType<typeof vi.fn>
 
 // Import after mocking
-const { generateCloudInit, _resetCloudInitCache } = await import("../../../src/provisioning/cloud-init.js")
+const { generateCloudInit, _resetCloudInitCache } = await import("../../../src/fleet/provisioning/cloud-init.js")
 
 // Use a realistic-looking dummy JWT string — no need to actually sign for cloud-init tests
 const DUMMY_LICENSE_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhY21lIn0.dummysignature"

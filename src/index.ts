@@ -32,10 +32,11 @@ import { autoReplyWorker } from "./workers/auto-reply-worker.js"
 import { prDraftPrepWorker } from "./workers/pr-draft-prep-worker.js"
 import { outageRoutingWorker } from "./workers/outage-routing-worker.js"
 import { registerDigestCron } from "./workers/digest-cron.js"
-import { registerProvisioningWorker } from "./workers/provisioning-worker.js"
-import { registerDeprovisionScheduler } from "./workers/deprovision-scheduler.js"
-import { registerFleetHealthWorker } from "./workers/fleet-health-worker.js"
-import { registerLicenseReissueWorker } from "./workers/license-reissue-worker.js"
+import { registerProvisioningWorker } from "./fleet/workers/provisioning-worker.js"
+import { registerDeprovisionScheduler } from "./fleet/workers/deprovision-scheduler.js"
+import { registerFleetHealthWorker } from "./fleet/workers/fleet-health-worker.js"
+import { registerLicenseReissueWorker } from "./fleet/workers/license-reissue-worker.js"
+import { verifyOperatorKey, isFleetOperatorAuthorized } from "./fleet/operator-key.js"
 import { registerDeadLetterHandler } from "./infra/queue/boss.js"
 
 async function main(): Promise<void> {
@@ -69,8 +70,24 @@ async function main(): Promise<void> {
       registerDigestCron(),
     ]
 
-    // Provisioning workers — only on main instance
-    if (config.PROVISIONING_ENABLED) {
+    // Fleet provisioning workers — gated on NESTFLEET_OPERATOR_KEY (FEAT-018).
+    // Skipped in test environment. In community deployments (no operator key), these
+    // workers are not registered and fleet routes return 404 (PROVISIONING_ENABLED=false).
+    if (config.PROVISIONING_ENABLED && config.NODE_ENV !== "test") {
+      const operatorKey = process.env["NESTFLEET_OPERATOR_KEY"]
+      if (operatorKey) {
+        try {
+          await verifyOperatorKey(operatorKey)
+          logger.info("Fleet operator key verified — fleet workers enabled")
+        } catch (err) {
+          logger.error({ err }, "Fleet operator key invalid — fleet workers disabled")
+        }
+      } else {
+        logger.warn("NESTFLEET_OPERATOR_KEY not set — fleet workers disabled")
+      }
+    }
+
+    if (config.PROVISIONING_ENABLED && (config.NODE_ENV === "test" || isFleetOperatorAuthorized())) {
       workerRegistrations.push(registerProvisioningWorker())
       workerRegistrations.push(registerDeprovisionScheduler())
       workerRegistrations.push(registerFleetHealthWorker())

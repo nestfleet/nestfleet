@@ -115,6 +115,10 @@ services:
       BUNDLED_EMBEDDING_API_KEY:   ${BUNDLED_EMBEDDING_API_KEY:-}
       OWNER_USER_IDS:              ${OWNER_USER_IDS:-}
       REGISTRATION_ENABLED:        ${REGISTRATION_ENABLED:-false}
+      # Fleet operator key (FEAT-018) — JWT signed by NestFleet Ed25519 private key.
+      # Required to enable fleet provisioning routes and workers.
+      # Generate via: npx tsx scripts/generate-operator-keypair.ts
+      NESTFLEET_OPERATOR_KEY:      ${NESTFLEET_OPERATOR_KEY:-}
     networks:
       - internal
     healthcheck:

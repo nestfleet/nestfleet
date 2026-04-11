@@ -81,11 +81,11 @@ const mockDeprovisionOne   = vi.fn().mockResolvedValue(undefined)
 const mockStartDeprovisioning = vi.fn().mockResolvedValue(undefined)
 const mockBossSend         = vi.fn().mockResolvedValue(undefined)
 
-vi.mock("../../src/provisioning/hetzner-client.js", () => ({
+vi.mock("../../src/fleet/provisioning/hetzner-client.js", () => ({
   createHetznerClient: vi.fn().mockImplementation(() => ({ resetServer: mockResetServer })),
 }))
 
-vi.mock("../../src/provisioning/deprovision.js", () => ({
+vi.mock("../../src/fleet/provisioning/deprovision.js", () => ({
   get deprovisionOne()      { return mockDeprovisionOne },
   get startDeprovisioning() { return mockStartDeprovisioning },
 }))
@@ -96,14 +96,14 @@ vi.mock("../../src/infra/queue/boss.js", () => ({
   getBossState:  vi.fn().mockReturnValue("started"),
 }))
 
-vi.mock("../../src/workers/provisioning-worker.js", () => ({
+vi.mock("../../src/fleet/workers/provisioning-worker.js", () => ({
   PROVISION_JOB:              "provision_vps",
   registerProvisioningWorker: vi.fn(),
 }))
 
 // ── Cloud-init mock (avoids disk reads) ───────────────────────────────────────
 
-vi.mock("../../src/provisioning/cloud-init.js", () => ({
+vi.mock("../../src/fleet/provisioning/cloud-init.js", () => ({
   generateCloudInit: vi.fn().mockResolvedValue("#cloud-config\nruncmd: []"),
 }))
 

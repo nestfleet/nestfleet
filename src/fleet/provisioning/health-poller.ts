@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Health poller — FEAT-001.
  *
@@ -12,8 +13,8 @@
  *   - Caddy ACME adds ~30–60s on the first HTTPS request — covered by initial delay
  */
 
-import { logger } from "../shared/logger.js"
-import { updateProvisioning } from "../infra/db/repositories/provisionings.js"
+import { logger } from "../../shared/logger.js"
+import { updateProvisioning } from "../../infra/db/repositories/provisionings.js"
 
 export interface PollOpts {
   provisioningId: string

@@ -106,10 +106,10 @@ export class ChangePrepWorker extends AbstractAgentWorker {
       // Bug 1 fix: support_policy.github_repo canonical; fall back to agent_config.githubRepoUrl
       const githubRepo = (product?.support_policy?.["github_repo"] as string | undefined)
         ?? (product?.agent_config?.["githubRepoUrl"] as string | undefined)
-      // Bug 2 fix: env var → support_policy encrypted → agent_config plaintext (setup wizard)
-      const githubToken = config.GITHUB_TOKEN
-        ?? decryptSecret(product?.support_policy?.["github_token_enc"] as string | undefined)
+      // DB config takes priority over env fallback — per-product PAT from Settings → CI Integration
+      const githubToken = decryptSecret(product?.support_policy?.["github_token_enc"] as string | undefined)
         ?? (product?.agent_config?.["githubPatToken"] as string | undefined)
+        ?? config.GITHUB_TOKEN
 
       if (githubToken && !githubRepo) {
         logger.warn({ changeRequestId, productId }, "GITHUB_TOKEN configured but no github_repo set — skipping issue creation. Set github_repo in Settings → CI Integration.")

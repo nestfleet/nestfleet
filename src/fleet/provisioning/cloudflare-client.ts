@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Cloudflare DNS API client — FEAT-001.
  *
@@ -6,7 +7,7 @@
  * ttl: 60 is the Cloudflare minimum for non-proxied records.
  */
 
-import { logger } from "../shared/logger.js"
+import { logger } from "../../shared/logger.js"
 
 const CF_BASE = "https://api.cloudflare.com/client/v4"
 

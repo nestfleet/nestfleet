@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Hetzner Cloud API client — FEAT-001.
  *
@@ -7,7 +8,7 @@
  * Retry logic is handled by pg-boss at the job level, not here.
  */
 
-import { logger } from "../shared/logger.js"
+import { logger } from "../../shared/logger.js"
 
 const HETZNER_BASE = "https://api.hetzner.cloud/v1"
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * cloud-init YAML generator — FEAT-001.
  *
@@ -14,7 +15,8 @@ import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const REPO_ROOT = join(__dirname, "../../")
+// src/fleet/provisioning/ → go up 3 levels to reach repo root
+const REPO_ROOT = join(__dirname, "../../../")
 
 // ── File content cache (loaded once at first use) ─────────────────────────────
 

@@ -59,18 +59,18 @@ vi.mock("../../src/infra/queue/boss.js", () => ({
   getBossState: vi.fn().mockReturnValue("started"),
 }))
 
-vi.mock("../../src/workers/provisioning-worker.js", () => ({
+vi.mock("../../src/fleet/workers/provisioning-worker.js", () => ({
   PROVISION_JOB:              "provision_vps",
   registerProvisioningWorker: vi.fn(),
 }))
 
-vi.mock("../../src/workers/license-reissue-worker.js", () => ({
+vi.mock("../../src/fleet/workers/license-reissue-worker.js", () => ({
   LICENSE_REISSUE_JOB:             "license_reissue",
   registerLicenseReissueWorker:    vi.fn(),
   executeLicenseReissue:           vi.fn(),
 }))
 
-vi.mock("../../src/provisioning/cloud-init.js", () => ({
+vi.mock("../../src/fleet/provisioning/cloud-init.js", () => ({
   generateCloudInit: vi.fn().mockResolvedValue("#cloud-config\nruncmd: []"),
 }))
 

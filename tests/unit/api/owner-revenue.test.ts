@@ -69,16 +69,16 @@ vi.mock("../../../src/infra/db/repositories/provisionings.js", () => ({
 
 // ── Provisioning / Hetzner / Cloudflare mocks ─────────────────────────────────
 
-vi.mock("../../../src/provisioning/hetzner-client.js", () => ({
+vi.mock("../../../src/fleet/provisioning/hetzner-client.js", () => ({
   createHetznerClient: vi.fn().mockReturnValue({ resetServer: vi.fn() }),
 }))
 
-vi.mock("../../../src/provisioning/deprovision.js", () => ({
+vi.mock("../../../src/fleet/provisioning/deprovision.js", () => ({
   deprovisionOne:     vi.fn().mockResolvedValue(undefined),
   startDeprovisioning: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock("../../../src/workers/provisioning-worker.js", () => ({
+vi.mock("../../../src/fleet/workers/provisioning-worker.js", () => ({
   PROVISION_JOB:              "provision_vps",
   registerProvisioningWorker: vi.fn(),
 }))
@@ -146,7 +146,7 @@ describe("Owner API — revenue & cohort endpoints", () => {
 
   beforeEach(async () => {
     // Reset the module-level revenue/cohort cache so each test starts cold.
-    const { _resetOwnerCache } = await import("../../../src/api/v1/owner.js")
+    const { _resetOwnerCache } = await import("../../../src/fleet/api/owner.js")
     _resetOwnerCache()
   })
 

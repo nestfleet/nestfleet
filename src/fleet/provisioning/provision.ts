@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Provisioning saga — FEAT-001.
  *
@@ -20,21 +21,21 @@
  */
 
 import { randomBytes } from "node:crypto"
-import { config } from "../shared/config.js"
-import { logger } from "../shared/logger.js"
-import { encryptSecret, decryptSecret } from "../shared/crypto.js"
-import { sendEmail } from "../email/sender.js"
+import { config } from "../../shared/config.js"
+import { logger } from "../../shared/logger.js"
+import { encryptSecret, decryptSecret } from "../../shared/crypto.js"
+import { sendEmail } from "../../email/sender.js"
 import {
   findProvisioningByIntentId,
   findSignupIntentById,
   createProvisioning,
   updateProvisioning,
-} from "../infra/db/repositories/provisionings.js"
+} from "../../infra/db/repositories/provisionings.js"
 import { createHetznerClient } from "./hetzner-client.js"
 import { createCloudflareClient } from "./cloudflare-client.js"
 import { generateCloudInit, type CloudInitOpts } from "./cloud-init.js"
 import { pollUntilHealthy } from "./health-poller.js"
-import { issueLicenseToken } from "../license/issuer.js"
+import { issueLicenseToken } from "../../license/issuer.js"
 
 // ── Secrets ───────────────────────────────────────────────────────────────────
 
@@ -100,9 +101,11 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
   if (!prov) {
     prov = await createProvisioning({
       intentId,
-      orgSlug:       intent.org_slug,
-      customerEmail: intent.email,
-      plan:          intent.plan,
+      orgSlug:              intent.org_slug,
+      customerEmail:        intent.email,
+      plan:                 intent.plan,
+      stripeCustomerId:     intent.stripe_customer_id,
+      stripeSubscriptionId: intent.stripe_subscription_id,
     })
     logger.info({ intentId, slug: intent.org_slug }, "ProvisioningSaga: row created")
   }
@@ -300,7 +303,8 @@ export async function runProvisioningSaga(intentId: string): Promise<void> {
 }
 
 async function sendWelcomeEmail(slug: string, email: string, baseDomain: string): Promise<void> {
-  const loginUrl = `https://${slug}.${baseDomain}`
+  const loginUrl   = `https://${slug}.${baseDomain}`
+  const accountUrl = "https://nestfleet.dev/account"
   await sendEmail({
     to:      email,
     subject: "Your NestFleet instance is ready",
@@ -312,6 +316,10 @@ async function sendWelcomeEmail(slug: string, email: string, baseDomain: string)
       "  2. Create your admin account",
       "  3. Complete the setup wizard to configure your first product",
       "",
+      "Manage your subscription (cancel, upgrade, update billing):",
+      `  ${accountUrl}`,
+      "Use the email address you registered with to log in.",
+      "",
       "Documentation: https://nestfleet.dev/docs",
       "Support: support@nestfleet.dev",
     ].join("\n"),
@@ -321,6 +329,11 @@ async function sendWelcomeEmail(slug: string, email: string, baseDomain: string)
   <li><a href="${loginUrl}/register">Open the registration page</a> to create your admin account</li>
   <li>Complete the setup wizard to configure your first product</li>
 </ol>
+<p>
+  <strong>Manage your subscription</strong> (cancel, upgrade, update billing):<br>
+  <a href="${accountUrl}">${accountUrl}</a><br>
+  Use the email address you registered with to log in.
+</p>
 <p>
   <a href="https://nestfleet.dev/docs">Documentation</a> ·
   <a href="mailto:support@nestfleet.dev">Support</a>

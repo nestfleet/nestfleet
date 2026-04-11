@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * License reissue worker — FEAT-012.
  *
@@ -12,20 +13,20 @@
  */
 
 import type { Job } from "pg-boss"
-import { getBoss } from "../infra/queue/boss.js"
-import { logger } from "../shared/logger.js"
-import { config, getFleetSshPrivateKey } from "../shared/config.js"
-import { decryptSecret } from "../shared/crypto.js"
+import { getBoss } from "../../infra/queue/boss.js"
+import { logger } from "../../shared/logger.js"
+import { config, getFleetSshPrivateKey } from "../../shared/config.js"
+import { decryptSecret } from "../../shared/crypto.js"
 import {
   findProvisioningBySlug,
   updateProvisioning,
-} from "../infra/db/repositories/provisionings.js"
+} from "../../infra/db/repositories/provisionings.js"
 import {
   findLicenseReissueById,
   updateLicenseReissue,
-} from "../infra/db/repositories/license-reissues.js"
-import { issueLicenseToken } from "../license/issuer.js"
-import { sshWriteFile, sshExec } from "../fleet/ssh-exec.js"
+} from "../../infra/db/repositories/license-reissues.js"
+import { issueLicenseToken } from "../../license/issuer.js"
+import { sshWriteFile, sshExec } from "../ssh-exec.js"
 
 // ── Job name + payload ────────────────────────────────────────────────────────
 

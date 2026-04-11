@@ -87,10 +87,11 @@ export class PrDraftPrepWorker extends AbstractAgentWorker {
     //            (written by setup wizard before this storage split was fixed)
     const githubRepo = (product?.support_policy?.["github_repo"] as string | undefined)
       ?? (product?.agent_config?.["githubRepoUrl"] as string | undefined)
-    // Bug 2 fix: resolve token from env → support_policy (encrypted) → agent_config (setup wizard plaintext)
-    const githubToken = config.GITHUB_TOKEN
-      ?? decryptSecret(product?.support_policy?.["github_token_enc"] as string | undefined)
+    // DB config takes priority over env fallback — per-product PAT from Settings → CI Integration
+    // overrides the instance-level GITHUB_TOKEN env var.
+    const githubToken = decryptSecret(product?.support_policy?.["github_token_enc"] as string | undefined)
       ?? (product?.agent_config?.["githubPatToken"] as string | undefined)
+      ?? config.GITHUB_TOKEN
 
     // ── 5. Run pr_draft_prep agent ────────────────────────────────────────────
     const result = await runPrDraftPrepAgent({

@@ -32,8 +32,8 @@ import {
   findProvisioningBySlug,
   updateProvisioning,
 } from "../../src/infra/db/repositories/provisionings.js"
-import { runProvisioningSaga } from "../../src/provisioning/provision.js"
-import { deprovisionOne, startDeprovisioning } from "../../src/provisioning/deprovision.js"
+import { runProvisioningSaga } from "../../src/fleet/provisioning/provision.js"
+import { deprovisionOne, startDeprovisioning } from "../../src/fleet/provisioning/deprovision.js"
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -42,12 +42,12 @@ vi.mock("../../src/email/sender.js", () => ({
 }))
 
 // Mock cloud-init to avoid disk reads in integration tests
-vi.mock("../../src/provisioning/cloud-init.js", () => ({
+vi.mock("../../src/fleet/provisioning/cloud-init.js", () => ({
   generateCloudInit: vi.fn().mockResolvedValue("#cloud-config\nruncmd: []"),
 }))
 
 // Mock health poller to return 'ok' immediately (avoid 7.5-min wait)
-vi.mock("../../src/provisioning/health-poller.js", () => ({
+vi.mock("../../src/fleet/provisioning/health-poller.js", () => ({
   pollUntilHealthy: vi.fn().mockResolvedValue("ok"),
 }))
 
@@ -68,7 +68,7 @@ vi.mock("stripe", () => {
 })
 
 import { sendEmail } from "../../src/email/sender.js"
-import { pollUntilHealthy } from "../../src/provisioning/health-poller.js"
+import { pollUntilHealthy } from "../../src/fleet/provisioning/health-poller.js"
 
 // ── msw: Mock Hetzner + Cloudflare APIs ───────────────────────────────────────
 

@@ -59,16 +59,16 @@ vi.mock("../../../src/infra/db/repositories/provisionings.js", () => ({
   updateProvisioning:     vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock("../../../src/provisioning/hetzner-client.js", () => ({
+vi.mock("../../../src/fleet/provisioning/hetzner-client.js", () => ({
   createHetznerClient: vi.fn().mockReturnValue({ resetServer: vi.fn() }),
 }))
 
-vi.mock("../../../src/provisioning/deprovision.js", () => ({
+vi.mock("../../../src/fleet/provisioning/deprovision.js", () => ({
   deprovisionOne:      vi.fn().mockResolvedValue(undefined),
   startDeprovisioning: vi.fn().mockResolvedValue(undefined),
 }))
 
-vi.mock("../../../src/workers/provisioning-worker.js", () => ({
+vi.mock("../../../src/fleet/workers/provisioning-worker.js", () => ({
   PROVISION_JOB:              "provision_vps",
   registerProvisioningWorker: vi.fn(),
 }))

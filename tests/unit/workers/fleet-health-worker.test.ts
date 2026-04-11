@@ -40,7 +40,7 @@ vi.mock("../../../src/shared/logger.js", () => ({
 
 // ── Imports (after mocks) ─────────────────────────────────────────────────────
 
-import { checkInstanceHealth } from "../../../src/workers/fleet-health-worker.js"
+import { checkInstanceHealth } from "../../../src/fleet/workers/fleet-health-worker.js"
 import { updateProvisioning } from "../../../src/infra/db/repositories/provisionings.js"
 import { sendEmail } from "../../../src/email/sender.js"
 

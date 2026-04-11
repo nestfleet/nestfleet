@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Owner fleet API — FEAT-001 (NF-OPS-01 subset).
  *
@@ -33,16 +34,16 @@ import {
   findProvisioningBySlug,
   updateProvisioning,
 } from "../../infra/db/repositories/provisionings.js"
-import { createHetznerClient } from "../../provisioning/hetzner-client.js"
-import { deprovisionOne, startDeprovisioning } from "../../provisioning/deprovision.js"
+import { createHetznerClient } from "../provisioning/hetzner-client.js"
+import { deprovisionOne, startDeprovisioning } from "../provisioning/deprovision.js"
 import { getBoss } from "../../infra/queue/boss.js"
-import { PROVISION_JOB } from "../../workers/provisioning-worker.js"
+import { PROVISION_JOB } from "../workers/provisioning-worker.js"
 import Stripe from "stripe"
 import { getStripeClient } from "../../billing/stripe.js"
 import { aggregateRevenue, buildCohorts } from "../../billing/stripe-revenue.js"
 import type { RevenueData, CohortWeek } from "../../billing/stripe-revenue.js"
 import { getRecentTelemetry, countDistinctInstances } from "../../infra/db/repositories/telemetry.js"
-import { validateAndCheckSlug } from "../../provisioning/slug.js"
+import { validateAndCheckSlug } from "../provisioning/slug.js"
 import { createSignupIntent } from "../../infra/db/repositories/provisionings.js"
 import {
   createLicenseReissue,
@@ -50,7 +51,7 @@ import {
   findFailedPendingJwt,
   clearPendingJwt,
 } from "../../infra/db/repositories/license-reissues.js"
-import { LICENSE_REISSUE_JOB } from "../../workers/license-reissue-worker.js"
+import { LICENSE_REISSUE_JOB } from "../workers/license-reissue-worker.js"
 
 // ── Revenue cache (5 min TTL) ─────────────────────────────────────────────────
 

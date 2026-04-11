@@ -17,13 +17,12 @@ import { priceIdToPlan } from "./stripe.js"
 import { upsertWorkspaceBilling } from "./workspace-billing-repo.js"
 import { logger } from "../shared/logger.js"
 import { config } from "../shared/config.js"
-import { getBoss } from "../infra/queue/boss.js"
-import { PROVISION_JOB } from "../workers/provisioning-worker.js"
 import {
-  findProvisioningBySlug,
-  updateSignupIntentStatus,
-} from "../infra/db/repositories/provisionings.js"
-import { startDeprovisioning } from "../provisioning/deprovision.js"
+  handleFleetCheckoutCompleted,
+  handleFleetSubscriptionDeleted,
+  handleFleetSubscriptionUpdated,
+  handleFleetCustomerUpdated,
+} from "../fleet/billing/webhook-fleet.js"
 
 type StripeEvent = { type: string; data: { object: Record<string, unknown> } }
 
@@ -37,27 +36,18 @@ export async function handleStripeEvent(event: Stripe.Event | StripeEvent): Prom
       const customerId     = obj["customer"] as string | null
       const subscriptionId = obj["subscription"] as string | null
 
-      // ── SaaS provisioning path ─────────────────────────────────────────────
+      // ── SaaS provisioning path (fleet) ────────────────────────────────────
       if (config.PROVISIONING_ENABLED && metadata?.["event_type"] === "saas_signup") {
         const intentId = metadata["intent_id"]
         const slug     = metadata["slug"]
-        const plan     = metadata["plan"]
+        const plan     = metadata["plan"] ?? ""
 
         if (!intentId || !slug) {
           logger.error({ metadata }, "Stripe saas_signup: missing intent_id or slug in metadata")
           return
         }
 
-        // Mark signup_intent as completed
-        await updateSignupIntentStatus(intentId, "completed").catch((err) => {
-          logger.warn({ err, intentId }, "Stripe saas_signup: intent status update failed (non-fatal)")
-        })
-
-        // Enqueue provisioning job — singletonKey prevents duplicate on Stripe retry
-        const boss = await getBoss()
-        await boss.send(PROVISION_JOB, { intentId }, { singletonKey: intentId })
-
-        logger.info({ intentId, slug, plan }, "Stripe saas_signup: provisioning job enqueued")
+        await handleFleetCheckoutCompleted(intentId, slug, plan, customerId, subscriptionId)
         return
       }
 
@@ -88,20 +78,22 @@ export async function handleStripeEvent(event: Stripe.Event | StripeEvent): Prom
       const customerId = obj["customer"] as string
       const subMeta    = obj["metadata"] as Record<string, string> | undefined
 
-      // ── SaaS churn path ────────────────────────────────────────────────────
+      // ── SaaS subscription lifecycle path (fleet) ──────────────────────────
       if (
         config.PROVISIONING_ENABLED &&
-        type === "customer.subscription.deleted" &&
         subMeta?.["event_type"] === "saas_subscription"
       ) {
         const slug = subMeta["slug"]
         if (slug) {
-          const prov = await findProvisioningBySlug(slug)
-          if (prov && prov.status === "active") {
-            await startDeprovisioning(prov)
-            logger.info({ slug }, "Stripe subscription.deleted: deprovisioning grace period started")
-          } else {
-            logger.warn({ slug, status: prov?.status }, "Stripe subscription.deleted: no active provisioning found for slug")
+          if (type === "customer.subscription.deleted") {
+            const rawStatus  = obj["status"] as string
+            const trialEnd   = obj["trial_end"] as number | null
+            const wasTrialing = rawStatus === "trialing"
+            await handleFleetSubscriptionDeleted(slug, wasTrialing, trialEnd)
+          } else if (type === "customer.subscription.updated") {
+            const items  = obj["items"] as { data: Array<{ price: { id: string } }> } | undefined
+            const priceId = items?.data?.[0]?.price?.id ?? null
+            await handleFleetSubscriptionUpdated(slug, priceId, subId)
           }
           return
         }
@@ -144,6 +136,18 @@ export async function handleStripeEvent(event: Stripe.Event | StripeEvent): Prom
       })
 
       logger.info({ type, subId, plan: planResolved, status }, "Stripe subscription event processed")
+      break
+    }
+
+    case "customer.updated": {
+      // ── Email sync for SaaS fleet customers (FEAT-017-D / spec C3) ─────────
+      if (config.PROVISIONING_ENABLED) {
+        const customerId = obj["id"] as string
+        const email      = obj["email"] as string | null
+        if (customerId && email) {
+          await handleFleetCustomerUpdated(customerId, email)
+        }
+      }
       break
     }
 

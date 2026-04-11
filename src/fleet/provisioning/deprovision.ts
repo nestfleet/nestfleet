@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Deprovisioning saga — FEAT-001 (NF-OPS-06).
  *
@@ -11,10 +12,10 @@
  * S3 backups: retained 90 days by lifecycle rule on the bucket — no action needed here.
  */
 
-import { config } from "../shared/config.js"
-import { logger } from "../shared/logger.js"
-import { sendEmail } from "../email/sender.js"
-import { updateProvisioning, type ProvisioningRow } from "../infra/db/repositories/provisionings.js"
+import { config } from "../../shared/config.js"
+import { logger } from "../../shared/logger.js"
+import { sendEmail } from "../../email/sender.js"
+import { updateProvisioning, type ProvisioningRow } from "../../infra/db/repositories/provisionings.js"
 import { createHetznerClient } from "./hetzner-client.js"
 import { createCloudflareClient } from "./cloudflare-client.js"
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Fleet health worker — NF-OPS-01 Phase 3.
  *
@@ -7,12 +8,12 @@
  * Sends alert email to OPS_ALERT_EMAIL if unreachable for > 2 hours.
  */
 
-import { getBoss } from "../infra/queue/boss.js"
-import { logger } from "../shared/logger.js"
-import { config } from "../shared/config.js"
-import { listProvisionings, updateProvisioning } from "../infra/db/repositories/provisionings.js"
-import type { ProvisioningRow } from "../infra/db/repositories/provisionings.js"
-import { sendEmail } from "../email/sender.js"
+import { getBoss } from "../../infra/queue/boss.js"
+import { logger } from "../../shared/logger.js"
+import { config } from "../../shared/config.js"
+import { listProvisionings, updateProvisioning } from "../../infra/db/repositories/provisionings.js"
+import type { ProvisioningRow } from "../../infra/db/repositories/provisionings.js"
+import { sendEmail } from "../../email/sender.js"
 
 const SCHEDULE_NAME   = "fleet_health_check"
 const CRON_EVERY_10M  = "*/10 * * * *"

@@ -30,7 +30,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   "http://localhost:3001";
 
-const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots"];
+const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots", "/account"];
 const BYPASS_EXACT    = ["/setup", "/login", "/register", "/signup", "/terms", "/privacy"];
 
 // Matches /p/<slug> and /p/<slug>/anything

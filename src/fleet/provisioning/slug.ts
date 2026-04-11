@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * Slug validation and reservation — FEAT-001.
  *
@@ -7,7 +8,7 @@
  * (prevents DNS caching confusion from old → new tenant on same subdomain).
  */
 
-import { slugHasSignupIntent, findProvisioningBySlug } from "../infra/db/repositories/provisionings.js"
+import { slugHasSignupIntent, findProvisioningBySlug } from "../../infra/db/repositories/provisionings.js"
 
 export const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/
 

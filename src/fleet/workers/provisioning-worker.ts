@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: LicenseRef-NestFleet-Commercial
 /**
  * ProvisioningWorker — FEAT-001.
  *
@@ -16,8 +17,8 @@
  */
 
 import type { Job } from "pg-boss"
-import { getBoss } from "../infra/queue/boss.js"
-import { logger } from "../shared/logger.js"
+import { getBoss } from "../../infra/queue/boss.js"
+import { logger } from "../../shared/logger.js"
 import { runProvisioningSaga } from "../provisioning/provision.js"
 
 export const PROVISION_JOB = "provision_vps"

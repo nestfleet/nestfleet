@@ -132,4 +132,13 @@ npm run lint                  # TypeScript type check
 
 ## License
 
-[GNU Affero General Public License v3.0](LICENSE). If you run a modified version as a service, the AGPL requires you to make the modified source available to users of that service.
+NestFleet uses an **open-core** model:
+
+| Component | License |
+|-----------|---------|
+| Core (`src/` except `src/fleet/`) | [AGPL-3.0-or-later](LICENSE) |
+| Fleet Module (`src/fleet/`) | [Commercial](LICENSE-FLEET.md) |
+
+The core product operations features are free and open source under AGPL-3.0. If you run a modified version as a service, the AGPL requires you to make the modified source available to users of that service.
+
+The Fleet Module implements managed-hosting infrastructure (VPS provisioning, fleet management, license reissue). It requires a `NESTFLEET_OPERATOR_KEY` JWT issued by NestFleet. See [LICENSE-FLEET.md](LICENSE-FLEET.md) for details, or contact licensing@nestfleet.dev.
