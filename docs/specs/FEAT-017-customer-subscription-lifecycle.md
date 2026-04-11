@@ -1,6 +1,6 @@
 # FEAT-017 — Customer Subscription Lifecycle
 
-> **Status:** Spec complete, not started  
+> **Status:** ✅ Done (2026-04-11) — commit e233841  
 > **Priority:** P1 (blocking first paying customer)  
 > **Size:** M  
 > **Depends on:** FEAT-016 (SaaS signup form — ✅ Done), FEAT-012 (license reissue worker — ✅ Done)

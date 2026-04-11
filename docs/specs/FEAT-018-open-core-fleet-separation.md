@@ -1,6 +1,6 @@
 # FEAT-018 — Open-Core Fleet Separation
 
-> **Status:** Spec complete, not started  
+> **Status:** ✅ Done (2026-04-11) — commit e233841  
 > **Priority:** P2 (before public repo flip — no external pressure yet)  
 > **Size:** M  
 > **Depends on:** FEAT-017 (subscription lifecycle — ✅ in progress)
