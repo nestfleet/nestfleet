@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 /**
  * Typed fetch wrapper for the NestFleet API.
  * - Reads NEXT_PUBLIC_API_URL for the base URL

@@ -188,6 +188,12 @@ const ConfigSchema = z.object({
   // Owner console auth — comma-separated user IDs granted /owner/* access
   OWNER_USER_IDS: z.string().optional(),
 
+  // Internal cron endpoints secret (SEC-A1).
+  // When set, POST /internal/send-reminders and /internal/run-escalations require
+  // the X-Internal-Secret header to match this value.
+  // Leave unset in dev/test to keep the endpoints open; always set in production.
+  INTERNAL_CRON_SECRET: z.string().min(32).optional(),
+
   // Backup — Hetzner Object Storage (S3-compatible). Optional — local-only if unset.
   BACKUP_S3_ENDPOINT:   optionalUrl,
   BACKUP_S3_ACCESS_KEY: z.string().optional(),

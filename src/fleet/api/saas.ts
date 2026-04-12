@@ -33,7 +33,11 @@ export const saasRouter = new Hono()
 const rlMap = new Map<string, { count: number; resetAt: number }>()
 
 function checkSaasRateLimit(ip: string): boolean {
-  const now   = Date.now()
+  const now = Date.now()
+  // SEC-RL1: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of rlMap) {
+    if (now > e.resetAt) rlMap.delete(k)
+  }
   const entry = rlMap.get(ip)
   if (!entry || now > entry.resetAt) {
     rlMap.set(ip, { count: 1, resetAt: now + 60_000 })

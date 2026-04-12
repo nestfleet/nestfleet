@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";

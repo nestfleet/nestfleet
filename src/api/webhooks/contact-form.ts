@@ -37,13 +37,17 @@ const ContactFormBodySchema = z.object({
 // INFRA-03: keyed by productId:ip so products behind a shared egress IP (corporate
 // proxies, CDNs) don't bleed into each other's rate limit buckets.
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+/** @internal — exported for unit tests only */ export const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
 const RATE_WINDOW_MS = 60_000
 const RATE_MAX       = 10
 
 function checkRateLimit(productId: string, ip: string): boolean {
-  const key   = `${productId}:${ip}`
-  const now   = Date.now()
+  const key = `${productId}:${ip}`
+  const now = Date.now()
+  // SEC-RL1: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of rateLimitMap) {
+    if (now > e.resetAt) rateLimitMap.delete(k)
+  }
   const entry = rateLimitMap.get(key)
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS })
@@ -52,6 +56,10 @@ function checkRateLimit(productId: string, ip: string): boolean {
   if (entry.count >= RATE_MAX) return false
   entry.count++
   return true
+}
+
+/** @internal — for unit tests */ export function checkRateLimitForTest(productId: string, ip: string): boolean {
+  return checkRateLimit(productId, ip)
 }
 
 // ── Route ─────────────────────────────────────────────────────────────────────

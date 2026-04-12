@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 // FEAT-002: Static channel catalog. Adding a new channel = adding an entry here.
 // No DB required — status is computed via GET /channels/status.
 

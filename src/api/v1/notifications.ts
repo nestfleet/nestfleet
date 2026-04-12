@@ -9,6 +9,7 @@
  */
 
 import { Hono } from "hono"
+import { config } from "../../shared/config.js"
 import { requireAuth } from "../../auth/middleware.js"
 import type { AuthVariables } from "../../auth/middleware.js"
 import { logger } from "../../shared/logger.js"
@@ -129,6 +130,12 @@ notificationsRouter.get(
 notificationsRouter.post(
   "/internal/run-escalations",
   async (c) => {
+    const secret = config.INTERNAL_CRON_SECRET
+    if (secret) {
+      const provided = c.req.header("X-Internal-Secret")
+      if (provided !== secret) return c.json({ error: "UNAUTHORIZED" }, 401)
+    }
+
     try {
       const result = await runEscalations()
       return c.json({ ok: true, ...result })

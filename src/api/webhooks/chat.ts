@@ -30,15 +30,19 @@ export const chatRouter = new Hono()
 const RATE_WINDOW_MS = 60_000
 
 // Per-session: 30 messages / 60 s (prevents runaway loops)
-const sessionRateMap = new Map<string, { count: number; resetAt: number }>()
+/** @internal — exported for unit tests only */ export const sessionRateMap = new Map<string, { count: number; resetAt: number }>()
 const SESSION_RATE_MAX = 30
 
 // Per-IP: 60 messages / 60 s
-const ipRateMap = new Map<string, { count: number; resetAt: number }>()
+/** @internal — exported for unit tests only */ export const ipRateMap = new Map<string, { count: number; resetAt: number }>()
 const IP_RATE_MAX = 60
 
 function checkRate(map: Map<string, { count: number; resetAt: number }>, key: string, max: number): boolean {
   const now = Date.now()
+  // SEC-RL1: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of map) {
+    if (now > e.resetAt) map.delete(k)
+  }
   const entry = map.get(key)
   if (!entry || now > entry.resetAt) {
     map.set(key, { count: 1, resetAt: now + RATE_WINDOW_MS })
@@ -47,6 +51,14 @@ function checkRate(map: Map<string, { count: number; resetAt: number }>, key: st
   if (entry.count >= max) return false
   entry.count++
   return true
+}
+
+/** @internal — for unit tests */ export function checkRateForTest(
+  map: Map<string, { count: number; resetAt: number }>,
+  key: string,
+  max: number,
+): boolean {
+  return checkRate(map, key, max)
 }
 
 // ── Input schema ──────────────────────────────────────────────────────────────

@@ -42,12 +42,16 @@ saasAccountRouter.use("*", async (c, next) => {
 
 // ── Rate limiter for magic link (3 req / email / 15min) ───────────────────────
 
-const magicLinkRlMap = new Map<string, { count: number; resetAt: number }>()
+/** @internal — exported for unit tests only */ export const magicLinkRlMap = new Map<string, { count: number; resetAt: number }>()
 
 function checkMagicLinkRateLimit(email: string): boolean {
   const now    = Date.now()
   const window = 15 * 60 * 1000
-  const entry  = magicLinkRlMap.get(email)
+  // SEC-RL1: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of magicLinkRlMap) {
+    if (now > e.resetAt) magicLinkRlMap.delete(k)
+  }
+  const entry = magicLinkRlMap.get(email)
   if (!entry || now > entry.resetAt) {
     magicLinkRlMap.set(email, { count: 1, resetAt: now + window })
     return true
@@ -55,6 +59,10 @@ function checkMagicLinkRateLimit(email: string): boolean {
   if (entry.count >= 3) return false
   entry.count++
   return true
+}
+
+/** @internal — for unit tests */ export function checkMagicLinkRateLimitForTest(email: string): boolean {
+  return checkMagicLinkRateLimit(email)
 }
 
 // ── JWT helpers ──────────────────────────────���─────────────────────────────���──

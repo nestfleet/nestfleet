@@ -24,9 +24,38 @@ const LoginBodySchema = z.object({
   password: z.string().min(1),
 })
 
+// ── Rate limiter for login (5 attempts / IP / 5 min) — SEC-RL2 ───────────────
+
+const LOGIN_RL_MAX    = 5
+const LOGIN_RL_WINDOW = 5 * 60_000   // 5 minutes
+
+/** @internal — exported for unit tests only */
+export const loginRlMap = new Map<string, { count: number; resetAt: number }>()
+
+function checkLoginRateLimit(ip: string): boolean {
+  const now = Date.now()
+  // SEC-RL1 pattern: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of loginRlMap) {
+    if (now > e.resetAt) loginRlMap.delete(k)
+  }
+  const entry = loginRlMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    loginRlMap.set(ip, { count: 1, resetAt: now + LOGIN_RL_WINDOW })
+    return true
+  }
+  if (entry.count >= LOGIN_RL_MAX) return false
+  entry.count++
+  return true
+}
+
 // ── POST /api/v1/auth/login ───────────────────────────────────────────────────
 
 authRouter.post("/auth/login", async (c) => {
+  const ip = c.req.header("X-Forwarded-For")?.split(",")[0]?.trim() ?? "unknown"
+  if (!checkLoginRateLimit(ip)) {
+    return c.json({ error: "TOO_MANY_REQUESTS", message: "Too many login attempts. Try again later." }, 429)
+  }
+
   const body = await c.req.json().catch(() => null)
   const parsed = LoginBodySchema.safeParse(body)
 

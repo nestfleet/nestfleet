@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 /**
  * Console-side presentational copy of FEATURE_CATALOG.
  * Labels and data must stay verbatim with src/rbac/feature-catalog.ts.

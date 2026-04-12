@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 import { type Node, type Edge } from "@xyflow/react";
 import dagre from "dagre";
 import type { LineageNode, LineageEdge, LineageNodeType } from "@/lib/types";

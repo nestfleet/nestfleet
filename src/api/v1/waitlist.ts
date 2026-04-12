@@ -25,7 +25,11 @@ export const waitlistRouter = new Hono()
 const rlMap = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(ip: string): boolean {
-  const now   = Date.now()
+  const now = Date.now()
+  // SEC-RL1: evict expired entries to prevent unbounded memory growth
+  for (const [k, e] of rlMap) {
+    if (now > e.resetAt) rlMap.delete(k)
+  }
   const state = rlMap.get(ip)
   if (!state || state.resetAt < now) {
     rlMap.set(ip, { count: 1, resetAt: now + 60 * 60_000 })

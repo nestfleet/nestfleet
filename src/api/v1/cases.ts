@@ -19,6 +19,7 @@
 
 import { Hono } from "hono"
 import { z } from "zod"
+import { config } from "../../shared/config.js"
 import { logger } from "../../shared/logger.js"
 import { requireAuth, requireRole } from "../../auth/middleware.js"
 import type { AuthVariables } from "../../auth/middleware.js"
@@ -797,6 +798,12 @@ const SendRemindersBodySchema = z.object({
 })
 
 casesRouter.post("/internal/send-reminders", async (c) => {
+  const secret = config.INTERNAL_CRON_SECRET
+  if (secret) {
+    const provided = c.req.header("X-Internal-Secret")
+    if (provided !== secret) return c.json({ error: "UNAUTHORIZED" }, 401)
+  }
+
   let body: unknown
   try { body = await c.req.json() } catch {
     return c.json({ error: "Invalid JSON body" }, 400)

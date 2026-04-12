@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+
 /**
  * Typed fetch wrappers for the NestFleet owner admin API.
  * All functions require an authenticated owner JWT.
