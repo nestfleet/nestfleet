@@ -170,8 +170,8 @@
 | ID | Action | Priority | Status |
 |----|--------|----------|--------|
 | SEC-S1 | Verify `.env` was never committed — **already confirmed clean** (`git log --all -- .env` = empty) | Blocker | ✅ Done |
-| SEC-S2 | Rotate all secrets listed in AUDIT-001 Part 1 (GitHub App key, GitHub PAT ×2, Hetzner token, Cloudflare token, Google API keys ×3, JWT_SECRET, LICENSE_SECRET, ENCRYPTION_KEY ×2, POSTGRES_PASSWORD) | Blocker | Not Started |
-| SEC-S3 | **URGENT** — Replace `STRIPE_SECRET_KEY` (currently `sk_test_51T7uyN…`, comment says *"borrowed from DG sandbox"*). This is a third party's Stripe credentials. Get your own Stripe test key immediately, then archive this one at Stripe dashboard | Blocker | Not Started |
+| SEC-S2 | Rotate production secrets (GitHub App key, GitHub PATs, Hetzner token, Cloudflare token, Google API keys, JWT_SECRET, LICENSE_SECRET, ENCRYPTION_KEY, POSTGRES_PASSWORD) before first live customer. **Not a public-repo blocker** — `.env` was never committed and no real values appear in any committed file (verified). Reclassified as pre-first-customer hygiene. | Pre-first-customer | Not Started |
+| SEC-S3 | ~~URGENT~~ — `STRIPE_SECRET_KEY` is owner's own shared test key (also used in DocuGardener sandbox). Not a third-party credential. Swap for a live key when legal entity is registered (covered by ORGA-01-S9). SEC-ST2 startup guard prevents accidental prod use of test key. | Non-issue | ✅ Resolved |
 
 #### Code items — Blockers (must fix before public repo)
 
