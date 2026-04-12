@@ -159,6 +159,56 @@
 | LP-04 | Landing page: Pricing section — Free (community, self-hosted) vs Starter / Growth / Scale with feature comparison table | S | P1 | ✅ Done (2026-04-08) | Pricing section: Free (community, self-hosted) vs Starter/Growth/Scale. CTAs: "Self-host free on GitHub" + "Get managed hosting → /signup". main. |
 | LP-05 | Landing page: SEO basics — title, meta description, OG image, Twitter card, structured data | XS | P2 | ✅ Done (2026-04-08) | OG/Twitter meta tags added to landing page. main. |
 
+### Security & Compliance (AUDIT-001 — Pre-Open-Source)
+
+> Source: `docs/specs/AUDIT-001-pre-opensource-security.md`
+> **Blockers** must be resolved before making the repo public.
+> **High** items before accepting first external PR.
+
+#### Owner actions (no code change — must be done manually)
+
+| ID | Action | Priority | Status |
+|----|--------|----------|--------|
+| SEC-S1 | Verify `.env` was never committed — **already confirmed clean** (`git log --all -- .env` = empty) | Blocker | ✅ Done |
+| SEC-S2 | Rotate all secrets listed in AUDIT-001 Part 1 (GitHub App key, GitHub PAT ×2, Hetzner token, Cloudflare token, Google API keys ×3, JWT_SECRET, LICENSE_SECRET, ENCRYPTION_KEY ×2, POSTGRES_PASSWORD) | Blocker | Not Started |
+| SEC-S3 | **URGENT** — Replace `STRIPE_SECRET_KEY` (currently `sk_test_51T7uyN…`, comment says *"borrowed from DG sandbox"*). This is a third party's Stripe credentials. Get your own Stripe test key immediately, then archive this one at Stripe dashboard | Blocker | Not Started |
+
+#### Code items — Blockers (must fix before public repo)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| SEC-A1 | Secure 2 unauthenticated internal endpoints — add `X-Internal-Secret` header check to `POST /api/v1/internal/send-reminders` (`src/api/v1/cases.ts:799`) and `POST /api/v1/internal/run-escalations` (`src/api/v1/notifications.ts:130`). Add `INTERNAL_CRON_SECRET` to config + `.env.example`. | S | Blocker | Not Started | Any internet user can trigger these today. Option B (move off public router) is cleaner but larger. |
+| SEC-RL1 | Fix memory leak in 5 in-memory rate limiters — add expired-entry cleanup loop at top of each `checkRateLimit()`: `contact-form.ts`, `chat.ts`, `src/fleet/api/saas.ts`, `src/fleet/api/saas-account.ts` (missed by audit), `waitlist.ts` | XS | Blocker | Not Started | Maps grow unbounded under sustained load. Pattern from `telemetry.ts` is the reference. |
+| SEC-RL2 | Add IP-based rate limiting to `POST /api/v1/auth/login` — 5 attempts / 5 min / IP, checked before password verification (`src/api/v1/auth.ts:29`) | XS | Blocker | Not Started | Unlimited brute-force possible against operator credentials today. |
+| SEC-LC1 | Add SPDX headers to all 134 `console/src/` files — `// SPDX-License-Identifier: AGPL-3.0-or-later` + copyright line. Backend `src/` is already 100% covered. | XS | Blocker | Not Started | All 134 files confirmed missing. Script in audit doc. |
+| SEC-LC2 | Create `LICENSES.md` at repo root — attribution for `axe-core` (MPL-2.0), `postgres` (Unlicense), and all other notable dependency licenses | XS | Blocker | Not Started | Required for AGPL compliance. |
+
+#### Code items — High priority (before first external PR)
+
+| ID | Title | Size | Priority | Status | Notes |
+|----|-------|------|----------|--------|-------|
+| SEC-ST1 | Validate `success_url` / `cancel_url` origin against `CONSOLE_ORIGIN` in `POST /api/v1/billing/checkout` (`src/api/v1/billing.ts:96–102`) — reject if origin doesn't match | XS | High | Not Started | Authenticated admin can redirect post-payment users to any domain today. |
+| SEC-ST2 | Add Stripe test vs. live key startup guard in `src/billing/stripe.ts` — throw on startup if `NODE_ENV=production` and key is `sk_test_` | XS | High | Not Started | Prevents accidental test-key prod deploy. |
+| SEC-ST3 | Add plan tier validation to `POST /api/v1/billing/downgrade` — reject if requested plan ≥ current plan (`src/api/v1/billing.ts:137`) | XS | High | Not Started | Can currently "downgrade" to same or higher tier, generating unnecessary Stripe API calls. |
+| SEC-JQ1 | Add per-user job dispatch rate limiting in `src/agents/dispatcher.ts` — e.g. 10 jobs/min/user/action | S | High | Not Started | Monthly token budget is the only backstop; can be exhausted in minutes by a runaway client. |
+| SEC-CLA | Add DCO sign-off requirement to `CONTRIBUTING.md` — one-liner per commit (`Signed-off-by:`), enforced via CI check | XS | High | Not Started | Single author now so no dispute risk for v1.0 — but required before accepting any external PRs. |
+
+#### Backlog — post-launch polish
+
+| ID | Title | Priority | Notes |
+|----|-------|----------|-------|
+| SEC-CORS1 | Validate `CONSOLE_ORIGIN` is a bare origin (no path/query/hash) at startup | Low | `src/api/index.ts:153` |
+| SEC-RL3 | Add rate limiting to `POST /api/v1/auth/register` — 5 req/IP/60s | Low | Lower priority; registration is first-run only |
+| SEC-AI2 | Count first-attempt token spend (from failed `AI_NoObjectGeneratedError` retries) against monthly budget | Low | `src/agents/run-agent.ts:188` — first call tokens currently lost |
+| SEC-AI3 | Separate `knowledge_capture` sub-quota (Growth-tier) from main monthly pool | Low | `src/agents/dispatcher.ts` |
+| SEC-JQ2 | Per-product pg-boss concurrency cap — prevent one product consuming all triage slots | Low | `src/agents/dispatcher.ts` |
+| SEC-JQ3 | Manual dead-letter retry endpoint — `POST /api/v1/cases/:caseId/retry-agent-job` | Low | `src/infra/queue/boss.ts` |
+| SEC-LC3 | Add `author` + `repository` fields to `console/package.json` | Low | Standard npm metadata |
+
+> **Note:** AUDIT-001 finding AI-1 ("no soft-cap or circuit breaker") is **incorrect** — `src/agents/budget.ts` + `src/agents/dispatcher.ts` already implement both soft warnings and hard stops per action type (AE-13/ADR-028). Finding removed from blockers.
+
+---
+
 ### Self-Host Foundation (FREE track)
 
 > Goal: a developer can clone the repo, run 3 commands, and have a working NestFleet instance.
