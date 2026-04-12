@@ -177,11 +177,11 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| SEC-A1 | Secure 2 unauthenticated internal endpoints — add `X-Internal-Secret` header check to `POST /api/v1/internal/send-reminders` (`src/api/v1/cases.ts:799`) and `POST /api/v1/internal/run-escalations` (`src/api/v1/notifications.ts:130`). Add `INTERNAL_CRON_SECRET` to config + `.env.example`. | S | Blocker | Not Started | Any internet user can trigger these today. Option B (move off public router) is cleaner but larger. |
-| SEC-RL1 | Fix memory leak in 5 in-memory rate limiters — add expired-entry cleanup loop at top of each `checkRateLimit()`: `contact-form.ts`, `chat.ts`, `src/fleet/api/saas.ts`, `src/fleet/api/saas-account.ts` (missed by audit), `waitlist.ts` | XS | Blocker | Not Started | Maps grow unbounded under sustained load. Pattern from `telemetry.ts` is the reference. |
-| SEC-RL2 | Add IP-based rate limiting to `POST /api/v1/auth/login` — 5 attempts / 5 min / IP, checked before password verification (`src/api/v1/auth.ts:29`) | XS | Blocker | Not Started | Unlimited brute-force possible against operator credentials today. |
-| SEC-LC1 | Add SPDX headers to all 134 `console/src/` files — `// SPDX-License-Identifier: AGPL-3.0-or-later` + copyright line. Backend `src/` is already 100% covered. | XS | Blocker | Not Started | All 134 files confirmed missing. Script in audit doc. |
-| SEC-LC2 | Create `LICENSES.md` at repo root — attribution for `axe-core` (MPL-2.0), `postgres` (Unlicense), and all other notable dependency licenses | XS | Blocker | Not Started | Required for AGPL compliance. |
+| SEC-A1 | Secure 2 unauthenticated internal endpoints — add `X-Internal-Secret` header check to `POST /api/v1/internal/send-reminders` (`src/api/v1/cases.ts:799`) and `POST /api/v1/internal/run-escalations` (`src/api/v1/notifications.ts:130`). Add `INTERNAL_CRON_SECRET` to config + `.env.example`. | S | Blocker | ✅ Done (2026-04-12) — commit b12c37a | 7 unit tests (NF-UNIT-INT-01..07). |
+| SEC-RL1 | Fix memory leak in 5 in-memory rate limiters — add expired-entry cleanup loop at top of each `checkRateLimit()`: `contact-form.ts`, `chat.ts`, `src/fleet/api/saas.ts`, `src/fleet/api/saas-account.ts` (missed by audit), `waitlist.ts` | XS | Blocker | ✅ Done (2026-04-12) — commit b12c37a | 8 unit tests (NF-UNIT-RL-01..03). |
+| SEC-RL2 | Add IP-based rate limiting to `POST /api/v1/auth/login` — 5 attempts / 5 min / IP, checked before password verification (`src/api/v1/auth.ts:29`) | XS | Blocker | ✅ Done (2026-04-12) — commit b12c37a | 6 unit tests (NF-UNIT-ARL-01..06). |
+| SEC-LC1 | Add SPDX headers to all 134 `console/src/` files — `// SPDX-License-Identifier: AGPL-3.0-or-later` + copyright line. Backend `src/` is already 100% covered. | XS | Blocker | ✅ Done (2026-04-12) — commit b12c37a | All 134 files updated. |
+| SEC-LC2 | Create `LICENSES.md` at repo root — attribution for key dependencies (postgres/Unlicense, pg-boss/MIT, hono/MIT, ai-sdk/Apache-2.0, etc.). Note: axe-core not present in codebase. | XS | Blocker | ✅ Done (2026-04-12) — commit b12c37a | |
 
 #### Code items — High priority (before first external PR)
 
