@@ -5,11 +5,19 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Skip publish and deploy current GHCR images directly'
+        required: false
+        default: 'false'
+        type: boolean
 
 # CI-06: Cancel in-progress runs on the same branch when a new push arrives.
-# Uses the branch ref so PRs and main runs have separate groups.
+# Dependabot auto-merges each get a unique SHA-based group so they never cancel
+# human pushes (which share the branch-ref group and cancel each other as intended).
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.actor == 'dependabot[bot]' && format('ci-dependabot-{0}', github.sha) || format('ci-{0}', github.ref) }}
   cancel-in-progress: true
 
 jobs:
@@ -205,9 +213,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [publish]
     if: |
-      github.ref == 'refs/heads/main' &&
-      github.event_name == 'push' &&
-      github.repository == 'nestfleet/nestfleet'
+      always() &&
+      github.repository == 'nestfleet/nestfleet' &&
+      (
+        (needs.publish.result == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+      )
     steps:
       - name: Set up SSH key
         run: |
