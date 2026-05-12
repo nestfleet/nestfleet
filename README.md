@@ -24,7 +24,7 @@ cd nestfleet
 cp .env.example .env
 ```
 
-Then open `.env` and fill in the six required variables (see table below). Everything else can stay at its default for a local install.
+Then open `.env` and fill in the required variables (see table below). Three are needed to start; the LLM and embedding keys are needed to use the AI pipeline.
 
 **3. Start NestFleet**
 
@@ -47,19 +47,26 @@ Open `http://localhost/register` in your browser. The first account registered a
 
 **6. Add your first product**
 
-Log in, click **"New Product"**, and follow the setup wizard. Once a product exists you can connect channels (email, Telegram, GitHub, webhook) from the **Channels** tab.
+After registering you'll be taken directly to the setup wizard. Complete it to create your first product. Once a product exists you can connect channels (email, Telegram, GitHub, webhook) from the **Channels** tab.
 
 ---
 
 ### Required Environment Variables
 
-Open `.env` and set these six values before running `docker compose up`:
+Open `.env` and set these values before running `docker compose up`:
+
+**Required to start:**
 
 | Variable | What it does | How to generate |
 |---|---|---|
 | `POSTGRES_PASSWORD` | Password for the bundled PostgreSQL container | `openssl rand -hex 16` |
 | `JWT_SECRET` | Signs auth tokens — min 32 characters | `openssl rand -hex 32` |
 | `SECRET_ENCRYPTION_KEY` | AES-256 key for secrets stored in the DB | `openssl rand -hex 32` |
+
+**Required to use the AI pipeline:**
+
+| Variable | What it does | How to generate |
+|---|---|---|
 | `LLM_PROVIDER` | Your LLM provider: `anthropic` \| `openai` \| `google` \| `ollama` | — |
 | `LLM_API_KEY` | API key for the LLM provider above | From your provider dashboard |
 | `EMBEDDING_API_KEY` | API key for the embedding provider (see note) | From your provider dashboard |
