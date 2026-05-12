@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Per-product LLM token budget enforcement — AE-13.
  * ADR-028: soft/hard limits enforced at dispatch time.

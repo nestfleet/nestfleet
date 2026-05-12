@@ -3,7 +3,7 @@
 # For customer VPS provisioning: docker-compose.customer.yml
 #
 # Usage:
-#   cp .env.example .env   # set JWT_SECRET, ENCRYPTION_KEY, LLM_API_KEY
+#   cp .env.example .env   # set POSTGRES_PASSWORD, JWT_SECRET, SECRET_ENCRYPTION_KEY, LLM_API_KEY
 #   docker compose up -d
 #
 # Console → http://localhost  (or https://{NESTFLEET_DOMAIN} in production)
@@ -18,7 +18,7 @@ services:
     environment:
       POSTGRES_DB:       nestfleet
       POSTGRES_USER:     nestfleet
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nestfleet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required — set it in your .env file}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -42,7 +42,7 @@ services:
       # Internal defaults — override in .env as needed
       NODE_ENV:        production
       PORT:            3001
-      DATABASE_URL:    postgres://nestfleet:${POSTGRES_PASSWORD:-nestfleet}@postgres:5432/nestfleet
+      DATABASE_URL:    postgres://nestfleet:${POSTGRES_PASSWORD}@postgres:5432/nestfleet
       # CORS: must match the public URL users open in their browser.
       # Default works for local installs; set to https://yourdomain.com for production.
       CONSOLE_ORIGIN:  ${CONSOLE_ORIGIN:-http://localhost}

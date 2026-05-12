@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * TOOL_SETS_BY_ACTION_TYPE — compile-time constant mapping action types to tool sets.
  * AE-03 / ADR-024: static tool sets per action type, no runtime registration.

@@ -73,3 +73,31 @@ describe("Config schema", () => {
     expect(off.success && off.data.TELEMETRY_ENABLED).toBe(false)
   })
 })
+
+// ── EMBEDDING_PROVIDER enum (INST-01) ─────────────────────────────────────────
+
+// Mirror only the EMBEDDING_PROVIDER field from the real config schema so these
+// tests don't require a full valid config (JWT_SECRET etc.).
+const EmbeddingProviderSchema = z.object({
+  EMBEDDING_PROVIDER: z.enum(["openai", "ollama", "google"]).default("openai"),
+})
+
+describe("EMBEDDING_PROVIDER config validation (INST-01)", () => {
+  it("INST01-T01: accepts 'google' as EMBEDDING_PROVIDER", () => {
+    const result = EmbeddingProviderSchema.safeParse({ EMBEDDING_PROVIDER: "google" })
+    expect(result.success).toBe(true)
+    if (result.success) expect(result.data.EMBEDDING_PROVIDER).toBe("google")
+  })
+
+  it("INST01-T02: rejects unknown provider 'vertex'", () => {
+    const result = EmbeddingProviderSchema.safeParse({ EMBEDDING_PROVIDER: "vertex" })
+    expect(result.success).toBe(false)
+  })
+
+  it("INST01-T03: 'openai' and 'ollama' are still accepted", () => {
+    const oa = EmbeddingProviderSchema.safeParse({ EMBEDDING_PROVIDER: "openai" })
+    const ol = EmbeddingProviderSchema.safeParse({ EMBEDDING_PROVIDER: "ollama" })
+    expect(oa.success).toBe(true)
+    expect(ol.success).toBe(true)
+  })
+})

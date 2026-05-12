@@ -40,7 +40,7 @@ vi.mock("../../src/shared/config.js", async (importOriginal) => {
       CUSTOMER_BASE_DOMAIN:         "nestfleet.io",
       FLEET_SSH_PRIVATE_KEY:        "fake-private-key",
       FLEET_SSH_USER:               "root",
-      ENCRYPTION_KEY:               "0".repeat(64),
+      SECRET_ENCRYPTION_KEY:               "0".repeat(64),
     },
   }
 })

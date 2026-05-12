@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Cases API — SLICE-01 + SLICE-02.
  *
@@ -798,11 +802,9 @@ const SendRemindersBodySchema = z.object({
 })
 
 casesRouter.post("/internal/send-reminders", async (c) => {
-  const secret = config.INTERNAL_CRON_SECRET
-  if (secret) {
-    const provided = c.req.header("X-Internal-Secret")
-    if (provided !== secret) return c.json({ error: "UNAUTHORIZED" }, 401)
-  }
+  const secret   = config.INTERNAL_CRON_SECRET
+  const provided = c.req.header("X-Internal-Secret")
+  if (!secret || provided !== secret) return c.json({ error: "unauthorized" }, 401)
 
   let body: unknown
   try { body = await c.req.json() } catch {
@@ -904,7 +906,7 @@ casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requ
 
       jobId = newId("job_")
       afterStatus = "in-change"
-      await dispatch({ actionType: "pr_draft_prep", productId, caseId, jobId, payload: { changeRequestId: approvedCr.change_request_id } })
+      await dispatch({ actionType: "pr_draft_prep", productId, caseId, jobId, userId: actor.sub, payload: { changeRequestId: approvedCr.change_request_id } })
     } else {
       // Default: re-enter at triage (enriching)
       await transitionCase(caseId, "processing-failed", "enriching", {
@@ -915,7 +917,7 @@ casesRouter.post("/products/:productId/cases/:caseId/retry", requireAuth(), requ
 
       jobId = newId("job_")
       afterStatus = "enriching"
-      await dispatch({ actionType: "triage", productId, caseId, jobId })
+      await dispatch({ actionType: "triage", productId, caseId, jobId, userId: actor.sub })
     }
 
     await createAuditEvent({

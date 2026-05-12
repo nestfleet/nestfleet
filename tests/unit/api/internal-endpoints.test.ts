@@ -23,7 +23,7 @@ const CRON_SECRET = "test-cron-secret-32-chars-minimum!"
 vi.mock("../../../src/shared/config.js", () => ({
   config: {
     JWT_SECRET:             "test-secret-32-chars-minimum-ok!",
-    ENCRYPTION_KEY:         "a".repeat(64),
+    SECRET_ENCRYPTION_KEY:         "a".repeat(64),
     DATABASE_URL:           "postgres://localhost/nestfleet_test",
     LLM_PROVIDER:           "anthropic",
     LLM_API_KEY:            "sk-ant-test",
@@ -155,27 +155,29 @@ describe("Internal cron endpoint auth guard (SEC-A1)", () => {
   })
 })
 
-// ── Guard disabled when INTERNAL_CRON_SECRET not set ──────────────────────────
+// ── Guard fail-closed when INTERNAL_CRON_SECRET not set (C4) ─────────────────
 
-describe("Internal cron endpoint — no secret configured (open mode)", () => {
-  let appOpen: Awaited<ReturnType<typeof import("../../../src/api/index.js").default>>
-
-  beforeAll(async () => {
+describe("Internal cron endpoint — fail-closed when no secret configured (C4)", () => {
+  it("C4-T01: missing header → 401 even when INTERNAL_CRON_SECRET is unset", async () => {
     const { config } = await import("../../../src/shared/config.js")
     ;(config as Record<string, unknown>).INTERNAL_CRON_SECRET = undefined
-    const mod = await import("../../../src/api/index.js")
-    appOpen = mod.app
-  })
+    const { app: appNoSecret } = await import("../../../src/api/index.js")
 
-  afterAll(async () => {
-    const { config } = await import("../../../src/shared/config.js")
-    ;(config as Record<string, unknown>).INTERNAL_CRON_SECRET = CRON_SECRET
-  })
-
-  it("NF-UNIT-INT-07: no secret configured → request proceeds (not 401)", async () => {
-    const res = await appOpen.request("/api/v1/internal/run-escalations", {
+    const res = await appNoSecret.request("/api/v1/internal/run-escalations", {
       method: "POST",
     })
-    expect(res.status).not.toBe(401)
+    expect(res.status).toBe(401)
+  })
+
+  it("C4-T02: correct header but no secret configured → still 401 (fail-closed)", async () => {
+    const { config } = await import("../../../src/shared/config.js")
+    ;(config as Record<string, unknown>).INTERNAL_CRON_SECRET = undefined
+    const { app: appNoSecret } = await import("../../../src/api/index.js")
+
+    const res = await appNoSecret.request("/api/v1/internal/run-escalations", {
+      method:  "POST",
+      headers: { "X-Internal-Secret": "any-value" },
+    })
+    expect(res.status).toBe(401)
   })
 })

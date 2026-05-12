@@ -73,8 +73,9 @@ services:
       SMTP_USER:        ${SMTP_USER:-}
       SMTP_PASS:        ${SMTP_PASS:-}
       SMTP_FROM:        ${SMTP_FROM:-}
-      POSTMARK_API_KEY: ${POSTMARK_API_KEY:-}
-      RESEND_API_KEY:   ${RESEND_API_KEY:-}
+      POSTMARK_API_KEY:     ${POSTMARK_API_KEY:-}
+      RESEND_API_KEY:       ${RESEND_API_KEY:-}
+      EMAIL_WEBHOOK_SECRET: ${EMAIL_WEBHOOK_SECRET:-}
       # GitHub
       GITHUB_APP_ID:             ${GITHUB_APP_ID:-}
       GITHUB_APP_PRIVATE_KEY:    ${GITHUB_APP_PRIVATE_KEY:-}

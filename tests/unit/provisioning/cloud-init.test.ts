@@ -5,7 +5,7 @@
  * NF-UNIT-CLINIT-02  slug is substituted into NESTFLEET_DOMAIN
  * NF-UNIT-CLINIT-03  postgresPassword is present in output (in DATABASE_URL + POSTGRES_PASSWORD)
  * NF-UNIT-CLINIT-04  jwtSecret is present in JWT_SECRET line
- * NF-UNIT-CLINIT-05  encryptionKey is present in ENCRYPTION_KEY line
+ * NF-UNIT-CLINIT-05  encryptionKey is present in SECRET_ENCRYPTION_KEY line
  * NF-UNIT-CLINIT-06  BILLING_ENABLED=false is set (customer VPSes must not have billing active)
  * NF-UNIT-CLINIT-07  REGISTRATION_ENABLED=true is set (customer creates first account)
  * NF-UNIT-CLINIT-08  ssh_authorized_keys contains the ops public key
@@ -77,9 +77,9 @@ describe("generateCloudInit", () => {
     expect(yaml).toContain(`JWT_SECRET=${BASE_OPTS.jwtSecret}`)
   })
 
-  it("NF-UNIT-CLINIT-05: encryptionKey appears in ENCRYPTION_KEY line", async () => {
+  it("NF-UNIT-CLINIT-05: encryptionKey appears in SECRET_ENCRYPTION_KEY line", async () => {
     const yaml = await generateCloudInit(BASE_OPTS)
-    expect(yaml).toContain(`ENCRYPTION_KEY=${BASE_OPTS.encryptionKey}`)
+    expect(yaml).toContain(`SECRET_ENCRYPTION_KEY=${BASE_OPTS.encryptionKey}`)
   })
 
   it("NF-UNIT-CLINIT-06: BILLING_ENABLED=false is set", async () => {

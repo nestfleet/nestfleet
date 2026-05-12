@@ -119,7 +119,7 @@ write_files:
       DATABASE_URL=postgres://nestfleet:${postgresPassword}@postgres:5432/nestfleet
       POSTGRES_PASSWORD=${postgresPassword}
       JWT_SECRET=${jwtSecret}
-      ENCRYPTION_KEY=${encryptionKey}
+      SECRET_ENCRYPTION_KEY=${encryptionKey}
       LICENSE_SECRET=${licenseSecret}
       LICENSE_FILE_PATH=/opt/nestfleet/license.jwt
       REGISTRATION_ENABLED=true

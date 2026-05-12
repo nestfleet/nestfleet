@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Embedding API client — SLICE-11 update.
  * ADR-017: customer-configured LLM/embedding provider.
@@ -20,7 +24,7 @@ export interface EmbedResult {
 
 /** Resolved embedding configuration. */
 interface EmbeddingConfig {
-  provider: "openai" | "ollama"
+  provider: "openai" | "ollama" | "google"
   apiKey: string | undefined
   model: string
   dimensions: number
@@ -38,7 +42,7 @@ async function resolveEmbeddingConfig(productId?: string): Promise<EmbeddingConf
       if (llm?.provider && llm?.embeddingModel) {
         // Map provider to embedding provider type
         const provider = llm.provider as string
-        const embProvider: "openai" | "ollama" =
+        const embProvider: "openai" | "ollama" | "google" =
           (provider === "self-hosted" || provider === "ollama") ? "ollama" : "openai"
 
         // text-embedding-004 only works via the native Gemini API, not the OpenAI-compat
@@ -100,7 +104,8 @@ export async function embedBatch(texts: string[], productId?: string): Promise<E
 
   for (let i = 0; i < texts.length; i += BATCH_SIZE) {
     const batch = texts.slice(i, i + BATCH_SIZE)
-    if (cfg.provider === "openai") {
+    if (cfg.provider === "openai" || cfg.provider === "google") {
+      // Google Generative Language API exposes an OpenAI-compatible endpoint
       results.push(...await embedOpenAI(batch, cfg))
     } else if (cfg.provider === "ollama") {
       results.push(...await embedOllama(batch, cfg))

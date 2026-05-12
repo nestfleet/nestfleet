@@ -41,6 +41,7 @@ import { bridgeRouter } from "./v1/bridge.js"
 import { saasRouter }        from "../fleet/api/saas.js"
 import { ownerRouter }       from "../fleet/api/owner.js"
 import { saasAccountRouter } from "../fleet/api/saas-account.js"
+import { isFleetOperatorAuthorized } from "../fleet/operator-key.js"
 import { telemetryRouter } from "./v1/telemetry.js"
 import { notificationPrefsRouter } from "./v1/notification-prefs.js"
 import { waitlistRouter } from "./v1/waitlist.js"
@@ -227,10 +228,13 @@ app.route("/api/v1", productEventsRouter)
 app.route("/api/v1", chatApiRouter)
 app.route("/api/v1", dashboardRouter)
 app.route("/api/v1", bridgeRouter)
-app.route("/api/v1/saas",         saasRouter)
-app.route("/api/v1/saas/account", saasAccountRouter)
+// Fleet routes — only available on NestFleet-operated instances (C6)
+if (isFleetOperatorAuthorized() || config.NODE_ENV === "test") {
+  app.route("/api/v1/saas",         saasRouter)
+  app.route("/api/v1/saas/account", saasAccountRouter)
+  app.route("/api/v1/owner",        ownerRouter)
+}
 app.route("/api/v1/waitlist",     waitlistRouter)
-app.route("/api/v1/owner",        ownerRouter)
 app.route("/api/v1", notificationPrefsRouter)
 app.route("/api/v1/telemetry", telemetryRouter)
 

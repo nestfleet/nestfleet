@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * `change_prep` agent — AE-08.
  * Gathers implementation context for a change request and produces a

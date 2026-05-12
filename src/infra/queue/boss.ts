@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * pg-boss singleton — AE-04.
  * ADR-025: pg-boss (PostgreSQL-backed job queue), pg-boss v12.

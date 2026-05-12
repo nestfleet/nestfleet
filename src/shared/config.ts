@@ -58,7 +58,7 @@ const ConfigSchema = z.object({
   LLM_BASE_URL: optionalUrl,
 
   // Embeddings — may differ from the chat model (e.g. openai for embeddings, anthropic for chat)
-  EMBEDDING_PROVIDER: z.enum(["openai", "ollama"]).default("openai"),
+  EMBEDDING_PROVIDER: z.enum(["openai", "ollama", "google"]).default("openai"),
   EMBEDDING_API_KEY: z.string().optional(),
   EMBEDDING_MODEL: z.string().default("text-embedding-3-small"),
   EMBEDDING_DIMENSIONS: z.coerce.number().int().min(64).max(3072).default(768),
@@ -105,7 +105,9 @@ const ConfigSchema = z.object({
   CLOUD_REFRESH_HMAC_SECRET: z.string().min(32, "CLOUD_REFRESH_HMAC_SECRET must be at least 32 characters").optional(),
 
   // Secret encryption (AES-256-GCM) — 64 hex chars = 32 bytes
-  // Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  // Generate with: openssl rand -hex 32
+  SECRET_ENCRYPTION_KEY: z.string().regex(/^[0-9a-f]{64}$/, "SECRET_ENCRYPTION_KEY must be 64 lowercase hex chars").optional(),
+  // Deprecated alias — use SECRET_ENCRYPTION_KEY instead. Will be removed in v0.2.0.
   ENCRYPTION_KEY: z.string().regex(/^[0-9a-f]{64}$/, "ENCRYPTION_KEY must be 64 lowercase hex chars").optional(),
 
   // Auth (SPIKE-07)
@@ -194,6 +196,11 @@ const ConfigSchema = z.object({
   // Leave unset in dev/test to keep the endpoints open; always set in production.
   INTERNAL_CRON_SECRET: z.string().min(32).optional(),
 
+  // Email inbound webhook secret (SEC-C5).
+  // All POST /webhooks/email/inbound/* requests must supply X-Webhook-Secret matching this value.
+  // Generate with: openssl rand -hex 32
+  EMAIL_WEBHOOK_SECRET: z.string().min(16).optional(),
+
   // Backup — Hetzner Object Storage (S3-compatible). Optional — local-only if unset.
   BACKUP_S3_ENDPOINT:   optionalUrl,
   BACKUP_S3_ACCESS_KEY: z.string().optional(),
@@ -217,7 +224,25 @@ function parseConfig(): Config {
       .join("\n")
     throw new Error(`Invalid configuration:\n${messages}`)
   }
-  return result.data
+
+  const data = result.data
+  if (data.NODE_ENV === "production") {
+    if (!data.SECRET_ENCRYPTION_KEY && !data.ENCRYPTION_KEY) {
+      throw new Error(
+        "SECRET_ENCRYPTION_KEY must be set in production (SEC-C2). Generate: openssl rand -hex 32"
+      )
+    }
+    if (!data.INTERNAL_CRON_SECRET) {
+      throw new Error(
+        "INTERNAL_CRON_SECRET must be set in production (SEC-A1). Generate: openssl rand -hex 32"
+      )
+    }
+    // EMAIL_WEBHOOK_SECRET is optional at startup — the endpoint itself fails
+    // closed (401) when the secret is unset, so startup enforcement is not needed.
+    // Operators should set it whenever email inbound is configured.
+  }
+
+  return data
 }
 
 // Singleton — parsed once at startup

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Notifications API — SLICE-07 + SLICE-09.
  *
@@ -130,11 +134,9 @@ notificationsRouter.get(
 notificationsRouter.post(
   "/internal/run-escalations",
   async (c) => {
-    const secret = config.INTERNAL_CRON_SECRET
-    if (secret) {
-      const provided = c.req.header("X-Internal-Secret")
-      if (provided !== secret) return c.json({ error: "UNAUTHORIZED" }, 401)
-    }
+    const secret   = config.INTERNAL_CRON_SECRET
+    const provided = c.req.header("X-Internal-Secret")
+    if (!secret || provided !== secret) return c.json({ error: "unauthorized" }, 401)
 
     try {
       const result = await runEscalations()

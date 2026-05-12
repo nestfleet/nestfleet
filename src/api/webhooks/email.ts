@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Inbound email webhook route — SLICE-01.
  *
@@ -11,6 +15,7 @@
  */
 
 import { Hono } from "hono"
+import { config } from "../../shared/config.js"
 import { logger } from "../../shared/logger.js"
 import { parsePostmarkInbound, PostmarkInboundSchema } from "../../email/parser.js"
 import { ingestEmailSignal } from "../../ingress/signal-ingress.js"
@@ -20,6 +25,13 @@ export const emailWebhookRouter = new Hono()
 emailWebhookRouter.post(
   "/inbound/:productId",
   async (c) => {
+    // ── Auth guard (SEC-C5): fail-closed regardless of whether secret is set ──
+    const secret   = config.EMAIL_WEBHOOK_SECRET
+    const provided = c.req.header("X-Webhook-Secret")
+    if (!secret || provided !== secret) {
+      return c.json({ error: "Unauthorized" }, 401)
+    }
+
     const productId = c.req.param("productId")
 
     // ── Parse body ────────────────────────────────────────────────────────────

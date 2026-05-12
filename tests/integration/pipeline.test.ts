@@ -35,6 +35,12 @@ function makeToken(productId: string): string {
   return signJwt({ sub: "test-user", email: "test@example.com", roles: ["admin"], productIds: [productId] })
 }
 
+const EMAIL_SECRET = "integration-test-email-webhook-secret-32chars!"
+
+function emailHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  return { "Content-Type": "application/json", "X-Webhook-Secret": EMAIL_SECRET, ...extra }
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function makePostmarkPayload(overrides: Record<string, unknown> = {}): Record<string, unknown> {
@@ -87,7 +93,7 @@ describe("Signal ingress pipeline (integration)", () => {
       `/webhooks/email/inbound/${productId}`,
       {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: emailHeaders(),
         body:    JSON.stringify(payload),
       },
     )
@@ -112,7 +118,7 @@ describe("Signal ingress pipeline (integration)", () => {
       `/webhooks/email/inbound/${productId}`,
       {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: emailHeaders(),
         body:    JSON.stringify(payload),
       },
     )
@@ -134,7 +140,7 @@ describe("Signal ingress pipeline (integration)", () => {
     // First delivery
     const res1 = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload) },
     )
     expect(res1.status).toBe(200)
     expect(((await res1.json()) as Record<string, unknown>).duplicate).toBe(false)
@@ -142,7 +148,7 @@ describe("Signal ingress pipeline (integration)", () => {
     // Second delivery — same MessageID
     const res2 = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload) },
     )
     expect(res2.status).toBe(200)
     const body2 = await res2.json() as Record<string, unknown>
@@ -155,7 +161,7 @@ describe("Signal ingress pipeline (integration)", () => {
 
     const res = await app.request(
       `/webhooks/email/inbound/prod_nonexistent`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload) },
     )
     expect(res.status).toBe(500)
   }, 30_000)
@@ -165,7 +171,7 @@ describe("Signal ingress pipeline (integration)", () => {
       `/webhooks/email/inbound/${productId}`,
       {
         method:  "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: emailHeaders(),
         body:    JSON.stringify({ not: "a-postmark-payload" }),
       },
     )
@@ -182,7 +188,7 @@ describe("Signal ingress pipeline (integration)", () => {
     })
     const res1 = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload1) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload1) },
     )
     expect(res1.status).toBe(200)
     const { conversationId: conv1 } = await res1.json() as { conversationId: string }
@@ -195,7 +201,7 @@ describe("Signal ingress pipeline (integration)", () => {
     })
     const res2 = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload2) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload2) },
     )
     expect(res2.status).toBe(200)
     const { conversationId: conv2 } = await res2.json() as { conversationId: string }
@@ -227,7 +233,7 @@ describe("Signal ingress pipeline (integration)", () => {
     })
     const res = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload) },
     )
     const { caseId } = await res.json() as { caseId: string }
 
@@ -255,7 +261,7 @@ describe("Signal ingress pipeline (integration)", () => {
 
     const res = await app.request(
       `/webhooks/email/inbound/${productId}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) },
+      { method: "POST", headers: emailHeaders(), body: JSON.stringify(payload) },
     )
     const { caseId, signalId } = await res.json() as { caseId: string; signalId: string }
 

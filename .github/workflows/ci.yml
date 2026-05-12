@@ -6,10 +6,47 @@ on:
   pull_request:
     branches: [main]
 
+# CI-06: Cancel in-progress runs on the same branch when a new push arrives.
+# Uses the branch ref so PRs and main runs have separate groups.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+
+  # ── CI-02 / CI-03: Detect which paths changed ──────────────────────────────
+  # Runs fast (<30 s). Outputs drive api/console job skip conditions.
+
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      console: ${{ steps.filter.outputs.console }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3  # pin SHA via Dependabot once OSS-01 is merged
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'src/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'Dockerfile'
+              - 'tsconfig*.json'
+              - 'vitest*.config.ts'
+            console:
+              - 'console/**'
+
+  # ── API: type-check, unit tests, security audit ────────────────────────────
+
   api:
     name: API — type-check, test, audit
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
 
@@ -35,9 +72,13 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=high
 
+  # ── Console: type-check, security audit ────────────────────────────────────
+
   console:
     name: Console — type-check, audit
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.console == 'true'
     defaults:
       run:
         working-directory: console
@@ -59,6 +100,11 @@ jobs:
       - name: Security audit
         run: npm audit --audit-level=high
 
+  # ── Secrets scan ────────────────────────────────────────────────────────────
+  # CI-07: Full history scan on push to main; PR-diff-only scan on pull_request
+  # (scanning --all on every PR is slow and redundant — the full scan on merge
+  # is the authoritative gate).
+
   secrets:
     name: Secrets scan
     runs-on: ubuntu-latest
@@ -71,14 +117,51 @@ jobs:
         run: |
           curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.22.1/gitleaks_8.22.1_linux_x64.tar.gz | tar -xz -C /usr/local/bin gitleaks
 
-      - name: Scan for secrets
+      - name: Scan for secrets — full history (push to main)
+        if: github.event_name == 'push'
         run: gitleaks detect --source . --config .gitleaks.toml --redact --log-opts="--all"
+
+      - name: Scan for secrets — PR commits only (pull_request)
+        if: github.event_name == 'pull_request'
+        run: |
+          gitleaks detect --source . --config .gitleaks.toml --redact \
+            --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
+
+  # ── DCO sign-off check (CI-04) ─────────────────────────────────────────────
+  # Rejects PRs where any commit is missing a Signed-off-by line.
+  # Only runs on pull_request — push to main is gated by branch protection.
+
+  dco:
+    name: DCO sign-off check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: github/dco@v1  # pin SHA via Dependabot once OSS-01 is merged
+
+  # ── Publish images to GHCR ─────────────────────────────────────────────────
+  # Runs only on push to main in the canonical repo.
+  # Skips when no code changed (doc-only push): both api and console skipped
+  # → neither succeeded → publish condition evaluates to false.
+  # Handles path-filter skips via always() + explicit result checks.
+  # CI-05: github.repository guard prevents accidental runs in forks.
 
   publish:
     name: Publish — push images to GHCR
     runs-on: ubuntu-latest
     needs: [api, console, secrets]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      always() &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      github.repository == 'nestfleet/nestfleet' &&
+      needs.secrets.result == 'success' &&
+      (needs.api.result == 'success' || needs.api.result == 'skipped') &&
+      (needs.console.result == 'success' || needs.console.result == 'skipped') &&
+      (needs.api.result == 'success' || needs.console.result == 'success')
     permissions:
       contents: read
       packages: write
@@ -114,11 +197,17 @@ jobs:
             NEXT_PUBLIC_PRODUCT_ID=${{ secrets.NEXT_PUBLIC_PRODUCT_ID }}
             NEXT_PUBLIC_API_URL=
 
+  # ── Deploy to main VPS ─────────────────────────────────────────────────────
+  # CI-05: github.repository guard prevents accidental deploys from forks.
+
   deploy:
     name: Deploy — main VPS
     runs-on: ubuntu-latest
     needs: [publish]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      github.repository == 'nestfleet/nestfleet'
     steps:
       - name: Set up SSH key
         run: |
@@ -171,11 +260,17 @@ jobs:
             echo "Canary creds not set — skipping auth/CRUD smoke"
           fi
 
+  # ── Pipeline smoke test ────────────────────────────────────────────────────
+  # CI-05: github.repository guard prevents accidental runs in forks.
+
   smoke-pipeline:
     name: Smoke — pipeline end-to-end
     runs-on: ubuntu-latest
     needs: [deploy]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      github.repository == 'nestfleet/nestfleet'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
 
@@ -194,11 +289,17 @@ jobs:
           SMOKE_API_TOKEN: ${{ secrets.SMOKE_API_TOKEN }}
         run: tsx scripts/smoke-pipeline.ts
 
+  # ── E2E browser tests ──────────────────────────────────────────────────────
+  # CI-05: github.repository guard prevents accidental runs in forks.
+
   e2e:
     name: E2E — post-deploy browser tests
     runs-on: ubuntu-latest
     needs: [deploy]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push' &&
+      github.repository == 'nestfleet/nestfleet'
     defaults:
       run:
         working-directory: console

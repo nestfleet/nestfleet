@@ -12,9 +12,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:integration": "DOCKER_HOST=unix:///Users/Alexey_Kopachev/.colima/default/docker.sock TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock vitest run --config vitest.integration.config.ts",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "db:migrate": "tsx src/infra/db/migrate.ts",
-    "spike:ingest": "tsx scripts/ingest-docugardener.ts",
+    "spike:ingest": "tsx scripts/ingest-docs.ts",
     "spike:eval": "tsx tests/spike-01/run-evaluation.ts",
     "lint": "tsc --noEmit"
   },
@@ -58,5 +58,11 @@
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vitest": "^3.0.9"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
+  },
+  "notes": {
+    "otel-audit": "GHSA-q7rr-3cgh-j5r3 (Prometheus exporter crash) affects @opentelemetry/sdk-node <=0.216.0. NestFleet does not start a Prometheus metrics endpoint so this path is not reachable. Fix requires OTel ecosystem upgrade 0.57→0.217 (breaks @opentelemetry/core peer deps). Track in v0.2.0 backlog."
   }
 }

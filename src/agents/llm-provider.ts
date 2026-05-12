@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * LLM provider factory — AE-01 + SLICE-11.
  * ADR-022: Vercel AI SDK, provider selected at runtime from config.

@@ -28,14 +28,6 @@ export default function TermsPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-5 sm:px-8 py-12">
-        {/* Draft banner */}
-        <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          <strong>Draft document.</strong> This Terms of Service is a placeholder and is not yet legally binding.
-          A finalised version will be published before paid plans are made available to users.
-          Questions? Contact{" "}
-          <a href="mailto:legal@nestfleet.dev" className="underline">legal@nestfleet.dev</a>.
-        </div>
-
         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
           Terms of Service
         </h1>

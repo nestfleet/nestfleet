@@ -9,6 +9,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Security
+
+- AES-256-GCM encryption key renamed to `SECRET_ENCRYPTION_KEY` (64 hex chars); `ENCRYPTION_KEY` deprecated with warning
+- Internal cron endpoints (`/cases/trigger-triage`, `/notifications/trigger`) now fail-closed when `INTERNAL_CRON_SECRET` is unset
+- Email webhook endpoint requires `EMAIL_WEBHOOK_SECRET` header; rejects if unset
+- Fleet SaaS routes (`/api/v1/saas`, `/api/v1/owner`) conditionally registered only when operator JWT is present
+- Stripe checkout `success_url`/`cancel_url` validated against `CONSOLE_ORIGIN`
+- Stripe test key (`sk_test_…`) blocked at startup in `NODE_ENV=production`
+
+### Changed
+
+- Pricing section: paid plan cards blurred in community/open-source builds
+- Removed DRAFT banner from `/terms` and `/privacy` pages
+- `docker-publish.yml` removed — image publish now inline in `ci.yml`
+
+### Added
+
+- CI: path-based job skipping (`dorny/paths-filter`) — API and console jobs skip when unrelated paths change
+- CI: DCO sign-off check on all pull requests (`github/dco`)
+- CI: secrets scan split — full history on push to main, PR-diff-only on pull_request
+- CI: `github.repository` guard on publish/deploy/e2e jobs (prevents fork runs)
+- CI: concurrency group cancels in-progress runs on the same branch
+- `dependabot.yml` — weekly updates for npm (root + console), Docker, and GitHub Actions
+- `CODE_OF_CONDUCT.md` — Contributor Covenant v2.1
+- DCO sign-off requirement documented in `CONTRIBUTING.md`
+- SPDX license headers on all `src/**/*.ts` and `console/src/**` files
+
 ---
 
 ## [0.1.0] — 2026-04-05

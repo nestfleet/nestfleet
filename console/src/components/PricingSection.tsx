@@ -129,7 +129,7 @@ function LockedRow({ feature }: { feature: FeatureEntry }) {
 
 // ── Plan card ──────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; delay: string }) {
+function PlanCard({ plan, visible, delay, blurPrice }: { plan: PlanMeta; visible: boolean; delay: string; blurPrice?: boolean }) {
   const newFeatures  = getNewFeaturesAtTier(plan.key);
   const lockedFeatures = getLockedTeaserFeatures(plan.key, 3);
 
@@ -159,8 +159,8 @@ function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; 
       {/* Price block */}
       <div className="mb-5">
         <h3 className="text-lg font-bold text-gray-900 mb-1">{plan.name}</h3>
-        <p className="text-2xl font-extrabold text-gray-900">{plan.price}</p>
-        <p className="text-xs text-gray-400 mt-0.5">{plan.period}</p>
+        <p className={`text-2xl font-extrabold text-gray-900 ${blurPrice ? "blur-sm select-none" : ""}`}>{plan.price}</p>
+        <p className={`text-xs text-gray-400 mt-0.5 ${blurPrice ? "blur-sm select-none" : ""}`}>{plan.period}</p>
       </div>
 
       <p className="text-sm text-gray-500 leading-relaxed mb-5">{plan.desc}</p>
@@ -292,35 +292,20 @@ export function PricingSection() {
         </div>
 
         {/* Tier cards */}
-        {process.env.NEXT_PUBLIC_BILLING_ENABLED === "true" ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PLANS.map((plan, i) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {PLANS.map((plan, i) => {
+            const blurPrice = process.env.NEXT_PUBLIC_BILLING_ENABLED !== "true" && plan.key !== "community";
+            return (
               <PlanCard
                 key={plan.key}
                 plan={plan}
                 visible={visible}
                 delay={CARD_DELAYS[i]}
+                blurPrice={blurPrice}
               />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-full max-w-sm">
-              <PlanCard
-                plan={PLANS[0]}
-                visible={visible}
-                delay={CARD_DELAYS[0]}
-              />
-            </div>
-            <p className={`text-sm text-gray-500 transition-all duration-700 delay-150 ${visible ? "opacity-100" : "opacity-0"}`}>
-              Starter, Growth, and Scale plans available on{" "}
-              <a href="https://nestfleet.dev" className="text-indigo-600 hover:underline font-medium">
-                nestfleet.dev
-              </a>{" "}
-              — managed hosting with zero ops.
-            </p>
-          </div>
-        )}
+            );
+          })}
+        </div>
 
         {/* Footer trust notes */}
         <div className={`mt-10 grid sm:grid-cols-3 gap-5 transition-all duration-700 delay-200 ${visible ? "opacity-100" : "opacity-0"}`}>

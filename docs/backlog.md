@@ -187,11 +187,11 @@
 
 | ID | Title | Size | Priority | Status | Notes |
 |----|-------|------|----------|--------|-------|
-| SEC-ST1 | Validate `success_url` / `cancel_url` origin against `CONSOLE_ORIGIN` in `POST /api/v1/billing/checkout` (`src/api/v1/billing.ts:96–102`) — reject if origin doesn't match | XS | High | Not Started | Authenticated admin can redirect post-payment users to any domain today. |
-| SEC-ST2 | Add Stripe test vs. live key startup guard in `src/billing/stripe.ts` — throw on startup if `NODE_ENV=production` and key is `sk_test_` | XS | High | Not Started | Prevents accidental test-key prod deploy. |
-| SEC-ST3 | Add plan tier validation to `POST /api/v1/billing/downgrade` — reject if requested plan ≥ current plan (`src/api/v1/billing.ts:137`) | XS | High | Not Started | Can currently "downgrade" to same or higher tier, generating unnecessary Stripe API calls. |
-| SEC-JQ1 | Add per-user job dispatch rate limiting in `src/agents/dispatcher.ts` — e.g. 10 jobs/min/user/action | S | High | Not Started | Monthly token budget is the only backstop; can be exhausted in minutes by a runaway client. |
-| SEC-CLA | Add DCO sign-off requirement to `CONTRIBUTING.md` — one-liner per commit (`Signed-off-by:`), enforced via CI check | XS | High | Not Started | Single author now so no dispute risk for v1.0 — but required before accepting any external PRs. |
+| SEC-ST1 | Validate `success_url` / `cancel_url` origin against `CONSOLE_ORIGIN` in `POST /api/v1/billing/checkout` (`src/api/v1/billing.ts:96–102`) — reject if origin doesn't match | XS | High | ✅ Done (2026-04-12) — commit 09309b3 | Already implemented; backlog was stale. |
+| SEC-ST2 | Add Stripe test vs. live key startup guard in `src/billing/stripe.ts` — throw on startup if `NODE_ENV=production` and key is `sk_test_` | XS | High | ✅ Done (2026-04-12) — commit 09309b3 | Already implemented; backlog was stale. |
+| SEC-ST3 | Add plan tier validation to `POST /api/v1/billing/downgrade` — reject if requested plan ≥ current plan (`src/api/v1/billing.ts:137`) | XS | High | ✅ Done (2026-05-12) | Uses `PLAN_ORDER` from `plans.ts`; no Stripe call on invalid request. 5 unit tests (NF-UNIT-BD-01..05). |
+| SEC-JQ1 | Add per-user job dispatch rate limiting in `src/agents/dispatcher.ts` — e.g. 10 jobs/min/user/action | S | High | ✅ Done (2026-05-12) | 10 jobs/min/user/actionType. In-memory Map with inline expiry cleanup. Optional `userId` on `DispatchOptions`. 5 unit tests (NF-UNIT-DRL-01..05). |
+| SEC-CLA | Add DCO sign-off requirement to `CONTRIBUTING.md` — one-liner per commit (`Signed-off-by:`), enforced via CI check | XS | High | ✅ Done (2026-04-12) | `CONTRIBUTING.md §DCO` + `ci.yml dco` job both wired; backlog was stale. |
 
 #### Backlog — post-launch polish
 

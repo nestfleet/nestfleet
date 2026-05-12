@@ -2,7 +2,7 @@
  * SPIKE-01 ingestion script: ingest the DocuGardener documentation corpus.
  *
  * Usage:
- *   npx tsx scripts/ingest-docugardener.ts [options]
+ *   npx tsx scripts/ingest-docs.ts [options]
  *
  * Options:
  *   --product-id      Product ID to ingest under             (default: "docugardener")
@@ -208,7 +208,7 @@ async function main(): Promise<void> {
 
   logger.info(
     { productId, docsDir, productVersion },
-    "ingest-docugardener starting",
+    "ingest-docs starting",
   )
 
   // ── Main ingestion ─────────────────────────────────────────────────────────
@@ -274,12 +274,12 @@ async function main(): Promise<void> {
 
   printHealthSummary(staleReport)
 
-  logger.info("ingest-docugardener completed successfully")
+  logger.info("ingest-docs completed successfully")
 }
 
 main()
   .catch((err: unknown) => {
-    logger.error({ err }, "Unhandled error in ingest-docugardener")
+    logger.error({ err }, "Unhandled error in ingest-docs")
     process.exitCode = 1
   })
   .finally(() => {

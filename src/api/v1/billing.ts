@@ -19,6 +19,7 @@ import { logger } from "../../shared/logger.js"
 import { config } from "../../shared/config.js"
 import { getStripeClient, planToPriceId } from "../../billing/stripe.js"
 import { getWorkspaceBilling } from "../../billing/workspace-billing-repo.js"
+import { PLAN_ORDER } from "../../billing/plans.js"
 import type { BillingPlan, PlanInterval } from "../../billing/plans.js"
 
 export const billingRouter = new Hono<{ Variables: AuthVariables }>()
@@ -90,6 +91,13 @@ billingRouter.post("/billing/checkout", requireAuth(), requireRole("admin"), asy
       return c.json({ error: "INVALID_PLAN", message: `No price ID configured for ${body.plan}/${body.interval}` }, 400)
     }
 
+    // SEC-ST1: reject redirect URLs that don't originate from CONSOLE_ORIGIN
+    const allowedOrigin = config.CONSOLE_ORIGIN
+    const toOrigin = (url: string) => { try { return new URL(url).origin } catch { return null } }
+    if (toOrigin(body.success_url) !== allowedOrigin || toOrigin(body.cancel_url) !== allowedOrigin) {
+      return c.json({ error: "INVALID_REDIRECT", message: "success_url and cancel_url must originate from the configured console origin" }, 400)
+    }
+
     const stripe = getStripeClient()
     const row = await getWorkspaceBilling()
 
@@ -141,6 +149,11 @@ billingRouter.post("/billing/downgrade", requireAuth(), requireRole("admin"), as
 
     if (!row?.stripe_subscription_id) {
       return c.json({ error: "NO_SUBSCRIPTION", message: "No active subscription found" }, 400)
+    }
+
+    // SEC-ST3: reject if target plan is same tier or higher than current plan
+    if (PLAN_ORDER.indexOf(body.plan) >= PLAN_ORDER.indexOf(row.plan)) {
+      return c.json({ error: "INVALID_DOWNGRADE", message: "Target plan must be lower than current plan" }, 400)
     }
 
     const priceId = planToPriceId(body.plan, body.interval)

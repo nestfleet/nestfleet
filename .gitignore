@@ -22,6 +22,7 @@ coverage/
 
 # Local verification / scratch scripts (see CLAUDE.md)
 tmp_*/
+tmp_*.ts
 tmp_verification/
 
 # Claude Code local settings (may contain API keys)

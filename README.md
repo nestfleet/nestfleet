@@ -9,30 +9,69 @@
 
 ## Quick Start
 
+**Prerequisites:** Docker and Docker Compose (v2) installed and running.
+
+**1. Clone the repo**
+
 ```bash
-git clone https://github.com/nestfleet/nestfleet.git && cd nestfleet
-cp .env.example .env   # fill in the five required vars below
+git clone https://github.com/nestfleet/nestfleet.git
+cd nestfleet
+```
+
+**2. Create your `.env` file**
+
+```bash
+cp .env.example .env
+```
+
+Then open `.env` and fill in the six required variables (see table below). Everything else can stay at its default for a local install.
+
+**3. Start NestFleet**
+
+```bash
 docker compose up -d
 ```
 
-Console opens at `http://localhost`. On first visit, register your admin account — the first registered user receives admin privileges automatically.
+This starts PostgreSQL, the API (runs DB migrations automatically), the console, and a Caddy reverse proxy. First startup takes 1–2 minutes while images are pulled.
+
+**4. Verify it's running**
+
+```bash
+curl http://localhost/health
+# → {"status":"ok","db":"ok","queue":"started",...}
+```
+
+**5. Create your admin account**
+
+Open `http://localhost/register` in your browser. The first account registered automatically receives admin privileges. After that, registration locks — additional users must be invited by an admin.
+
+**6. Add your first product**
+
+Log in, click **"New Product"**, and follow the setup wizard. Once a product exists you can connect channels (email, Telegram, GitHub, webhook) from the **Channels** tab.
+
+---
 
 ### Required Environment Variables
 
-| Variable | Description | Generate |
+Open `.env` and set these six values before running `docker compose up`:
+
+| Variable | What it does | How to generate |
 |---|---|---|
-| `JWT_SECRET` | Auth token signing key (min 32 chars) | `openssl rand -hex 32` |
-| `SECRET_ENCRYPTION_KEY` | AES-256 key for secrets at rest | `openssl rand -hex 32` |
 | `POSTGRES_PASSWORD` | Password for the bundled PostgreSQL container | `openssl rand -hex 16` |
-| `LLM_PROVIDER` | `anthropic` \| `openai` \| `ollama` \| `google` | — |
-| `LLM_API_KEY` | API key for your chosen LLM provider | — |
+| `JWT_SECRET` | Signs auth tokens — min 32 characters | `openssl rand -hex 32` |
+| `SECRET_ENCRYPTION_KEY` | AES-256 key for secrets stored in the DB | `openssl rand -hex 32` |
+| `LLM_PROVIDER` | Your LLM provider: `anthropic` \| `openai` \| `google` \| `ollama` | — |
+| `LLM_API_KEY` | API key for the LLM provider above | From your provider dashboard |
+| `EMBEDDING_API_KEY` | API key for the embedding provider (see note) | From your provider dashboard |
 
-For production with a custom domain, also set:
+> **Embeddings use a separate provider.** Product memory (RAG) requires an embedding model. The default is `EMBEDDING_PROVIDER=openai` — set `EMBEDDING_API_KEY` to an OpenAI key even if you use Anthropic or Google for chat. To use Google embeddings instead, set `EMBEDDING_PROVIDER=google` and point `EMBEDDING_API_KEY` to your Gemini API key. Ollama is also supported for fully local installs.
 
-| Variable | Description |
+**For production with a custom domain**, also set:
+
+| Variable | What it does |
 |---|---|
-| `NESTFLEET_DOMAIN` | Your public domain — Caddy provisions TLS automatically |
-| `CONSOLE_ORIGIN` | Public URL of the console, e.g. `https://nestfleet.example.com` (defaults to `http://localhost`) |
+| `NESTFLEET_DOMAIN` | Your public domain — Caddy provisions a Let's Encrypt TLS cert automatically |
+| `CONSOLE_ORIGIN` | Public URL of the console, e.g. `https://nestfleet.example.com` |
 
 See the full [Self-Hosting Guide](docs/self-hosting.md) for all configuration options.
 
@@ -112,6 +151,25 @@ Old Docker images accumulate with each deploy. Free space with: `docker image pr
 
 **Case count not incrementing / OU limit reached**
 Community mode caps at 200 Outcome Units/month. Check current usage in the console under Settings → Usage. To raise the cap: set `COMMUNITY_OU_LIMIT=500` (or `0` for unlimited) in `.env` and restart.
+
+---
+
+## Security Notes
+
+**JWT token storage:** The operator console stores session JWTs in `localStorage`. This is a deliberate trade-off for a self-hosted, operator-facing tool where HttpOnly cookies introduce cross-subdomain and reverse-proxy complexity. Mitigations in place:
+
+- Short-lived tokens (default: 8 h expiry)
+- Strict CSP headers (`script-src 'self'`) on the API to reduce XSS surface
+- `X-Frame-Options: DENY` and `X-Content-Type-Options: nosniff` on all responses
+- CORS restricted to `CONSOLE_ORIGIN` in production
+
+If your threat model requires HttpOnly cookies, this is a known gap. A cookie-based auth option is tracked in the backlog.
+
+---
+
+## Glossary
+
+**Outcome Unit (OU):** The primary billing and rate-limiting unit in NestFleet. One OU is consumed when NestFleet autonomously closes or escalates a support case using AI. Cases manually resolved or left open do not consume an OU. Community tier installs default to 200 OUs/month (`COMMUNITY_OU_LIMIT`); set to `0` for unlimited.
 
 ---
 

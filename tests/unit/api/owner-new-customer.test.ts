@@ -21,7 +21,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 vi.mock("../../../src/shared/config.js", () => ({
   config: {
     JWT_SECRET:                   "test-secret-32-chars-minimum-ok!",
-    ENCRYPTION_KEY:               "a".repeat(64),
+    SECRET_ENCRYPTION_KEY:               "a".repeat(64),
     DATABASE_URL:                 "postgres://localhost/nestfleet_test",
     LLM_PROVIDER:                 "anthropic",
     NODE_ENV:                     "test",

@@ -23,7 +23,7 @@ cd console && npm install && cd ..
 
 ```bash
 cp .env.example .env
-# Fill in JWT_SECRET, ENCRYPTION_KEY (see README for generation commands)
+# Fill in JWT_SECRET, SECRET_ENCRYPTION_KEY (see README for generation commands)
 # LLM_API_KEY is optional for most tests
 ```
 
@@ -89,6 +89,22 @@ feat(billing): add Stripe checkout endpoint
 fix(triage): handle null severity in case routing
 docs: update README quick-start section
 ```
+
+## Sign-off (DCO)
+
+All commits must include a `Signed-off-by` line certifying you authored the work and agree to the [Developer Certificate of Origin](https://developercertificate.org/):
+
+```
+Signed-off-by: Your Name <you@example.com>
+```
+
+Add it automatically with:
+
+```bash
+git commit -s -m "your message"
+```
+
+CI will reject PRs where any commit is missing the sign-off.
 
 ## License
 

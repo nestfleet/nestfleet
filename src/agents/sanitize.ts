@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * Prompt injection defense — pre-sanitization layer.
  * ADR-027: Layer 1 of 3-layer defense (sanitize → XML delimiter → Zod gate).

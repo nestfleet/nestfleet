@@ -39,7 +39,7 @@ vi.mock("../../../src/shared/crypto.js", () => ({
 
 vi.mock("../../../src/shared/config.js", () => ({
   config: {
-    ENCRYPTION_KEY:        "0".repeat(64),
+    SECRET_ENCRYPTION_KEY:        "0".repeat(64),
     FLEET_SSH_PRIVATE_KEY: "fake-private-key",
     FLEET_SSH_USER:        "root",
     CUSTOMER_BASE_DOMAIN:  "nestfleet.dev",

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2024-2026 NestFleet contributors
+// This file is part of NestFleet — https://github.com/nestfleet/nestfleet
+
 /**
  * AgentDispatcher — AE-04.
  * ADR-025: pg-boss transactional enqueue.
@@ -52,6 +56,29 @@ export interface DispatchOptions {
   jobId: string
   /** Any additional action-specific data needed by the worker */
   payload?: Record<string, unknown>
+  /** Operator user ID (JWT sub). When set, per-user rate limit is enforced (SEC-JQ1). */
+  userId?: string
+}
+
+// ── Per-user dispatch rate limit (SEC-JQ1) ────────────────────────────────────
+// 10 dispatches / user / actionType / 60 s. Keyed by `${userId}:${actionType}`.
+// In-memory — resets on restart, no cross-replica coordination (acceptable for
+// single-instance deploy; revisit if horizontal scaling is introduced).
+const DISPATCH_RATE_LIMIT    = 10
+const DISPATCH_WINDOW_MS     = 60_000
+export const dispatchAttempts = new Map<string, number[]>()
+
+function checkDispatchRateLimit(userId: string, actionType: ActionType): void {
+  const key  = `${userId}:${actionType}`
+  const now  = Date.now()
+  const hits = (dispatchAttempts.get(key) ?? []).filter(t => now - t < DISPATCH_WINDOW_MS)
+  if (hits.length >= DISPATCH_RATE_LIMIT) {
+    throw new Error(
+      `Dispatch rate limit exceeded for user ${userId} on action ${actionType} — max ${DISPATCH_RATE_LIMIT} per ${DISPATCH_WINDOW_MS / 1000}s`,
+    )
+  }
+  hits.push(now)
+  dispatchAttempts.set(key, hits)
 }
 
 export interface AgentJobData {
@@ -68,7 +95,10 @@ export interface AgentJobData {
  * @throws Error if actionType is not a valid supported action type
  */
 export async function dispatch(opts: DispatchOptions): Promise<string> {
-  const { actionType, productId, caseId, jobId, payload } = opts
+  const { actionType, productId, caseId, jobId, payload, userId } = opts
+
+  // ── Per-user rate limit (SEC-JQ1) ─────────────────────────────────────────
+  if (userId) checkDispatchRateLimit(userId, actionType)
 
   // ── Validate action type at dispatch time (ADR-024) ───────────────────────
   if (!isValidActionType(actionType)) {

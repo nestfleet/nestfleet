@@ -12,6 +12,10 @@ export function getStripeClient(): Stripe {
     if (!config.STRIPE_SECRET_KEY) {
       throw new Error("STRIPE_SECRET_KEY is not set — cannot initialise Stripe client")
     }
+    // SEC-ST2: block accidental use of test keys in production
+    if (config.NODE_ENV === "production" && config.STRIPE_SECRET_KEY.startsWith("sk_test_")) {
+      throw new Error("STRIPE_SECRET_KEY is a test key (sk_test_…) but NODE_ENV=production. Set a live key before going live.")
+    }
     _stripe = new Stripe(config.STRIPE_SECRET_KEY, { apiVersion: "2026-03-25.dahlia" })
   }
   return _stripe
