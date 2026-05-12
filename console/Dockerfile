@@ -10,7 +10,9 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ARG NEXT_PUBLIC_PRODUCT_ID=""
 ENV NEXT_PUBLIC_PRODUCT_ID=${NEXT_PUBLIC_PRODUCT_ID}
 
-# Set to "true" to show the marketing landing page at /. Leave empty for app-only builds.
+# Set to "true" to show the marketing landing page at /.
+# nestfleet.dev CI passes NEXT_PUBLIC_SHOW_LANDING=true via --build-arg.
+# Customer VPS builds omit it (app-only, landing not needed).
 ARG NEXT_PUBLIC_SHOW_LANDING=""
 ENV NEXT_PUBLIC_SHOW_LANDING=${NEXT_PUBLIC_SHOW_LANDING}
 
