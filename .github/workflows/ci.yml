@@ -176,7 +176,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push API image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # docker/build-push-action@v6
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
@@ -187,7 +187,7 @@ jobs:
         # NEXT_PUBLIC_PRODUCT_ID is baked at build time. Set the secret to the
         # main-VPS product ID so nestfleet.dev gets the right value. Customer VPS
         # consoles are built locally during provisioning with their own product ID.
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # docker/build-push-action@v6
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # docker/build-push-action@v6
         with:
           context: console
           file: console/Dockerfile
