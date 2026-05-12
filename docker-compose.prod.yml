@@ -75,7 +75,9 @@ services:
       SMTP_FROM:        ${SMTP_FROM:-}
       POSTMARK_API_KEY:     ${POSTMARK_API_KEY:-}
       RESEND_API_KEY:       ${RESEND_API_KEY:-}
-      EMAIL_WEBHOOK_SECRET: ${EMAIL_WEBHOOK_SECRET:-}
+      EMAIL_WEBHOOK_SECRET:  ${EMAIL_WEBHOOK_SECRET:-}
+      # SEC-A1: set to a random 32+ char value to protect /internal/* endpoints
+      INTERNAL_CRON_SECRET:  ${INTERNAL_CRON_SECRET:-}
       # GitHub
       GITHUB_APP_ID:             ${GITHUB_APP_ID:-}
       GITHUB_APP_PRIVATE_KEY:    ${GITHUB_APP_PRIVATE_KEY:-}

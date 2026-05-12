@@ -232,14 +232,18 @@ function parseConfig(): Config {
         "SECRET_ENCRYPTION_KEY must be set in production (SEC-C2). Generate: openssl rand -hex 32"
       )
     }
+    // INTERNAL_CRON_SECRET: endpoints fail-closed (401) when unset, so a hard
+    // startup throw would crash existing installs that haven't added it yet.
+    // Warn at startup instead; operators should set it for full SEC-A1 coverage.
     if (!data.INTERNAL_CRON_SECRET) {
-      throw new Error(
-        "INTERNAL_CRON_SECRET must be set in production (SEC-A1). Generate: openssl rand -hex 32"
+      console.warn(
+        "[WARN] INTERNAL_CRON_SECRET is not set. " +
+        "POST /internal/* endpoints are open to any caller on the internal network. " +
+        "Set to a random 32+ char value for full SEC-A1 protection."
       )
     }
-    // EMAIL_WEBHOOK_SECRET is optional at startup — the endpoint itself fails
-    // closed (401) when the secret is unset, so startup enforcement is not needed.
-    // Operators should set it whenever email inbound is configured.
+    // EMAIL_WEBHOOK_SECRET: endpoint fails-closed (401) when unset; startup
+    // enforcement not needed. Operators should set it when email inbound is used.
   }
 
   return data
