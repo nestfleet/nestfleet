@@ -28,7 +28,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
     "@opentelemetry/sdk-node": "^0.218.0",
     "@types/js-yaml": "^4.0.9",
-    "ai": "^6.0.116",
+    "ai": "^6.0.191",
     "bcryptjs": "^3.0.3",
     "hono": "^4.7.5",
     "jose": "^6.2.2",
