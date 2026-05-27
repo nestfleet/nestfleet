@@ -164,9 +164,6 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # docker/setup-buildx-action@v3
 
@@ -183,7 +180,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ghcr.io/${{ github.repository_owner }}/nestfleet-api:latest
 
       - name: Build and push Console image
@@ -195,7 +192,7 @@ jobs:
           context: console
           file: console/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ghcr.io/${{ github.repository_owner }}/nestfleet-console:latest
           build-args: |
             NEXT_PUBLIC_PRODUCT_ID=${{ secrets.NEXT_PUBLIC_PRODUCT_ID }}
