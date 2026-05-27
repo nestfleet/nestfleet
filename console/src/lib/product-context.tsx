@@ -91,7 +91,7 @@ export function ProductProvider({ slug, children }: ProductProviderProps) {
   }, [loadProducts]);
 
   // U-01: preserve the current page segment when switching products.
-  // e.g. /p/skillseal/approvals → /p/docugardener/approvals (not always /cases)
+  // e.g. /p/acme-two/approvals → /p/acme/approvals (not always /cases)
   const switchProduct = useCallback((targetSlug: string) => {
     setLastProductCookie(targetSlug);
     recordMruVisit(targetSlug);
@@ -153,7 +153,7 @@ export function useProducts(): ProductSummary[] {
   return ctx.products;
 }
 
-/** Returns the slug-based path prefix for the active product, e.g. "/p/skillseal".
+/** Returns the slug-based path prefix for the active product, e.g. "/p/acme".
  *  Falls back to "" when rendered outside ProductProvider (legacy pages). */
 export function useProductBasePath(): string {
   const ctx = useContext(ProductContext);

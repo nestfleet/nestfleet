@@ -12,8 +12,8 @@
  *   - Truncated to 60 characters
  *
  * Examples:
- *   slugify("DocuGardener")    → "docugardener"
- *   slugify("Skill Seal")      → "skill-seal"
+ *   slugify("Acme Corp")    → "acme-corp"
+ *   slugify("Acme")         → "acme"
  *   slugify("My Product 2.0!") → "my-product-2-0"
  */
 export function slugify(name: string): string {

@@ -29,7 +29,7 @@ function SignalVisual() {
         <div className="flex items-start gap-3">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm">📧</div>
           <div className="min-w-0 space-y-0.5">
-            <p className="text-[11px] text-gray-400">From: alice@docugardener.io</p>
+            <p className="text-[11px] text-gray-400">From: alice@acme.io</p>
             <p className="text-sm font-semibold text-gray-900">Export pipeline keeps timing out</p>
           </div>
         </div>

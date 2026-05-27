@@ -13,7 +13,7 @@
  *   retrieve (known_issues, github_issue_filtered) → if abstain (capability_disabled):
  *   proceed without match, no LLM call → agent → if confidence ≥ 0.80: write match
  *
- * Note: DocuGardener corpus triggers capability_disabled abstain here
+ * Note: Acme corpus triggers capability_disabled abstain here
  * (no known_issues source) — expected and handled gracefully.
  *
  * Abstain logic (via buildEvidencePack):

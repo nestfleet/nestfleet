@@ -11,10 +11,8 @@
 
 import { test, expect, type Page } from "@playwright/test"
 
+import { TEST_EMAIL, TEST_PASSWORD } from "./fixtures/auth"
 // ─── Credentials ──────────────────────────────────────────────────────────────
-const TEST_EMAIL = "admin@nestfleet.local"
-const TEST_PASSWORD = "nestfleet-admin-2025"
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 async function login(page: Page) {

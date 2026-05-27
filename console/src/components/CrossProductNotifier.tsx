@@ -15,7 +15,7 @@
  *   - Resets baseline when the active product changes (prevents false positives
  *     caused by the polling catching up after a switch).
  *   - Toasts for queue and approvals separately so the operator knows where to
- *     look ("DocuGardener: 2 new queue items" vs "DocuGardener: 1 new approval").
+ *     look ("Acme: 2 new queue items" vs "Acme: 1 new approval").
  *   - Renders nothing — pure side-effect component.
  */
 

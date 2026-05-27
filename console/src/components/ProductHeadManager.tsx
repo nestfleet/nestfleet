@@ -10,8 +10,8 @@
  * unread activity without switching tabs.
  *
  * Format:
- *   - Unread items present:  "(5) SkillSeal | NestFleet"
- *   - No unread items:       "SkillSeal | NestFleet"
+ *   - Unread items present:  "(5) Acme | NestFleet"
+ *   - No unread items:       "Acme | NestFleet"
  *   - No product context:    "NestFleet"
  *
  * The count reflects the active product's total unread:

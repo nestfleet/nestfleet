@@ -6,7 +6,7 @@
  * Cross-product bridge event endpoint — BEF-11.
  *
  * POST /api/v1/bridge/event
- *   Receives an event from another product in the suite (e.g. DocuGardener → NestFleet)
+ *   Receives an event from another product in the suite (e.g. Acme → NestFleet)
  *   and creates a signal + case for the target product, then dispatches a triage job.
  *
  * Auth: admin JWT required — bridge events are system-to-system calls.

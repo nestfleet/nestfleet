@@ -22,7 +22,7 @@ interface DemoCase {
 
 const DEMO_CASES: DemoCase[] = [
   {
-    from: "alice@docugardener.io",
+    from: "alice@acme.io",
     subject: "Export pipeline keeps failing with timeout",
     preview: "Hi, I've been trying to export my document collection for the past 2 hours...",
     steps: [

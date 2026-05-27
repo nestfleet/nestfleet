@@ -4,7 +4,7 @@
 
 /**
  * Products repository — SLICE-01.
- * One product = one operated service (e.g. DocuGardener, SkillSeal).
+ * One product = one operated service (e.g. Acme, Acme Corp).
  */
 
 import { z } from "zod"

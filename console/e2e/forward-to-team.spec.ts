@@ -29,10 +29,9 @@
 
 import { test, expect, type Page } from "@playwright/test"
 
+import { TEST_EMAIL, TEST_PASSWORD } from "./fixtures/auth"
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const TEST_EMAIL    = "admin@nestfleet.local"
-const TEST_PASSWORD = "nestfleet-admin-2025"
 const API_BASE      = "http://localhost:3001"
 
 const MOCK_PRODUCT_ID   = "prod_e2e_forward_test"

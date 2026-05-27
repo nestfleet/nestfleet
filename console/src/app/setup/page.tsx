@@ -161,7 +161,7 @@ function Step1Welcome({
           type="text"
           value={productName}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="e.g. DocuGardener, SkillSeal, Acme SaaS"
+          placeholder="e.g. Acme, Acme Corp"
           className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
           autoFocus
         />

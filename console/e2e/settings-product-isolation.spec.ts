@@ -18,22 +18,21 @@
  * Pre-requisites:
  *   API running on localhost:3001
  *   Console running on localhost:3002
- *   Two products seeded: DocuGardener (google/gemini-flash-latest, valid key)
- *                        SkillSeal    (google/gemini-3-flash-preview, "admin" key)
+ *   Two products seeded: Acme (google/gemini-flash-latest, valid key)
+ *                        AcmeTwo    (google/gemini-3-flash-preview, "admin" key)
  *   Admin credentials: admin@nestfleet.local / nestfleet-admin-2025
  */
 
 import { test, expect, type Page } from "@playwright/test"
 
+import { TEST_EMAIL, TEST_PASSWORD } from "./fixtures/auth"
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const TEST_EMAIL    = "admin@nestfleet.local"
-const TEST_PASSWORD = "nestfleet-admin-2025"
 const API_BASE      = "http://localhost:3001"
 
 // Slugs match the seeded products. Tests skip gracefully when not found.
-const SLUG_A = "docugardener"  // valid encrypted key, model: gemini-flash-latest
-const SLUG_B = "skillseal"     // "admin" key (< 8 chars, no hint), model: gemini-3-flash-preview
+const SLUG_A = "acme"  // valid encrypted key, model: gemini-flash-latest
+const SLUG_B = "acme-two"     // "admin" key (< 8 chars, no hint), model: gemini-3-flash-preview
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -94,10 +93,10 @@ async function readModelValue(page: Page): Promise<string> {
 // ─── T-20: Each product loads its own LLM model ──────────────────────────────
 
 test.describe("T-20 — Settings LLM section shows correct model per product", () => {
-  test("DocuGardener settings shows gemini-flash-latest", async ({ page }) => {
+  test("Acme settings shows gemini-flash-latest", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-20 requires docugardener + skillseal products")
+      test.skip(true, "T-20 requires acme + acme-two products")
       return
     }
 
@@ -108,10 +107,10 @@ test.describe("T-20 — Settings LLM section shows correct model per product", (
       .toBeVisible({ timeout: 8_000 })
   })
 
-  test("SkillSeal settings shows gemini-3-flash-preview", async ({ page }) => {
+  test("AcmeTwo settings shows gemini-3-flash-preview", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-20 requires docugardener + skillseal products")
+      test.skip(true, "T-20 requires acme + acme-two products")
       return
     }
 
@@ -125,21 +124,21 @@ test.describe("T-20 — Settings LLM section shows correct model per product", (
 // ─── T-21: A→B switch shows Product B data ───────────────────────────────────
 
 test.describe("T-21 — Switching A→B loads Product B LLM data", () => {
-  test("after switching to SkillSeal, model is gemini-3-flash-preview (not gemini-flash-latest)", async ({ page }) => {
+  test("after switching to AcmeTwo, model is gemini-3-flash-preview (not gemini-flash-latest)", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-21 requires docugardener + skillseal products")
+      test.skip(true, "T-21 requires acme + acme-two products")
       return
     }
 
-    // Start on DocuGardener settings
+    // Start on Acme settings
     await gotoSettings(page, SLUG_A)
     await expect(page.locator("text=gemini-flash-latest").first()).toBeVisible({ timeout: 8_000 })
 
-    // Switch to SkillSeal
+    // Switch to AcmeTwo
     await gotoSettings(page, SLUG_B)
 
-    // Must show SkillSeal's model — NOT DocuGardener's stale value
+    // Must show AcmeTwo's model — NOT Acme's stale value
     await expect(page.locator("text=gemini-3-flash-preview").first()).toBeVisible({ timeout: 8_000 })
     await expect(page.locator("text=gemini-flash-latest")).not.toBeVisible()
   })
@@ -148,33 +147,33 @@ test.describe("T-21 — Switching A→B loads Product B LLM data", () => {
 // ─── T-22: A→B→A round-trip restores Product A data ─────────────────────────
 
 test.describe("T-22 — A→B→A round-trip: Product A data restored on return", () => {
-  test("model reverts to gemini-flash-latest after switching back to DocuGardener", async ({ page }) => {
+  test("model reverts to gemini-flash-latest after switching back to Acme", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-22 requires docugardener + skillseal products")
+      test.skip(true, "T-22 requires acme + acme-two products")
       return
     }
 
-    // Step 1: DocuGardener settings — note model
+    // Step 1: Acme settings — note model
     await gotoSettings(page, SLUG_A)
     await expect(page.locator("text=gemini-flash-latest").first()).toBeVisible({ timeout: 8_000 })
 
-    // Step 2: Switch to SkillSeal
+    // Step 2: Switch to AcmeTwo
     await gotoSettings(page, SLUG_B)
     await expect(page.locator("text=gemini-3-flash-preview").first()).toBeVisible({ timeout: 8_000 })
 
-    // Step 3: Switch back to DocuGardener
+    // Step 3: Switch back to Acme
     await gotoSettings(page, SLUG_A)
 
-    // Must show DocuGardener's model — ProductProvider remount ensures no stale state
+    // Must show Acme's model — ProductProvider remount ensures no stale state
     await expect(page.locator("text=gemini-flash-latest").first()).toBeVisible({ timeout: 8_000 })
     await expect(page.locator("text=gemini-3-flash-preview")).not.toBeVisible()
   })
 
-  test("URL is /p/docugardener/settings after round-trip", async ({ page }) => {
+  test("URL is /p/acme/settings after round-trip", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-22 requires docugardener + skillseal products")
+      test.skip(true, "T-22 requires acme + acme-two products")
       return
     }
 
@@ -189,10 +188,10 @@ test.describe("T-22 — A→B→A round-trip: Product A data restored on return"
 // ─── T-23: API key hint (****) correct per product ───────────────────────────
 
 test.describe("T-23 — API key hint visible/hidden per product", () => {
-  test("DocuGardener shows saved-key hint (****) because key > 8 chars", async ({ page }) => {
+  test("Acme shows saved-key hint (****) because key > 8 chars", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-23 requires docugardener + skillseal products")
+      test.skip(true, "T-23 requires acme + acme-two products")
       return
     }
 
@@ -202,10 +201,10 @@ test.describe("T-23 — API key hint visible/hidden per product", () => {
     await expect(page.locator("text=/\\(\\*{4}/").first()).toBeVisible({ timeout: 8_000 })
   })
 
-  test("SkillSeal does NOT show saved-key hint because 'admin' is < 8 chars (maskApiKey returns null)", async ({ page }) => {
+  test("AcmeTwo does NOT show saved-key hint because 'admin' is < 8 chars (maskApiKey returns null)", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-23 requires docugardener + skillseal products")
+      test.skip(true, "T-23 requires acme + acme-two products")
       return
     }
 
@@ -219,10 +218,10 @@ test.describe("T-23 — API key hint visible/hidden per product", () => {
       .toHaveAttribute("placeholder", /paste your api key/i, { timeout: 8_000 })
   })
 
-  test("after A→B→A, DocuGardener hint still shows (****)", async ({ page }) => {
+  test("after A→B→A, Acme hint still shows (****)", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-23 requires docugardener + skillseal products")
+      test.skip(true, "T-23 requires acme + acme-two products")
       return
     }
 
@@ -230,7 +229,7 @@ test.describe("T-23 — API key hint visible/hidden per product", () => {
     await gotoSettings(page, SLUG_B)
     await gotoSettings(page, SLUG_A)
 
-    // After round-trip, hint must still be present — not wiped by SkillSeal's null state
+    // After round-trip, hint must still be present — not wiped by AcmeTwo's null state
     await expect(page.locator("text=/\\(\\*{4}/").first()).toBeVisible({ timeout: 8_000 })
   })
 })
@@ -238,10 +237,10 @@ test.describe("T-23 — API key hint visible/hidden per product", () => {
 // ─── T-24: Save request targets the correct product endpoint ─────────────────
 
 test.describe("T-24 — LLM save request uses the current product's ID", () => {
-  test("saving settings on SkillSeal sends PUT to SkillSeal's product endpoint, not DocuGardener's", async ({ page }) => {
+  test("saving settings on AcmeTwo sends PUT to AcmeTwo's product endpoint, not Acme's", async ({ page }) => {
     await login(page)
     if (!(await hasBothProducts(page))) {
-      test.skip(true, "T-24 requires docugardener + skillseal products")
+      test.skip(true, "T-24 requires acme + acme-two products")
       return
     }
 
@@ -251,19 +250,19 @@ test.describe("T-24 — LLM save request uses the current product's ID", () => {
       headers: { Authorization: `Bearer ${token!}` },
     })
     const { products } = await resp.json() as { products: Array<{ slug: string; productId: string }> }
-    const skillseal = products.find((p) => p.slug === SLUG_B)
-    const docugardener = products.find((p) => p.slug === SLUG_A)
+    const acmeTwo = products.find((p) => p.slug === SLUG_B)
+    const acme = products.find((p) => p.slug === SLUG_A)
 
-    if (!skillseal || !docugardener) {
+    if (!acmeTwo || !acme) {
       test.skip(true, "T-24 requires both products in DB")
       return
     }
 
-    // Navigate to DocuGardener first (so there's a "previous" product in history)
+    // Navigate to Acme first (so there's a "previous" product in history)
     await gotoSettings(page, SLUG_A)
     await expect(page.locator("text=LLM Provider").first()).toBeVisible({ timeout: 8_000 })
 
-    // Then switch to SkillSeal
+    // Then switch to AcmeTwo
     await gotoSettings(page, SLUG_B)
     await expect(page.locator("text=LLM Provider").first()).toBeVisible({ timeout: 8_000 })
 
@@ -274,7 +273,7 @@ test.describe("T-24 — LLM save request uses the current product's ID", () => {
       void route.continue()
     })
 
-    // Click Save on SkillSeal's settings (provider + model already filled from state)
+    // Click Save on AcmeTwo's settings (provider + model already filled from state)
     const saveBtn = page.locator("button", { hasText: /save/i }).first()
     await expect(saveBtn).toBeEnabled({ timeout: 5_000 })
     await saveBtn.click()
@@ -282,12 +281,12 @@ test.describe("T-24 — LLM save request uses the current product's ID", () => {
     // Wait for the intercepted request
     await page.waitForTimeout(2_000)
 
-    // The PUT must target SkillSeal's productId — NOT DocuGardener's
+    // The PUT must target AcmeTwo's productId — NOT Acme's
     expect(putRequests.length).toBeGreaterThan(0)
-    const sentToSkillSeal    = putRequests.some((url) => url.includes(skillseal.productId))
-    const sentToDocuGardener = putRequests.some((url) => url.includes(docugardener.productId))
+    const sentToAcmeTwo    = putRequests.some((url) => url.includes(acmeTwo.productId))
+    const sentToAcme = putRequests.some((url) => url.includes(acme.productId))
 
-    expect(sentToSkillSeal,    "PUT must target SkillSeal's product ID").toBe(true)
-    expect(sentToDocuGardener, "PUT must NOT target DocuGardener's product ID").toBe(false)
+    expect(sentToAcmeTwo,    "PUT must target AcmeTwo's product ID").toBe(true)
+    expect(sentToAcme, "PUT must NOT target Acme's product ID").toBe(false)
   })
 })

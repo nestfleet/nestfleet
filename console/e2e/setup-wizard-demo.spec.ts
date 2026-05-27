@@ -31,7 +31,7 @@ test.describe("Setup Wizard — Full Demo", () => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ ok: true, data: { productId: "demo_product", productName: "DocuGardener" } }),
+        body: JSON.stringify({ ok: true, data: { productId: "demo_product", productName: "Acme" } }),
       })
     })
 
@@ -63,7 +63,7 @@ test.describe("Setup Wizard — Full Demo", () => {
 
     // Fill product name
     const nameInput = page.locator('input[id="productName"], input[name="productName"], input').first()
-    await nameInput.fill("DocuGardener")
+    await nameInput.fill("Acme")
     await page.waitForTimeout(300)
     await page.screenshot({ path: `${SCREENSHOTS_DIR}/02-welcome-filled.png`, fullPage: true })
 
@@ -117,9 +117,9 @@ test.describe("Setup Wizard — Full Demo", () => {
     const emailInputs = page.locator('input[type="email"]')
     const emailCount = await emailInputs.count()
     const demoEmails = [
-      "alexey@docugardener.io",
-      "change-lead@docugardener.io",
-      "product@docugardener.io",
+      "alexey@acme.io",
+      "change-lead@acme.io",
+      "product@acme.io",
     ]
     for (let i = 0; i < Math.min(emailCount, 3); i++) {
       await emailInputs.nth(i).fill(demoEmails[i])
@@ -144,7 +144,7 @@ test.describe("Setup Wizard — Full Demo", () => {
     const inputs = page.locator("input:visible")
     const inputCount = await inputs.count()
     if (inputCount >= 1) {
-      await inputs.nth(0).fill("https://github.com/alexeykopachev/docugardener")
+      await inputs.nth(0).fill("https://github.com/acme-org/acme")
     }
     if (inputCount >= 2) {
       await inputs.nth(1).fill("ghp_demo...redacted")
