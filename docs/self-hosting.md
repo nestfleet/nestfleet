@@ -71,10 +71,9 @@ docker compose ps   # all services should show "healthy"
 
 ## 5. Create Your First Product
 
-1. Log in to the console
-2. Go to **Products** and click **New Product**
-3. Fill in the product name and description
-4. Configure the product's support policy (response SLOs, approval gates, etc.)
+After registering, you are taken directly to the **setup wizard**. The wizard walks you through naming your product, choosing an LLM provider, and connecting your first channel. Complete it to create your first product.
+
+If you skipped the wizard or need to add a second product, go to **Settings → Products → New Product**.
 
 ## 6. Configure Channels
 

@@ -142,7 +142,7 @@ Operators see everything in the console and can intervene at any step. The AI ha
 The API applies migrations on startup. If it stays unhealthy: `docker compose logs api`. The most common cause is PostgreSQL not being ready — restart the API after the DB is healthy: `docker compose restart api`.
 
 **Console shows blank page or fails to load**
-Check the console container: `docker compose logs console`. If `NEXT_PUBLIC_API_URL` is not set to your public API URL, the console cannot reach the API from the browser.
+Check the console container: `docker compose logs console`. For standard Docker installs, `NEXT_PUBLIC_API_URL` does not need to be set — the console uses relative URLs that Caddy forwards to the API. Only set this variable if you are running the console and API on separate origins (e.g. different subdomains).
 
 **Landing page redirects to /login**
 Expected for self-hosted installs. Set `NEXT_PUBLIC_SHOW_LANDING=true` in your console environment if you want the public landing page enabled.
@@ -186,7 +186,7 @@ If your threat model requires HttpOnly cookies, this is a known gap. A cookie-ba
 npm install                   # install API deps
 npm run dev                   # API with auto-reload (port 3001)
 cd console && npm install     # install console deps
-cd console && npm run dev     # Console (port 3000)
+cd console && npm run dev     # Console (port 3002)
 
 npm test                      # unit tests
 npm run test:integration      # integration tests (requires Docker / Colima)
