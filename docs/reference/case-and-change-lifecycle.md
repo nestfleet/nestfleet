@@ -6,8 +6,8 @@ This document turns the NestFleet vision into explicit lifecycle rules for v1. I
 
 ## 2. Scope Assumptions
 
-- first live product is `DocuGardener`
-- second product is `SkillSeal`
+- first live product is `Acme`
+- second product is `AcmePro`
 - v1 channels are `email` and `Telegram`
 - v1 posture is `internal-operator first`
 - GitHub is the mandatory engineering backbone

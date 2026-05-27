@@ -1,5 +1,5 @@
 /**
- * Seed: creates the DocuGardener pilot product and fires several test webhooks
+ * Seed: creates the Acme pilot product and fires several test webhooks
  * to populate the case queue visible in the operator console.
  *
  * Usage: npx tsx --env-file .env scripts/seed-product.ts
@@ -17,10 +17,10 @@ async function main() {
     INSERT INTO products (product_id, slug, name, stage, support_policy, enabled_channels, lead_assignments)
     VALUES (
       ${productId},
-      'docugardener',
-      'DocuGardener',
+      'acme',
+      'Acme',
       'beta',
-      ${{ github_repo: "docugardener/app" }}::jsonb,
+      ${{ github_repo: "acme/app" }}::jsonb,
       ARRAY['email'],
       ${{ support_lead: "admin@nestfleet.local", change_lead: "admin@nestfleet.local" }}::jsonb
     )

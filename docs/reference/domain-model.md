@@ -686,7 +686,7 @@ Since GitHub is the mandatory backbone in v1:
 > **Note:** The original v1 constraints have been superseded by post-v1 delivery. This section reflects current production state.
 
 **Shipped and active:**
-- Multi-product console (DEFERRED-21 ✅): DocuGardener and SkillSeal both live; unlimited products supported per license tier
+- Multi-product console (DEFERRED-21 ✅): Acme and AcmePro both live; unlimited products supported per license tier
 - Active channels: email ✅, chat widget ✅, contact form ✅, GitHub webhooks ✅, Slack outbound notifications ✅
 - Telegram: deferred pending EU legal sign-off
 - Minimum viable persona set ✅ (Frontline, Steward, Change); role studio (SLICE-22/23) ✅

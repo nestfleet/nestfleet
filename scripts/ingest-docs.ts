@@ -1,16 +1,16 @@
 /**
- * SPIKE-01 ingestion script: ingest the DocuGardener documentation corpus.
+ * SPIKE-01 ingestion script: ingest the Acme documentation corpus.
  *
  * Usage:
  *   npx tsx scripts/ingest-docs.ts [options]
  *
  * Options:
- *   --product-id      Product ID to ingest under             (default: "docugardener")
+ *   --product-id      Product ID to ingest under             (default: "acme")
  *   --docs-dir        Path to the docs directory to scan     (required)
  *   --product-version Product version string                 (default: "1.0")
  *
  * After the main ingestion, also ingests a "stale" product variant
- * (product-id: docugardener-stale) with T1 docs backdated 200 days to
+ * (product-id: acme-stale) with T1 docs backdated 200 days to
  * trigger `stale_evidence` abstain for eval cases B-01 and B-02.
  *
  * DATABASE_URL defaults to postgresql://nestfleet:nestfleet@localhost:5434/nestfleet
@@ -37,7 +37,7 @@ import type { DocumentationHealthReport } from "../src/memory/types.js"
 
 // ── 3. Constants ─────────────────────────────────────────────────────────────
 
-const DEFAULT_PRODUCT_ID = "docugardener"
+const DEFAULT_PRODUCT_ID = "acme"
 const DEFAULT_PRODUCT_VERSION = "1.0"
 const STALE_PRODUCT_ID_SUFFIX = "-stale"
 const STALE_MS = 200 * 24 * 60 * 60 * 1000

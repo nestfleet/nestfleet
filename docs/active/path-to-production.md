@@ -1,4 +1,4 @@
-# Path to Production — NestFleet + DocuGardener
+# Path to Production — NestFleet + Acme
 
 > **Living document.** Updated as each phase is completed.
 > Covers both products in a single unified roadmap — shared infrastructure is done once.
@@ -11,7 +11,7 @@
 ```
 Customer's VPC / server
 ┌─────────────────────────────────────┐
-│  NestFleet (or DocuGardener)        │
+│  NestFleet (or Acme)        │
 │  ─ Docker container(s)              │
 │  ─ PostgreSQL + pgvector            │
 │  ─ All case/support data stays here │
@@ -76,7 +76,7 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 **Shared. Blocks: email, landing pages, TLS.**
 
 - [ ] `nestfleet.dev` — register / confirm ownership
-- [ ] `docugardener.io` — register / confirm ownership
+- [ ] `acme.io` — register / confirm ownership
 - [ ] `platformcloud.io` (or subdomain) — for PlatformCloud API
 - [ ] DNS: A records pointing to hosting
 - [ ] DNS: MX records (Google Workspace)
@@ -91,7 +91,7 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 - [ ] Primary workspace on primary domain
 - [ ] Verify all domains in Workspace
 - [ ] Email aliases — NestFleet: `hello@`, `support@`, `legal@`, `noreply@`, `updates@`
-- [ ] Email aliases — DocuGardener: `hello@`, `support@`, `noreply@`
+- [ ] Email aliases — Acme: `hello@`, `support@`, `noreply@`
 - [ ] Email aliases — PlatformCloud: `admin@` (internal only)
 - [ ] Group aliases (support@ → founders inbox)
 - [ ] SMTP relay configured for transactional email (or Postmark / Resend)
@@ -102,18 +102,18 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 **Shared + per-product. Blocks: CI/CD, releases, distribution.**
 
 - [ ] GitHub Organisation: `nestfleet-io`
-- [ ] GitHub Organisation: `docugardener-io`
+- [ ] GitHub Organisation: `acme-io`
 - [ ] Repos:
   - [ ] `nestfleet-io/nestfleet` — source (BSL, public)
   - [ ] `nestfleet-io/nestfleet-docs` — documentation site
-  - [ ] `docugardener-io/docugardener` — source (BSL, public)
-  - [ ] `docugardener-io/docugardener-docs`
+  - [ ] `acme-io/acme` — source (BSL, public)
+  - [ ] `acme-io/acme-docs`
   - [ ] `(private) platformcloud` — proprietary, never public
 - [ ] GitHub App: **NestFleet**
   - Permissions: repo read, issues write, pull_requests write, webhooks
   - Callback URL: `https://app.nestfleet.dev/oauth/github/callback`
   - Webhook URL: `https://app.nestfleet.dev/webhooks/github`
-- [ ] GitHub App: **DocuGardener** (same scope for its use case)
+- [ ] GitHub App: **Acme** (same scope for its use case)
 - [ ] GitHub Actions: CI/CD pipelines (test → build → push Docker image to GHCR)
 - [ ] GitHub Releases: tag-based, attaches docker-compose + checksums
 
@@ -125,7 +125,7 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 - [ ] VPS: Hetzner CX22 (Helsinki, EU — ~€4/mo, GDPR-safe)
 - [ ] PostgreSQL: managed EU instance (Supabase EU or Neon EU — free tier for Community)
 - [ ] Deploy PlatformCloud container
-- [ ] Seed product registry (nestfleet + docugardener, Community tier features)
+- [ ] Seed product registry (nestfleet + acme, Community tier features)
 - [ ] License key generation live: `POST /api/v1/licenses/generate`
 - [ ] Smoke test: NestFleet hits `/validate` with Community license → 200 (LPP: response includes `lease`, `status: "active"`, NestFleet schedules next refresh via TTL)
 - [ ] Smoke test: NestFleet pushes capability manifest → `PATCH /api/v1/admin/products/nestfleet/capabilities` returns 200 (set `PLATFORM_CLOUD_TOKEN`)
@@ -159,7 +159,7 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 - [ ] Privacy Notice + Terms of Service links
 - [ ] Community tier "Powered by NestFleet" branding note
 
-**DocuGardener (`docugardener.io`):**
+**Acme (`acme.io`):**
 - [ ] Hero: "AI-Powered Documentation Quality Engine"
 - [ ] Feature overview
 - [ ] Sign-up + license key flow (same PlatformCloud backend)
@@ -182,8 +182,8 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 - [ ] GHCR image pushed: `ghcr.io/nestfleet-io/nestfleet:1.0.0`
 - [ ] GitHub Release with: changelog, docker-compose.yml, SHA256 checksums, BSL text
 
-**DocuGardener:**
-- [ ] Same checklist as above for DocuGardener
+**Acme:**
+- [ ] Same checklist as above for Acme
 
 ---
 
@@ -196,7 +196,7 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 - [ ] Product Hunt submission scheduled
 - [ ] HN "Show HN" draft ready
 - [ ] X / LinkedIn posts prepared
-- [ ] First case study: "We used NestFleet on our own support ops" / "We used DocuGardener on our own docs"
+- [ ] First case study: "We used NestFleet on our own support ops" / "We used Acme on our own docs"
 
 ---
 
@@ -212,10 +212,10 @@ GDPR cares about data processing, not money flow. Minimum required for Community
 
 ---
 
-### PHASE 10 — NestFleet ↔ DocuGardener Bridge (deferred — Growth tier)
+### PHASE 10 — NestFleet ↔ Acme Bridge (deferred — Growth tier)
 **Requires both products in production with paying customers.**
 
-**Spec:** `docs/specs/nestfleet-docugardener-integration.md`
+**Spec:** `docs/specs/nestfleet-acme-integration.md`
 
 Bridge is **opt-in**, activates only when a customer runs both products on the same PlatformCloud tenant.
 
@@ -226,7 +226,7 @@ Bridge is **opt-in**, activates only when a customer runs both products on the s
 - [ ] Scale tier (weeks 11–12): Integration Point 6 — Unified cross-product notifications + preferences UI
 - [ ] Integration Point 2 (Doc Update Proposal NF badge) bundled with Point 3
 
-**Decision (2026-03-23):** Bridge deferred from Community release. Community users run one product only; DocuGardener not yet implemented. The manual upload slide-over (WAVE-5) covers the only standalone-useful flow (re-ingesting updated docs) without requiring the bridge.
+**Decision (2026-03-23):** Bridge deferred from Community release. Community users run one product only; Acme not yet implemented. The manual upload slide-over (WAVE-5) covers the only standalone-useful flow (re-ingesting updated docs) without requiring the bridge.
 
 ---
 

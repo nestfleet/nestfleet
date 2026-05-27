@@ -172,7 +172,7 @@
 | SEC-S1 | Verify `.env` was never committed — **already confirmed clean** (`git log --all -- .env` = empty) | Blocker | ✅ Done |
 | SEC-S2 | Rotate production secrets (GitHub App key, GitHub PATs, Hetzner token, Cloudflare token, Google API keys, JWT_SECRET, LICENSE_SECRET, ENCRYPTION_KEY, POSTGRES_PASSWORD) before first live customer. **Not a public-repo blocker** — `.env` was never committed and no real values appear in any committed file (verified). Reclassified as pre-first-customer hygiene. | Pre-first-customer | Not Started |
 | OPS-SEC-01 | Set `INTERNAL_CRON_SECRET` on main VPS — add to `/opt/nestfleet/.env` (`openssl rand -hex 32`) and as a GitHub Actions secret so provisioned customer VPSes also get it. Until set, `POST /internal/send-reminders` and `/internal/run-escalations` are open to any caller on the internal docker network (fail-closed to 401 externally). | P1 | ⏳ TODO |
-| SEC-S3 | ~~URGENT~~ — `STRIPE_SECRET_KEY` is owner's own shared test key (also used in DocuGardener sandbox). Not a third-party credential. Swap for a live key when legal entity is registered (covered by ORGA-01-S9). SEC-ST2 startup guard prevents accidental prod use of test key. | Non-issue | ✅ Resolved |
+| SEC-S3 | ~~URGENT~~ — `STRIPE_SECRET_KEY` is owner's own shared test key (also used in Acme sandbox). Not a third-party credential. Swap for a live key when legal entity is registered (covered by ORGA-01-S9). SEC-ST2 startup guard prevents accidental prod use of test key. | Non-issue | ✅ Resolved |
 
 #### Code items — Blockers (must fix before public repo)
 

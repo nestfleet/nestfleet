@@ -56,7 +56,7 @@ function testUseProductIdWithFallback(
 }
 
 const mockCtx: ProductCtx = {
-  product:         { productId: "prod_abc123", slug: "skillseal", name: "SkillSeal", stage: "beta" },
+  product:         { productId: "prod_abc123", slug: "acme", name: "Acme", stage: "beta" },
   products:        [],
   switchProduct:   () => {},
   refreshProducts: () => {},
@@ -200,21 +200,21 @@ function resolveProduct(
 }
 
 const PRODUCTS: MockProduct[] = [
-  { productId: "prod_aaa", slug: "skillseal",   name: "SkillSeal",   stage: "beta"       },
-  { productId: "prod_bbb", slug: "docugardener", name: "DocuGardener", stage: "production" },
+  { productId: "prod_aaa", slug: "acme",   name: "Acme",   stage: "beta"       },
+  { productId: "prod_bbb", slug: "acme-two", name: "AcmeTwo", stage: "production" },
   { productId: "prod_ccc", slug: "zoneshift",    name: "ZoneShift",    stage: "prelaunch"  },
 ]
 
 describe("T-01 — ProductProvider slug→product resolution (NF-UNIT-450)", () => {
-  it("resolves slug 'skillseal' to productId 'prod_aaa'", () => {
-    const match = resolveProduct(PRODUCTS, "skillseal")
+  it("resolves slug 'acme' to productId 'prod_aaa'", () => {
+    const match = resolveProduct(PRODUCTS, "acme")
     expect(match).not.toBeNull()
     // mirror of useProductId(ctx) — returns ctx.product.productId
     expect(match!.productId).toBe("prod_aaa")
   })
 
-  it("resolves slug 'docugardener' to productId 'prod_bbb'", () => {
-    const match = resolveProduct(PRODUCTS, "docugardener")
+  it("resolves slug 'acme-two' to productId 'prod_bbb'", () => {
+    const match = resolveProduct(PRODUCTS, "acme-two")
     expect(match!.productId).toBe("prod_bbb")
   })
 
@@ -223,8 +223,8 @@ describe("T-01 — ProductProvider slug→product resolution (NF-UNIT-450)", () 
     expect(match).toBeNull()
   })
 
-  it("is case-sensitive — 'SkillSeal' (wrong case) does not match", () => {
-    const match = resolveProduct(PRODUCTS, "SkillSeal")
+  it("is case-sensitive — 'Acme' (wrong case) does not match", () => {
+    const match = resolveProduct(PRODUCTS, "Acme")
     expect(match).toBeNull()
   })
 
@@ -237,7 +237,7 @@ describe("T-01 — ProductProvider slug→product resolution (NF-UNIT-450)", () 
   })
 
   it("empty product list always returns null", () => {
-    expect(resolveProduct([], "skillseal")).toBeNull()
+    expect(resolveProduct([], "acme")).toBeNull()
   })
 })
 
@@ -254,58 +254,58 @@ function buildSwitchUrl(pathname: string, targetSlug: string): string {
 
 describe("T-02 — switchProduct URL construction (NF-UNIT-451)", () => {
   it("preserves /cases sub-path", () => {
-    expect(buildSwitchUrl("/p/skillseal/cases", "docugardener"))
-      .toBe("/p/docugardener/cases")
+    expect(buildSwitchUrl("/p/acme/cases", "acme-two"))
+      .toBe("/p/acme-two/cases")
   })
 
   it("preserves /approvals sub-path", () => {
-    expect(buildSwitchUrl("/p/skillseal/approvals", "docugardener"))
-      .toBe("/p/docugardener/approvals")
+    expect(buildSwitchUrl("/p/acme/approvals", "acme-two"))
+      .toBe("/p/acme-two/approvals")
   })
 
   it("preserves /pr-drafts sub-path", () => {
-    expect(buildSwitchUrl("/p/skillseal/pr-drafts", "docugardener"))
-      .toBe("/p/docugardener/pr-drafts")
+    expect(buildSwitchUrl("/p/acme/pr-drafts", "acme-two"))
+      .toBe("/p/acme-two/pr-drafts")
   })
 
   it("preserves /knowledge sub-path", () => {
-    expect(buildSwitchUrl("/p/skillseal/knowledge", "docugardener"))
-      .toBe("/p/docugardener/knowledge")
+    expect(buildSwitchUrl("/p/acme/knowledge", "acme-two"))
+      .toBe("/p/acme-two/knowledge")
   })
 
   it("preserves /queue sub-path", () => {
-    expect(buildSwitchUrl("/p/skillseal/queue", "docugardener"))
-      .toBe("/p/docugardener/queue")
+    expect(buildSwitchUrl("/p/acme/queue", "acme-two"))
+      .toBe("/p/acme-two/queue")
   })
 
   it("preserves deep sub-path with case ID", () => {
-    expect(buildSwitchUrl("/p/skillseal/cases/case_01abc", "docugardener"))
-      .toBe("/p/docugardener/cases/case_01abc")
+    expect(buildSwitchUrl("/p/acme/cases/case_01abc", "acme-two"))
+      .toBe("/p/acme-two/cases/case_01abc")
   })
 
   it("falls back to /cases when slug has no sub-path", () => {
-    // /p/skillseal → pageSegment="" → fallback
-    expect(buildSwitchUrl("/p/skillseal", "docugardener"))
-      .toBe("/p/docugardener/cases")
+    // /p/acme → pageSegment="" → fallback
+    expect(buildSwitchUrl("/p/acme", "acme-two"))
+      .toBe("/p/acme-two/cases")
   })
 
   it("handles legacy non-product paths by passing through the segment", () => {
     // /cases has no /p/[slug] prefix — replace does nothing → "/cases"
-    expect(buildSwitchUrl("/cases", "docugardener"))
-      .toBe("/p/docugardener/cases")
+    expect(buildSwitchUrl("/cases", "acme-two"))
+      .toBe("/p/acme-two/cases")
   })
 
   it("handles root path by falling back to /cases", () => {
     // "/" → replace does nothing → "/" which is truthy → "/p/slug/"
     // Explicit: the fallback only triggers on empty string
-    const result = buildSwitchUrl("/", "docugardener")
-    // "/" is truthy so no fallback — result is "/p/docugardener/"
-    expect(result).toBe("/p/docugardener/")
+    const result = buildSwitchUrl("/", "acme-two")
+    // "/" is truthy so no fallback — result is "/p/acme-two/"
+    expect(result).toBe("/p/acme-two/")
   })
 
   it("uses the target slug, not the source slug", () => {
-    const url = buildSwitchUrl("/p/skillseal/cases", "zoneshift")
+    const url = buildSwitchUrl("/p/acme/cases", "zoneshift")
     expect(url).toContain("zoneshift")
-    expect(url).not.toContain("skillseal")
+    expect(url).not.toContain("acme")
   })
 })

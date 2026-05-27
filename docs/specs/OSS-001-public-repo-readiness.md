@@ -50,7 +50,7 @@ AUDIT-002 (independent re-audit, 27 findings) was conducted in worktree `xenodoc
 | H5 | SEC-ST1: Stripe checkout `success_url`/`cancel_url` not origin-validated | **INCORPORATE** (Phase 4) | Pre-first-external-PR security item |
 | H6 | SEC-ST2: No startup guard for `sk_test_` in production | **INCORPORATE** (Phase 4) | Pre-first-external-PR security item |
 | H7 | JWT localStorage — known XSS risk; doc warning needed now | **INCORPORATE** (Phase 0b, doc-fix) | OD-4: document, migrate in 0.2.0 |
-| H8 | `scripts/ingest-docugardener.ts` — DG-specific name on public CLI surface | **INCORPORATE** (Phase 0b) | Rename to `scripts/ingest-docs.ts` |
+| H8 | `scripts/ingest-acme.ts` — DG-specific name on public CLI surface | **INCORPORATE** (Phase 0b) | Rename to `scripts/ingest-docs.ts` |
 | H9 | `scripts/seed-admin.ts` default password `nestfleet-admin-2025` hardcoded | **INCORPORATE** (Phase 0b) | Env-ify; also appears in E2E specs |
 | H10 | `LICENSES.md` — lists 11 backend deps, zero console deps | **INCORPORATE** (Phase 0b) | Regenerate fully |
 
@@ -103,7 +103,7 @@ SEC-JQ1 (per-user job dispatch rate limit), SEC-CORS1 (CONSOLE_ORIGIN validation
 | H2 | Change `docker-compose.yml` `POSTGRES_PASSWORD` default from `nestfleet` to `:?POSTGRES_PASSWORD` (required); update `DATABASE_URL` likewise; update `.env.example` with placeholder and keygen note | `docker-compose.yml`, `.env.example` | XS |
 | H3+H4 | Add SPDX headers to all `src/**/*.ts` files missing them (scripted prepend, ~151 files); include `src/fleet/` files | `src/**/*.ts` | S |
 | H7-OD4 | Add JWT localStorage security note to `docs/self-hosting/security.md` (or README auth section): "v0.1.x uses localStorage; v0.2.0 migrates to httpOnly cookies" | docs | XS |
-| H8 | Rename `scripts/ingest-docugardener.ts` → `scripts/ingest-docs.ts`; update any references | `scripts/` | XS |
+| H8 | Rename `scripts/ingest-acme.ts` → `scripts/ingest-docs.ts`; update any references | `scripts/` | XS |
 | H9 | Env-ify seed admin password: read from `SEED_ADMIN_PASSWORD` env var with fallback only in test/dev mode; update E2E specs to use env var | `scripts/seed-admin.ts`, `tests/e2e/**` | S |
 | H10 | Regenerate `LICENSES.md` — audit both `node_modules` trees (root + console); list all Apache-2.0, MPL-2.0, BSD deps with attribution | `LICENSES.md` | S |
 | M1 | Remove hardcoded Colima socket path from `package.json:15`; use `DOCKER_HOST` env var only | `package.json` | XS |
@@ -139,7 +139,7 @@ SEC-JQ1 (per-user job dispatch rate limit), SEC-CORS1 (CONSOLE_ORIGIN validation
 
 ## Phase 1 — CI Optimisation (~1 hr)
 
-> Two overlapping publish workflows, no path filters, E2E runs against production on every push. Risk of burning GitHub Actions minutes for trivial changes (same issue that hit DocuGardener).
+> Two overlapping publish workflows, no path filters, E2E runs against production on every push. Risk of burning GitHub Actions minutes for trivial changes (same issue that hit Acme).
 
 | ID | Action | File | Size |
 |----|--------|------|------|

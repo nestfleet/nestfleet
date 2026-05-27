@@ -89,7 +89,7 @@ describe("TelegramUpdateSchema", () => {
       message: {
         message_id: 790,
         from: { id: 43, is_bot: false, first_name: "Bob", last_name: "Smith" },
-        chat: { id: -100123, type: "supergroup" as const, title: "DocuGardener Support" },
+        chat: { id: -100123, type: "supergroup" as const, title: "Acme Support" },
         date: 1710000100,
         text: "Getting 500 errors on the API",
       },

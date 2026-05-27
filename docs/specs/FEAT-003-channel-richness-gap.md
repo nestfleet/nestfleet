@@ -1,7 +1,7 @@
 # NestFleet Channel Integration — Richness Gap & Architecture Options
 
 > **Status:** Draft — 2026-04-02
-> **Context:** Analysed when mapping DocuGardener × NestFleet integration use cases.
+> **Context:** Analysed when mapping Acme × NestFleet integration use cases.
 > **Related:** `docs/specs/FEAT-002-onboarding-channels-hub-refactor.md`, `docs/active/v1-epics-and-user-stories.md §DEFERRED-01..18`
 
 ---
@@ -162,9 +162,9 @@ content without caring it came from Telegram. The outbound webhook carries
 
 ---
 
-## 7. What this means for the DocuGardener × NestFleet integration specifically
+## 7. What this means for the Acme × NestFleet integration specifically
 
-DocuGardener's users are developers — their primary channel is GitHub Issues (already
+Acme's users are developers — their primary channel is GitHub Issues (already
 fully integrated). The richness gap is minimal there: GitHub issues are structured
 text, NestFleet handles them natively.
 

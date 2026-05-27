@@ -21,7 +21,7 @@
 10. H2  — docker-compose.yml postgres password guard
 11. H3/H4 — SPDX headers (scripted, ~141 files)
 12. H7  — README JWT localStorage security note
-13. H8  — git mv scripts/ingest-docugardener.ts → scripts/ingest-docs.ts
+13. H8  — git mv scripts/ingest-acme.ts → scripts/ingest-docs.ts
 14. H9  — scripts/seed-admin.ts: env-ify password
 15. H10 — LICENSES.md: full regeneration
 16. M1/M2 — Remove hardcoded Colima socket paths
@@ -323,7 +323,7 @@ git push --force origin main   # after owner confirmation
 - Internal file references to the deleted files must be cleaned up:
   - `docs/business/beta-eval-run-plan.md:3`
   - `docs/business/pre-launch-audit.md:44,105,163`
-  - `docs/business/nestfleet-docugardener-client-sdlc.md:642`
+  - `docs/business/nestfleet-acme-client-sdlc.md:642`
   - `scripts/beta-eval/inject-signals.ts:781`
 
 **No TDD — filesystem operation.**
@@ -401,15 +401,15 @@ strict `Content-Security-Policy` header.
 
 ---
 
-### H8 — Rename ingest-docugardener.ts
+### H8 — Rename ingest-acme.ts
 
 ```bash
-git mv scripts/ingest-docugardener.ts scripts/ingest-docs.ts
+git mv scripts/ingest-acme.ts scripts/ingest-docs.ts
 ```
 
 Update:
 - `package.json:17`: `"spike:ingest": "tsx scripts/ingest-docs.ts"`
-- Internal log messages in `scripts/ingest-docs.ts`: `"ingest-docugardener"` → `"ingest-docs"`
+- Internal log messages in `scripts/ingest-docs.ts`: `"ingest-acme"` → `"ingest-docs"`
 - Any README / CONTRIBUTING references to the old filename.
 
 ---

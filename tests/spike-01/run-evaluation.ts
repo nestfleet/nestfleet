@@ -8,7 +8,7 @@
  *
  * The runner assumes:
  *  - NestFleet DB is running and migrated
- *  - A "good" product has been ingested (DocuGardener corpus recommended)
+ *  - A "good" product has been ingested (Acme corpus recommended)
  *  - A "stale" product has T1 docs ingested with sourceUpdatedAt = 200 days ago
  *  - DATABASE_URL env var points to the running DB
  */
@@ -26,9 +26,9 @@ import type { EvidencePack, ActionType, Audience } from "../../src/memory/types.
 const { values: args } = parseArgs({
   args: process.argv.slice(2),
   options: {
-    "product-id":       { type: "string", default: "docugardener" },
-    "stale-product-id": { type: "string", default: "docugardener-stale" },
-    "empty-product-id": { type: "string", default: "docugardener-empty" },
+    "product-id":       { type: "string", default: "acme" },
+    "stale-product-id": { type: "string", default: "acme-stale" },
+    "empty-product-id": { type: "string", default: "acme-empty" },
     "output":           { type: "string", default: "console" },  // console | json
   },
 })

@@ -44,7 +44,7 @@ Not needed for launch. Deferred indefinitely.
 ## Step 3 — Email: Google Workspace ✅ Done
 
 Google Workspace Starter is configured for `nestfleet.dev`. MX records, SPF, DKIM, DMARC, and
-mailboxes are all live. Same setup as DocuGardener.
+mailboxes are all live. Same setup as Acme.
 
 **Mailboxes configured:**
 - `info@nestfleet.dev` — general enquiries

@@ -6,13 +6,13 @@ This document is the canonical product backlog for NestFleet v1. It translates t
 
 Every item here traces to one or more source documents. Items that do not trace are not here. Items that look like generic agile filler were removed during drafting. Items that would turn NestFleet into a generic agent shell or arbitrary workflow builder were challenged and excluded.
 
-The backlog covers the scope from first email intake through approved PR draft for the DocuGardener pilot.
+The backlog covers the scope from first email intake through approved PR draft for the Acme pilot.
 
 ## 2. Scope Boundary
 
 ### In scope for v1
 
-- Single product: DocuGardener
+- Single product: Acme
 - Single inbound channel: email (Telegram deferred to fast-follow)
 - Three AI personas: Frontline, Steward, Change
 - Five human lead roles: Support Lead, Product Lead, Change Lead, Knowledge Lead (Release Lead reserved for later)
@@ -58,7 +58,7 @@ The backlog covers the scope from first email intake through approved PR draft f
 
 ## 3. Product Outcome for v1
 
-When v1 is complete, an operator running DocuGardener through NestFleet should be able to:
+When v1 is complete, an operator running Acme through NestFleet should be able to:
 
 1. Receive an inbound email from a user, see it normalized into a signal and case, and watch the system enrich and triage it automatically.
 2. See routine user requests answered directly when confidence, evidence, and policy thresholds are met, with full validation records and audit trail.
@@ -181,7 +181,7 @@ As the ingress pipeline, I need to group related signals into Conversations so t
 - Source: domain-model.md section 4.4
 
 #### US-05: Product Routing
-As the ingress pipeline, I need to route signals to the correct product so that DocuGardener messages reach the DocuGardener control plane and unknown products are flagged.
+As the ingress pipeline, I need to route signals to the correct product so that Acme messages reach the Acme control plane and unknown products are flagged.
 
 - Priority: must
 - Dependencies: US-02
@@ -189,7 +189,7 @@ As the ingress pipeline, I need to route signals to the correct product so that 
   - Product routing uses configured rules (email address patterns, subject prefixes, or explicit product mapping)
   - Signals that cannot be routed are flagged for operator review
   - Product_id is set on Signal and Conversation records
-  - v1 supports exactly one product (DocuGardener); multi-product routing is structurally present but not required to be exercised
+  - v1 supports exactly one product (Acme); multi-product routing is structurally present but not required to be exercised
 - Source: domain-model.md section 4.1, mvp-scope.md section 4.1
 
 #### US-06: Case Creation from Conversation
@@ -212,7 +212,7 @@ As the case control plane, I need to create a Case record when a new conversatio
 - Scheduled reminder events as signal sources belong to EPIC-06
 
 **Epic-level acceptance criteria:**
-- An email sent to the configured DocuGardener address results in a Signal, Conversation, and Case within the system
+- An email sent to the configured Acme address results in a Signal, Conversation, and Case within the system
 - Duplicate emails do not produce duplicate signals
 - Thread continuity is maintained across multi-message exchanges
 - Every creation event has an audit trail
@@ -353,7 +353,7 @@ As the agent flow engine, I need to schedule persona work as bounded tasks via a
 
 ### EPIC-03: Product Memory & Retrieval
 
-**Objective:** Ingest trusted DocuGardener sources, index them for hybrid retrieval, and assemble evidence-backed memory packs that ground every AI action.
+**Objective:** Ingest trusted Acme sources, index them for hybrid retrieval, and assemble evidence-backed memory packs that ground every AI action.
 
 **Why it matters:** Product memory is the evidence infrastructure that makes NestFleet deterministic and trustworthy. Without it, every persona hallucinates. Weak retrieval quality is identified as the highest-risk technical area in technical-risks-and-spikes.md.
 
@@ -362,7 +362,7 @@ As the agent flow engine, I need to schedule persona work as bounded tasks via a
 **In-scope stories:**
 
 #### US-15: Source Registration and Trust Tiering
-As an operator, I need to register approved knowledge sources for DocuGardener with explicit trust levels so that the retrieval system only uses vetted content.
+As an operator, I need to register approved knowledge sources for Acme with explicit trust levels so that the retrieval system only uses vetted content.
 
 - Priority: must
 - Dependencies: none
@@ -444,8 +444,8 @@ As the system, I need to create Knowledge Asset records after case resolution so
 - Chat memory or conversation-context accumulation (product memory is evidence infrastructure per ADR-007)
 
 **Epic-level acceptance criteria:**
-- DocuGardener markdown docs, FAQ content, GitHub issues, and known issues are indexed and retrievable
-- A query about a common DocuGardener support topic returns relevant, correctly cited evidence
+- Acme markdown docs, FAQ content, GitHub issues, and known issues are indexed and retrievable
+- A query about a common Acme support topic returns relevant, correctly cited evidence
 - Stale or low-trust content is ranked below fresh authoritative content
 - Evidence packs are attached to every persona proposal
 
@@ -867,7 +867,7 @@ As the case control plane, I need to mark a case as resolved after a validated r
 - Voice or chat-based resolution channels
 
 **Epic-level acceptance criteria:**
-- A routine user question about DocuGardener receives a grounded, cited answer within the configured SLA
+- A routine user question about Acme receives a grounded, cited answer within the configured SLA
 - Answers that meet all threshold conditions are sent automatically
 - Answers below threshold are routed to Support Lead for review
 - No unsupported claims, promises, or hallucinated content reaches the user
@@ -1080,7 +1080,7 @@ As the system, I need to validate that the active team composition for a product
 - Governed role improvement loop (per ADR-014, later phase)
 
 **Epic-level acceptance criteria:**
-- DocuGardener is configured with three active team members (Frontline, Steward, Change) with appropriate lead mappings
+- Acme is configured with three active team members (Frontline, Steward, Change) with appropriate lead mappings
 - Disabling a team member adjusts flow routing without system errors
 - Per-product overrides work within template boundaries
 - Incomplete team composition produces clear warnings
@@ -1454,7 +1454,7 @@ As a system admin, I need to create operator accounts, assign them to products, 
 - Source: domain-model.md section 4.2, technical-risks-and-spikes.md spike 7
 
 #### US-77: End-User Identity Resolution
-As the system, I need to maintain Identity records for end users who contact DocuGardener so that cases, conversations, and notifications are linked to the correct person for communication and DSAR purposes.
+As the system, I need to maintain Identity records for end users who contact Acme so that cases, conversations, and notifications are linked to the correct person for communication and DSAR purposes.
 
 - Priority: must
 - Dependencies: US-03 (identity hint extraction)
@@ -1467,7 +1467,7 @@ As the system, I need to maintain Identity records for end users who contact Doc
 - Source: domain-model.md section 4.2
 
 #### US-78: Tenant and Product Isolation
-As the system, I need to enforce data isolation between products (and later between tenants) so that DocuGardener data is not accessible from other product contexts.
+As the system, I need to enforce data isolation between products (and later between tenants) so that Acme data is not accessible from other product contexts.
 
 - Priority: must
 - Dependencies: US-75
@@ -1769,7 +1769,7 @@ The following items are explicitly deferred from v1. They are tracked here so th
 
 ### DEFERRED-02: Multi-Product Concurrent Operation
 - Deferred from v1
-- Reason: v1 proves the model with one product (DocuGardener) per mvp-scope.md
+- Reason: v1 proves the model with one product (Acme) per mvp-scope.md
 - Architecture impact: product_id isolation must be present in v1 data model to enable later
 
 ### DEFERRED-03: Governed Role Improvement
@@ -1873,7 +1873,7 @@ Closes US-72. Delivers the full operator-facing memory management surface as a s
 
 ### DEFERRED-16: Jira Integration (Bidirectional Signal Source + Change Sync)
 - Deferred from v1 to v2.1
-- Reason: pilot product (DocuGardener) uses GitHub Issues, not Jira; adding Jira before the connector pattern is validated with Linear adds risk
+- Reason: pilot product (Acme) uses GitHub Issues, not Jira; adding Jira before the connector pattern is validated with Linear adds risk
 - Scope (bidirectional, mirrors DEFERRED-14 Linear):
   - **Inbound**: Jira webhook events (issue created, commented, transitioned) ingested as Signals; Jira Service Management tickets treated as first-class signal sources
   - **Outbound**: NestFleet change requests sync back as Jira issues; status transitions in NestFleet propagate to Jira
@@ -1935,7 +1935,7 @@ What specific information should appear in digest summaries, and what is the ema
 How should duplicate end-user identities be merged when the same person uses different email addresses? Manual merge in v1 (per US-77), but the exact UX and data propagation need design. Affects US-77 and US-61.
 
 ### OQ-09: Evaluation Dataset for Product Memory Spike
-The product memory quality spike (technical-risks-and-spikes.md spike 1) requires 20-30 real support-like prompts for DocuGardener. Who creates these, and what is the pass criteria? Affects US-17 and US-19.
+The product memory quality spike (technical-risks-and-spikes.md spike 1) requires 20-30 real support-like prompts for Acme. Who creates these, and what is the pass criteria? Affects US-17 and US-19.
 
 ### OQ-10: Quiet Hours Configuration Scope
 Are quiet hours configured globally, per product, or per lead? The notification model defaults to 20:00-08:00 local time + weekends, but "local time" requires knowing each lead's timezone. Affects US-33.

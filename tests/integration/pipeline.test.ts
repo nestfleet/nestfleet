@@ -48,7 +48,7 @@ function makePostmarkPayload(overrides: Record<string, unknown> = {}): Record<st
     MessageID:  `test-msg-${Date.now()}@postmark.example`,
     From:       "Alice User <alice@example.com>",
     FromFull:   { Email: "alice@example.com", Name: "Alice User" },
-    To:         "support@docugardener.io",
+    To:         "support@acme.io",
     Subject:    "Export pipeline is broken",
     TextBody:   "Hi, I've been trying to export my documents for the past hour and it keeps failing with a timeout error. This is urgent — I have a deadline today.",
     HtmlBody:   "",
@@ -69,13 +69,13 @@ describe("Signal ingress pipeline (integration)", () => {
   beforeAll(async () => {
     ctx = await setupTestDb()
 
-    // Create a test product (DocuGardener pilot)
+    // Create a test product (Acme pilot)
     const product = await createProduct({
-      name:             "DocuGardener Test",
+      name:             "Acme Test",
       stage:            "beta",
-      support_policy:   { github_repo: "test-org/docugardener" },
+      support_policy:   { github_repo: "test-org/acme" },
       enabled_channels: ["email"],
-      lead_assignments: { support_lead: "lead@docugardener.io" },
+      lead_assignments: { support_lead: "lead@acme.io" },
     })
     productId = product.product_id
   }, 60_000)

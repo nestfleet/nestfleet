@@ -6,7 +6,7 @@ This document defines the reference architecture for NestFleet v1. It is designe
 
 ## 2. Architecture Drivers
 
-- first live product is `DocuGardener`
+- first live product is `Acme`
 - v1 is `internal-operator first`
 - v1 ends at `approved PR draft`
 - queue plus state-machine orchestration is preferred over chat-session-centric design
@@ -326,7 +326,7 @@ NestFleet implements the PlatformCloud License Propagation Protocol for lease-ba
 | **Lease scheduling** | PlatformCloud returns `lease.ttl_seconds` + `lease.jitter_seconds` in the validation response. NestFleet schedules the next refresh via a `setTimeout` chain: `delay = ttl_seconds * 1000 + random(0, jitter_seconds) * 1000`. Replaces the previous fixed 6-hour `setInterval`. |
 | **config_version / 304** | Each validation request sends `cached_config_version`. If the server's config is unchanged it returns `304 Not Modified` — NestFleet resets the lease timer without mutating state, saving a response-parse round trip. |
 | **Cloud status state machine** | PlatformCloud may return `status: "active" \| "grace" \| "read_only" \| "revoked"`. NestFleet stores this as `_cloudStatus` and exposes it via `getLicenseCloudStatus()`. The `requireLicenseActive()` Hono middleware reads this: `grace` → passes with `X-License-Status: grace` header; `read_only` / `revoked` → 403. |
-| **Pending changes** | Validation response may include `pending_changes[]` — a delta of discrete scheduled changes (plan upgrade/downgrade, feature add/remove, quota change, revocation). Stored separately from `features[]` and rendered by `PendingChangesNotice` as individual rows. Never rendered as the full feature set (DocuGardener bug pattern avoided). |
+| **Pending changes** | Validation response may include `pending_changes[]` — a delta of discrete scheduled changes (plan upgrade/downgrade, feature add/remove, quota change, revocation). Stored separately from `features[]` and rendered by `PendingChangesNotice` as individual rows. Never rendered as the full feature set (Acme bug pattern avoided). |
 | **Offline degradation** | On cloud fetch failure: `_offlineWarning = true` and a yellow banner is shown in the console. If the cloud has been unreachable for ≥ 24 hours (`lastValidatedAt` check), `_cloudStatus` autonomously transitions to `"read_only"` per C-05. On next successful validation the state is restored. |
 | **HMAC verification** | Cloud refresh responses optionally signed with HMAC-SHA256 (`X-Refresh-HMAC` header) when `CLOUD_REFRESH_HMAC_SECRET` is set. Verified via `verifyValidateResponse()` using `crypto.timingSafeEqual()` (SEC-M4). |
 

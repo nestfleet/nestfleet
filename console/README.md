@@ -28,15 +28,15 @@ npm run dev        # http://localhost:3002
 Since DEFERRED-21, all product-scoped pages live under `/p/[slug]/`:
 
 ```
-/p/skillseal/queue
-/p/skillseal/cases
-/p/skillseal/approvals
-/p/skillseal/pr-drafts
-/p/skillseal/knowledge
-/p/skillseal/analytics
-/p/skillseal/notifications
-/p/skillseal/compliance
-/p/skillseal/settings
+/p/acme/queue
+/p/acme/cases
+/p/acme/approvals
+/p/acme/pr-drafts
+/p/acme/knowledge
+/p/acme/analytics
+/p/acme/notifications
+/p/acme/compliance
+/p/acme/settings
 ```
 
 The legacy paths (`/cases`, `/queue`, etc.) remain active for backwards compatibility.

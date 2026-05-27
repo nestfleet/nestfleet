@@ -22,7 +22,7 @@
 | **Post-v1 UX + Security** | ✅ COMPLETE 2026-03-22 | Settings → Product section ✅, SEC-M4 ✅, CHAT-UX-01 (a)+(b)+(c) ✅, login redirect ✅, DEFERRED-21 ✅, INFRA-01/02/03 ✅. Console WAVE 1–5 ✅. E2E regression suite ✅ (75 tests). |
 | **Bug fixes + E2E gap coverage** | ✅ COMPLETE 2026-03-23 | DEFERRED-24 ✅ (EmailReplyPanel send bug fixed + collapsible UX). E2E gap audit: `nestfleet-gap-coverage.spec.ts` (20 tests, G1–G7). 3 existing specs hardened. Total E2E suite: **100 tests**. |
 | **PlatformCloud Phase 9 — Security Hardening** | ✅ COMPLETE 2026-03-29 | Wave 1 (config): PC-SEC-20 `.gitignore` ✅, PC-SEC-26 `.dockerignore` ✅, PC-SEC-46 coverage/ deleted ✅, PC-SEC-47 compose version key removed ✅. Wave 2 (Docker): PC-SEC-24 non-root user ✅, PC-SEC-25 .map strip ✅, PC-SEC-44 loopback bind ✅. Wave 3 (middleware): PC-SEC-27 CORS ✅, PC-SEC-28 security headers ✅, PC-SEC-40 _resetKey guard ✅, PC-SEC-42 min secret length ✅, PC-SEC-35 prod enc key guard ✅. Wave 4A (rate limiting): PC-SEC-32 TRUSTED_PROXY IP extraction ✅, PC-SEC-33 eviction + max-size ✅, PC-SEC-31 all public routes rate-limited ✅. Wave 4B (error/logging): PC-SEC-36 decrypt failure logging ✅, PC-SEC-37 webhook 64KB body limit ✅, PC-SEC-38 sanitized error responses ✅. Wave 4C: PC-SEC-34 server-side nonce tracking ✅, PC-SEC-48 instance_tokens table removed ✅, PC-SEC-29 cookie Secure flag ✅, PC-SEC-43 Stripe IDs encrypted ✅. Wave 4D: PC-SEC-30 backup script ✅. Wave 5: PC-SEC-22 standard JWT claims (iat/exp/nbf/jti) ✅, PC-SEC-41 console HTTPS guard ✅. Deferred: PC-SEC-39 (HMAC canonical JSON — both sides identical, theoretical only). Manual/dev: PC-SEC-21/23 secret rotation. **NestFleet NF-SEC-01..04 ✅** (incl. NF-SEC-02 all phases A/B/C ✅ 2026-03-29). |
-| **PlatformCloud Phase 10 — Multi-product billing consolidation** | ✅ COMPLETE 2026-03-29 | BIL-PA-01..12: product-aware billing engine (plans.ts rewrite, GPT3-arg getPriceId, docugardener price table) ✅. BIL-SR-01..08: public self-registration /trial endpoint (UUID org_id, product-prefix keys, email dedup) ✅. BIL-DN-01..06: downgrade scheduling via cancel_at_period_end + pending_changes webhook resolution ✅. DG-BIL-01: DocuGardener client_installed proxy routes (checkout + portal → PlatformCloud) ✅. NF-LIC-01..04: NestFleet billing proxy fixes (product field, POST /license/downgrade) + downgrade CTA in Settings ✅. BIL-EM-01..04: PlatformCloud billing email sequences (trial welcome, downgrade scheduled, upgrade confirmation, cancellation) ✅. 4 new test files (billing-product-aware, billing-selfregistration, billing-downgrade, billing-emails), 1 new NestFleet test file, 4 new DocuGardener tests. |
+| **PlatformCloud Phase 10 — Multi-product billing consolidation** | ✅ COMPLETE 2026-03-29 | BIL-PA-01..12: product-aware billing engine (plans.ts rewrite, GPT3-arg getPriceId, acme price table) ✅. BIL-SR-01..08: public self-registration /trial endpoint (UUID org_id, product-prefix keys, email dedup) ✅. BIL-DN-01..06: downgrade scheduling via cancel_at_period_end + pending_changes webhook resolution ✅. DG-BIL-01: Acme client_installed proxy routes (checkout + portal → PlatformCloud) ✅. NF-LIC-01..04: NestFleet billing proxy fixes (product field, POST /license/downgrade) + downgrade CTA in Settings ✅. BIL-EM-01..04: PlatformCloud billing email sequences (trial welcome, downgrade scheduled, upgrade confirmation, cancellation) ✅. 4 new test files (billing-product-aware, billing-selfregistration, billing-downgrade, billing-emails), 1 new NestFleet test file, 4 new Acme tests. |
 | **Settings LLM isolation + autofill fix** | ✅ COMPLETE 2026-03-23 | setup.ts API key encryption fix ✅. `key={productId}` on all settings sections ✅. `key={slug}` on ProductProvider ✅. Chrome autofill locked-field UX ✅. SLICE-11/12 tests ✅. E2E T-20..T-24 (5 tests). |
 | **Chat pipeline + lineage graph fixes** | ✅ COMPLETE 2026-03-24 | pg-boss singleton race fix ✅. Chat triage dispatch fix ✅. Awaiting-lead SSE ack ✅. Lineage KIM timing correction ✅. `auto_reply → resolved` edge + satellite removal ✅. |
 | **DG-08: sales_inquiry routing + pending handoff queue** | ✅ COMPLETE 2026-03-25 | `sales_inquiry` case type ✅. Enterprise severity floor ✅. `forward-to-team` endpoint ✅. Queue Pending Handoff section ✅. Cases pending handoff pill ✅. 50 new tests. |
@@ -49,7 +49,7 @@
 - **NF-LPP-01 — Lease-based scheduling** ✅ — `refreshFromCloud()` parses `lease.ttl_seconds` + `lease.jitter_seconds` from 200 response; `scheduleNextValidation()` uses `setTimeout` chain with random jitter. Falls back to 6h if no lease returned. Previous `setInterval`-based `startCloudRefreshInterval()` retained as backward-compat shim.
 - **NF-LPP-02 — config_version + 304 support** ✅ — Validation request body now sends `cached_config_version` (module-level `_configVersion`) and `product_version: "0.1.0"`. On 304 response: state unchanged, lease timer reset. On 200: `_configVersion` updated from response.
 - **NF-LPP-03 — Cloud status banner + middleware** ✅ — `getLicenseCloudStatus()` / `getLicenseGraceUntil()` / `getLicenseReadOnlyUntil()` / `getLicenseRevokeReason()` / `getLicenseSupportContact()` exported from `validator.ts`. `requireLicenseActive()` Hono middleware in `src/auth/license-middleware.ts`: `grace` → pass + `X-License-Status` header; `read_only`/`revoked` → 403. `/license/status` endpoint extended with `cloudStatus`, `cloudGraceUntil`, `cloudReadOnlyUntil`, `revokeReason`, `supportContact`. `LicenseStatusBanner` component in `AppLayout` shows amber/red banners per state. 6 unit tests NF-UNIT-510–515.
-- **NF-LPP-04 — Pending changes (delta display)** ✅ — `getPendingChanges()` exported. `PendingChangesNotice` renders each `PendingChange` item from `pending_changes[]` as a discrete row (type label + `effective_at` + optional message). Sources from delta array, NOT `features[]` — avoids DocuGardener's bug of showing the full plan feature list. Shown in Settings → License for admin users only.
+- **NF-LPP-04 — Pending changes (delta display)** ✅ — `getPendingChanges()` exported. `PendingChangesNotice` renders each `PendingChange` item from `pending_changes[]` as a discrete row (type label + `effective_at` + optional message). Sources from delta array, NOT `features[]` — avoids Acme's bug of showing the full plan feature list. Shown in Settings → License for admin users only.
 - **NF-LPP-05 — SSO feature taxonomy fix** ✅ — `sso_saml` and `sso_group_mapping` are now separate manifest entries with independent `featureFlag` keys, matching PlatformCloud's separate capability catalog entries for these two SSO variants.
 - **NF-LPP-06 — Offline fallback + autonomous degradation** ✅ — `_handleOfflineFailure()`: sets `_offlineWarning=true` immediately; if `_lastSuccessfulValidationAt` is ≥ 24h ago, autonomously enters `_cloudStatus="read_only"` (C-05). Yellow `LicenseStatusBanner` (distinct from Stripe grace amber) shown when `offlineWarning=true`. On next successful validation: warning cleared, status restored. 16 unit tests NF-UNIT-490–506.
 - **Console types** ✅ — `LicenseCloudStatus` type + `PendingChange` interface added to `console/src/lib/types.ts`. `LicenseStatus` interface extended with 8 new LPP fields.
@@ -69,7 +69,7 @@
 - Notifications tab — GroupByPopover + NotifFilterPopover (already in place, confirmed W7-04)
 - UX polish: Knowledge pending-review badge, AI Confidence column, bordered filter pills
 - UX polish: Analytics superscript tier badges, Cases FilterPopover, Approvals/PR-Drafts header badges
-- **Product suite strategy** ✅ — `docs/product-suite-strategy.md` (Option C: suite play, two products + shared PlatformCloud + deep integration bridge); `docs/specs/nestfleet-docugardener-integration.md` (full technical spec: 6 integration points, event schemas, shared data model, rollout plan)
+- **Product suite strategy** ✅ — `docs/product-suite-strategy.md` (Option C: suite play, two products + shared PlatformCloud + deep integration bridge); `docs/specs/nestfleet-acme-integration.md` (full technical spec: 6 integration points, event schemas, shared data model, rollout plan)
 - SEC-05 ✅ — AES-256-GCM webhook secret encryption
 - Landing page ZoomOnScroll animation (#8)
 - Backlog split — `active-backlog.md` + `v1-delivery-archive.md`
@@ -77,10 +77,10 @@
 - **cancel_at threading** ✅ — PlatformCloud DB → validate endpoint → NestFleet `_cancelAt` → status endpoint → useLicense → orange "Cancellation scheduled" banner with Reactivate CTA
 - **Stripe clover API fix** ✅ — portal cancel sets `sub.cancel_at` (unix ts) not `cancel_at_period_end: true`; webhook handler updated to read both
 - **Billing portal UX** ✅ — ↻ sync button, source-aware portal_return message, Growth tier shows Scale contact-sales CTA instead of duplicate plan cards
-- **PC-ARCH-01** ✅ — `PRODUCT_REGISTRY` built in `PlatformCloud/src/license/validator.ts` (feature matrix + OU limits for both `nestfleet` and `docugardener`)
+- **PC-ARCH-01** ✅ — `PRODUCT_REGISTRY` built in `PlatformCloud/src/license/validator.ts` (feature matrix + OU limits for both `nestfleet` and `acme`)
 - **PC-BIL-12** ✅ — `max_outcome_units_monthly` flows through PlatformCloud validation response → NestFleet `maxOutcomeUnitsMonthly` payload field
 - **PC-BIL-09** ✅ — License format unification (JWT); `generator.ts` JWT path verified, `.license-dev` is valid HS256 JWT
-- **PC-BIL-10** ✅ — Plan name migration; `seed-dev.ts` uses correct new plan names; DocuGardener intentionally keeps FREE/PRO/TEAM
+- **PC-BIL-10** ✅ — Plan name migration; `seed-dev.ts` uses correct new plan names; Acme intentionally keeps FREE/PRO/TEAM
 - **BIL-01→06** ✅ — Full OU tracking chain verified complete: payload field, DB table, event emission (case.resolved, cr.completed), soft-block at 100%, warning at 80%, trial→community degradation
 - **W6-06** ✅ — OU usage bar in Settings → Plan: `/license/status` returns `ouUsage`, bar renders amber ≥80% / red at 100%; also fixed pre-existing `currentProductCount` → `currentProducts` field mismatch
 - **PC-ARCH-02** ✅ — Admin API token scoping: `auth/admin.ts` with 4 scopes wired to all billing routes; `PLATFORM_CLOUD_TOKEN` added to NestFleet config for authenticated billing calls; backwards-compatible with `PLATFORM_ADMIN_SECRET`
@@ -110,7 +110,7 @@
 - **E2E gap audit + `nestfleet-gap-coverage.spec.ts`** ✅ — Systematic audit of all 7 existing Playwright specs surfaced 8 gap categories. New spec (20 tests, all green): G1 `EmailReplyPanel`/DEFERRED-24 (5 tests), G2 Settings CI GitHub fields (4 tests), G3 post-login redirect (3 tests), G4 auth token key `nestfleet_token` (2 tests), G5 `send-draft-reply` API contract (2 tests), G6 CI tab states (2 tests), G7 `FilterPopover` cases filter (2 tests).
 - **E2E spec hardening** ✅ — `nestfleet-main-flow.spec.ts` + `nestfleet.spec.ts`: `login()` helpers accept both `/cases` and `/p/<slug>/cases` redirect targets (DEFERRED-21-proof). `product-switcher.spec.ts`: `getProducts()` fixed from wrong key `nf_token` → canonical `nestfleet_token`.
 - **Settings LLM per-product isolation — root-cause investigation + fix** ✅ — Identified 3-layer bug:
-  1. **`setup.ts` API key plaintext storage** — setup wizard stored `llm.apiKey` as plaintext. Fixed: `encryptSecret(llm.apiKey)` now called before writing `llm_config`. Root cause of SkillSeal having `"admin"` in DB.
+  1. **`setup.ts` API key plaintext storage** — setup wizard stored `llm.apiKey` as plaintext. Fixed: `encryptSecret(llm.apiKey)` now called before writing `llm_config`. Root cause of AcmePro having `"admin"` in DB.
   2. **Settings section `useState` stale on product switch** — `LlmSection`, `LeadsSection`, etc. initialise their local state once on mount. Switching product without remounting kept the previous product's state. Fixed: `key={productId}` added to all section components in `console/src/app/settings/page.tsx`.
   3. **`ProductProvider` async race window** — `product` state remained at the old product during the async `getProductsApi()` refetch when the slug URL changed. Fixed: `key={slug}` on `<ProductProvider>` in `console/src/app/(app)/p/[slug]/layout.tsx` forces full remount on slug change.
 - **Chrome password autofill on API key field** ✅ — Chrome autofilled `input[type="password"]` (no `autoComplete` attribute) with a saved credential (`"admin"`), overwriting any valid key on section remount or product switch. Safari was not affected. Fix: API key input now renders as a **locked read-only display** (masked key + "Change" button) when a saved key exists — no `<input>` rendered, nothing to autofill. "Change" unlocks an `<input autoComplete="new-password">`. A `useEffect([provider])` re-locks automatically when switching back to the saved provider.
@@ -399,7 +399,7 @@ Work management tools (Linear, Jira, Asana) are **bidirectional** signal sources
 |--------|-----------|------|------|
 | **A: URL-based routing** | `/products/:productId/cases`, `/products/:productId/queue` | Bookmarkable, shareable links; browser back/forward works; no state management | Every route changes; existing bookmarks break; Next.js route group refactor |
 | **B: React Context + localStorage** | `ProductProvider` in root layout; `useProduct()` hook; persisted in `localStorage` | Minimal route changes; fast switch; simple implementation | Not URL-visible — can't share links to specific product views; stale tab risk |
-| **C: Hybrid (URL prefix + Context)** | URL carries product slug (`/p/docugardener/cases`); Context reads from URL; localStorage remembers last selection | Best of both; URLs shareable; context provides reactivity | Most complex; requires route group restructure + context |
+| **C: Hybrid (URL prefix + Context)** | URL carries product slug (`/p/acme/cases`); Context reads from URL; localStorage remembers last selection | Best of both; URLs shareable; context provides reactivity | Most complex; requires route group restructure + context |
 
 #### Spike Success Criteria
 
@@ -409,7 +409,7 @@ Work management tools (Linear, Jira, Asana) are **bidirectional** signal sources
    - Reset notification badge state and unread counts
    - Not leak cases, CRs, signals, or KB data from product A into product B's views
 3. **Auth boundary defined**: which products does a user see? Does the license tier gate the number of products? How does `AuthUser.productIds` get populated?
-4. **Prototype built**: minimal working product switcher (sidebar dropdown or header selector) + one page (e.g., Cases) reading from new context — verified with two real products (DocuGardener + SkillSeal)
+4. **Prototype built**: minimal working product switcher (sidebar dropdown or header selector) + one page (e.g., Cases) reading from new context — verified with two real products (Acme + AcmePro)
 5. **Migration path documented**: how do existing single-product deployments upgrade without breaking?
 6. **Performance verified**: product switch should be <200ms perceived (no full page reload)
 
@@ -483,7 +483,7 @@ The product switching mechanism is the **foundational infrastructure** for multi
 - [ ] Existing deployment with `NEXT_PUBLIC_PRODUCT_ID` set and 1 product works identically to current behaviour (regression test)
 - [ ] Product switch event appears in browser console (dev mode) and analytics endpoint (prod mode)
 - [ ] Adding a new page requires only `const productId = useProductId()` — no env var reading, no prop drilling from layout
-- [ ] Full E2E test suite passes when run against SkillSeal product ID (not just DocuGardener)
+- [ ] Full E2E test suite passes when run against AcmePro product ID (not just Acme)
 
 #### Scope of Impact
 
@@ -543,7 +543,7 @@ Source: `PlatformCloud/src/license/validator.ts` → `PRODUCT_REGISTRY` already 
 
 - License tier `maxProducts` ✅ already in PlatformCloud `PRODUCT_REGISTRY`
 - Backend auth `productIds` ✅ already in JWT claims and `/me` response — no API change needed
-- Both DocuGardener and SkillSeal must exist for testing ✅ done
+- Both Acme and AcmePro must exist for testing ✅ done
 - `slug` column migration must run before any Console deployment that uses new routing
 
 #### Unblocked by this Spike
@@ -929,7 +929,7 @@ New middleware: `src/auth/license-middleware.ts` → `requireLicenseActive()`.
 
 ### NF-LPP-04: Pending Changes (Delta Display)
 
-**Problem:** DocuGardener had a bug where it rendered the full `features[]` array in the pending-changes notice, showing the complete feature set instead of only the discrete scheduled changes.
+**Problem:** Acme had a bug where it rendered the full `features[]` array in the pending-changes notice, showing the complete feature set instead of only the discrete scheduled changes.
 
 | Item | Implementation |
 |------|---------------|
@@ -1058,7 +1058,7 @@ function hmacCanonical(payload: Record<string, unknown>): string {
 > **Full spec:** `PlatformCloud/docs/specs/PLAT-01-License-Enforcement-Hardening.md`
 > **Context:** SA review (2026-03-29) identified that self-hosted deployments with source code access can bypass local license gating in ~30–60 min. A cross-product hardening initiative was designed to close this gap systematically. NF-SEC-01–04 (§11) must complete first — they are Wave 0 prerequisites.
 
-### NestFleet gap vs DocuGardener (current state)
+### NestFleet gap vs Acme (current state)
 
 | Gap | DG status | NF status |
 |---|---|---|
@@ -1109,7 +1109,7 @@ Phase 3 (hardening):
 
 > **Trigger:** Strategic decision 2026-03-30. PlatformCloud is frozen. NestFleet pivots to AGPL open-source + SaaS-first. The license-key/LPP model is replaced by direct Stripe billing. Ops complexity of self-hosting at scale is the natural upgrade funnel — no feature paywall required.
 >
-> **Archived specs:** `docs/specs/nestfleet-docugardener-integration.md`, `docs/business/monetization-and-licensing-model.md`, `docs/business/product-suite-strategy.md`, `docs/legal/templates/*/CG-12-bsl-*`, `docs/legal/templates/en/CG-13-cloud-connection-data-flow.md` (all moved to `docs/archive/`).
+> **Archived specs:** `docs/specs/nestfleet-acme-integration.md`, `docs/business/monetization-and-licensing-model.md`, `docs/business/product-suite-strategy.md`, `docs/legal/templates/*/CG-12-bsl-*`, `docs/legal/templates/en/CG-13-cloud-connection-data-flow.md` (all moved to `docs/archive/`).
 >
 > **Effort:** ~2–3 days of focused work.
 > **Launch sequence:** DG ships first (SaaS already functional in `saas` mode). NF follows ~2–3 weeks after DG is live.
@@ -1870,7 +1870,7 @@ SS-09 is absent from inject-signals.ts available scenarios. The run-plan setup S
 
 **Priority:** P1 | **Effort:** L | **Scenarios affected:** XP-01
 
-`POST /api/v1/bridge/event` returns 404. The cross-product bridge event system (doc-drift detection, NestFleet ↔ DocuGardener signal routing) is spec'd in the scenarios but has no implementation.
+`POST /api/v1/bridge/event` returns 404. The cross-product bridge event system (doc-drift detection, NestFleet ↔ Acme signal routing) is spec'd in the scenarios but has no implementation.
 
 **Fix:** Implement `POST /api/v1/bridge/event`:
 - Auth: admin token
@@ -2038,7 +2038,7 @@ substantive re-handling.
 
 ### 16.1 — Architecture Challenge
 
-Unlike DocuGardener (single SaaS, centralised DB), NestFleet instances are:
+Unlike Acme (single SaaS, centralised DB), NestFleet instances are:
 - Independent VPS deployments (each customer has their own DB + runtime)
 - Communicating only via opt-in telemetry + Stripe webhooks
 

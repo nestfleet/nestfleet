@@ -6,7 +6,7 @@ This document defines the canonical specification for NestFleet's Product Memory
 
 Product Memory is not generic chat memory. It is the evidence infrastructure that determines whether an AI persona action is grounded, safe, and policy-compliant. Every auto-reply, triage decision, and change preparation depends on the quality of what is stored here.
 
-This spec applies to all products NestFleet services, not only DocuGardener.
+This spec applies to all products NestFleet services, not only Acme.
 
 ---
 

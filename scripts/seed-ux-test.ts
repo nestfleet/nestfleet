@@ -14,7 +14,7 @@
 import { getDb } from "../src/infra/db/client.js"
 import { newId } from "../src/infra/db/id.js"
 
-const PRODUCT_ID = "prod_01kkyb2x4444sj4px80v3253ha" // DocuGardener
+const PRODUCT_ID = "prod_01kkyb2x4444sj4px80v3253ha" // Acme
 const IDENTITY_ID = "id_01kkyb3e1vkc8vhfpwkng8xszb" // Test User
 
 async function main() {
@@ -113,7 +113,7 @@ async function main() {
   console.log(`✓ UX-09 test case: ${case2Id}  (status: triaged)`)
 
   console.log(`\n── Done ──`)
-  console.log(`Open console → DocuGardener product to see both cases.`)
+  console.log(`Open console → Acme product to see both cases.`)
   console.log(`  UX-06: Go to Approvals tab → find the pending CR → click Escalate`)
   console.log(`  UX-09: Open the triaged case → click "Mark Resolved" → add optional note`)
 

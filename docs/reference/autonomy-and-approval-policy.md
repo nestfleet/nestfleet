@@ -6,7 +6,7 @@ This document defines how NestFleet decides what may run automatically, what req
 
 ## 2. Scope Assumptions
 
-- v1 is `DocuGardener` first
+- v1 is `Acme` first
 - v1 is `internal-operator first`
 - v1 ends at `approved PR draft`
 - legal and security baselines in `docs/legal-compliance-eu-germany.md` apply by default

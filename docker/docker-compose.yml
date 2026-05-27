@@ -5,7 +5,7 @@ services:
     image: pgvector/pgvector:pg16
     container_name: nestfleet-postgres
     ports:
-      - "5434:5432"   # 5434 — 5432/5433 reserved for DocuGardener
+      - "5434:5432"   # 5434 — avoids conflict with common local Postgres ports
     environment:
       POSTGRES_DB: nestfleet
       POSTGRES_USER: nestfleet

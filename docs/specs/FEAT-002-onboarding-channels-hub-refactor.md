@@ -13,7 +13,7 @@
 
 NestFleet currently splits channel configuration across five disconnected Settings sections (CI Integration, Chat Widget, Contact Form, Notifications, and implicitly LLM). The first-run wizard introduces a product and an LLM, but never guides the operator through connecting the channels their users will actually contact them through.
 
-The result: a P1 owner (e.g. DocuGardener) completes the wizard, opens the Console, and has no signal that four channels are unconfigured. They discover Chat Widget and Contact Form by browsing Settings. Telegram is env-var only — no UI path at all.
+The result: a P1 owner (e.g. Acme) completes the wizard, opens the Console, and has no signal that four channels are unconfigured. They discover Chat Widget and Contact Form by browsing Settings. Telegram is env-var only — no UI path at all.
 
 As NestFleet v2 adds Linear, Jira, Telegram (full), WhatsApp, and others, the current Settings structure collapses — each new channel appends another section to an already long left-nav.
 
@@ -169,7 +169,7 @@ The operator picks one channel and configures the minimum required fields inline
 ### 6.3 Step 4 — Done + Completeness Preview (new)
 
 ```
-✅ DocuGardener is live
+✅ Acme is live
 
 AI provider:   Gemini 2.5 Flash  ✅
 First channel: Email (forwarding active)  ✅
@@ -294,7 +294,7 @@ Each channel renders as a card in a responsive grid (2 columns on ≥1280px, 1 c
 │  Auto-reply posts back to the issue thread.             │
 │                                                          │
 │  Last event: 4 minutes ago                              │
-│  Repo: your-org/docugardener                     │
+│  Repo: your-org/acme                     │
 │                                              [Configure] │
 └─────────────────────────────────────────────────────────┘
 
@@ -351,9 +351,9 @@ Each flow follows the same three-part structure:
     → shows platform-specific forwarding steps inline
 
 [2] Configure send-as (recommended)
-    So replies appear to come from support@docugardener.io:
+    So replies appear to come from support@acme.io:
 
-    Add these DNS records to docugardener.io:
+    Add these DNS records to acme.io:
     ┌─────────────────────────────────────────────────────┐
     │ TXT  @                  v=spf1 include:nestfleet.dev  │
     │ TXT  nestfleet._domainkey  [value]            [Copy] │
@@ -474,15 +474,15 @@ Each flow follows the same three-part structure:
 ```
 [1] Create bot
     In Telegram: message @BotFather → /newbot → copy token
-    Bot name tip: "DocuGardener Support" (@DocuGardener_SupportBot)
+    Bot name tip: "Acme Support" (@Acme_SupportBot)
 
 [2] Configure
     Bot token:  [____________________]  [lock icon]
     [Connect →]   NestFleet calls setWebhook automatically
 
 [3] Verify
-    Bot username: @DocuGardener_SupportBot  ✅
-    [Send test message →]   opens t.me/DocuGardener_SupportBot
+    Bot username: @Acme_SupportBot  ✅
+    [Send test message →]   opens t.me/Acme_SupportBot
     ✅ Message received as case — Telegram is live
 ```
 
