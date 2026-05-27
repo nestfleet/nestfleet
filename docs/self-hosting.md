@@ -89,11 +89,18 @@ Channels connect external communication sources to NestFleet. Configure at least
 
 ### HTTPS via Caddy
 
-Caddy handles TLS automatically. Ensure:
-- `NESTFLEET_DOMAIN` is set to your public domain in `.env`
-- DNS A record points to your server's IP
-- Ports 80 and 443 are open and not blocked by a firewall
-- Caddy will provision a Let's Encrypt certificate on first request
+The default `Caddyfile.selfhost` serves plain HTTP — ideal for localhost and internal installs. To enable automatic TLS with Let's Encrypt on a public domain:
+
+1. Set `NESTFLEET_DOMAIN=yourcompany.example.com` in `.env`
+2. Switch the Caddy volume mount in `docker-compose.yml`:
+   ```yaml
+   - ./docker/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+   ```
+3. Ensure DNS A record points to your server's IP
+4. Ensure ports 80 and 443 are open in your firewall
+5. Restart: `docker-compose up -d caddy`
+
+Caddy will provision a Let's Encrypt certificate automatically on first request.
 
 ### SMTP for Notifications
 

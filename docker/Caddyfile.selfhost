@@ -1,10 +1,12 @@
 # NestFleet self-hosted Caddyfile
 #
-# For local dev:  NESTFLEET_DOMAIN defaults to "localhost" → plain HTTP, no TLS.
-# For production: set NESTFLEET_DOMAIN=yourcompany.example.com in .env and open
-#                 ports 80 + 443 — Caddy auto-provisions a Let's Encrypt cert.
+# Serves plain HTTP on localhost (no TLS, no redirect).
+# For production with a real domain + automatic TLS, use Caddyfile.prod instead:
+#   - Set NESTFLEET_DOMAIN=yourcompany.example.com in .env
+#   - Update the Caddy volume mount in docker-compose.yml to Caddyfile.prod
+#   - Open ports 80 + 443 — Caddy auto-provisions a Let's Encrypt cert.
 
-{$NESTFLEET_DOMAIN:localhost} {
+http://{$NESTFLEET_DOMAIN:localhost} {
 
   # ── SSE / WebSocket (socket.io) ─────────────────────────────────────────────
   @socketio {
