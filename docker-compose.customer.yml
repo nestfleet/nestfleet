@@ -40,7 +40,7 @@ services:
       PORT:             3001
       DATABASE_URL:     postgres://nestfleet:${POSTGRES_PASSWORD}@postgres:5432/nestfleet
       JWT_SECRET:       ${JWT_SECRET:?JWT_SECRET required}
-      ENCRYPTION_KEY:   ${ENCRYPTION_KEY:?ENCRYPTION_KEY required}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY:?SECRET_ENCRYPTION_KEY required}
       LOG_LEVEL:        ${LOG_LEVEL:-info}
       # LLM (bundled — customers configure provider/model via setup wizard)
       LLM_PROVIDER:     ${LLM_PROVIDER:-google}

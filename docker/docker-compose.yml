@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: nestfleet
       POSTGRES_USER: nestfleet
-      POSTGRES_PASSWORD: nestfleet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nestfleet}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
