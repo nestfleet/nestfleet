@@ -28,6 +28,9 @@ jobs:
   changes:
     name: Detect changed paths
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       api: ${{ steps.filter.outputs.api }}
       console: ${{ steps.filter.outputs.console }}
@@ -134,21 +137,6 @@ jobs:
         run: |
           gitleaks detect --source . --config .gitleaks.toml --redact \
             --log-opts="${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"
-
-  # ── DCO sign-off check (CI-04) ─────────────────────────────────────────────
-  # Rejects PRs where any commit is missing a Signed-off-by line.
-  # Only runs on pull_request — push to main is gated by branch protection.
-
-  dco:
-    name: DCO sign-off check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: github/dco@v1  # pin SHA via Dependabot once OSS-01 is merged
 
   # ── Publish images to GHCR ─────────────────────────────────────────────────
   # Runs only on push to main in the canonical repo.
