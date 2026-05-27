@@ -22,13 +22,13 @@ Edit `.env` and fill in the required variables:
 ```bash
 # Generate secrets
 openssl rand -hex 32   # use output for JWT_SECRET
-openssl rand -hex 32   # use output for ENCRYPTION_KEY
+openssl rand -hex 32   # use output for SECRET_ENCRYPTION_KEY
 openssl rand -hex 16   # use output for POSTGRES_PASSWORD
 ```
 
 ```env
 JWT_SECRET=<paste-generated-value>
-ENCRYPTION_KEY=<paste-generated-value>
+SECRET_ENCRYPTION_KEY=<paste-generated-value>
 POSTGRES_PASSWORD=<paste-generated-value>
 LLM_PROVIDER=anthropic
 LLM_API_KEY=sk-ant-...
@@ -52,7 +52,7 @@ This starts four containers:
 |---|---|---|
 | `postgres` | PostgreSQL 16 database | 5432 |
 | `api` | NestFleet API (Hono) | 3001 |
-| `console` | Operator Console (Next.js) | 3000 |
+| `console` | Operator Console (Next.js) | 3002 |
 | `caddy` | Reverse proxy + automatic TLS | 80, 443 |
 
 The API automatically runs database migrations on startup. Wait for the healthcheck to pass:
