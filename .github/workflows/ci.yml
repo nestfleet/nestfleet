@@ -244,6 +244,9 @@ jobs:
         run: sudo apt-get install -y jq
 
       - name: Smoke test
+        env:
+          CANARY_EMAIL: ${{ secrets.CANARY_EMAIL }}
+          CANARY_PASSWORD: ${{ secrets.CANARY_PASSWORD }}
         run: |
           sleep 30
 
@@ -255,10 +258,11 @@ jobs:
           echo "Health check passed: $HEALTH"
 
           # 2. Auth flow — real login, JWT returned (proves DB read works)
-          if [ -n "${{ secrets.CANARY_EMAIL }}" ] && [ -n "${{ secrets.CANARY_PASSWORD }}" ]; then
+          if [ -n "$CANARY_EMAIL" ] && [ -n "$CANARY_PASSWORD" ]; then
+            PAYLOAD=$(jq -n --arg email "$CANARY_EMAIL" --arg password "$CANARY_PASSWORD" '{email:$email,password:$password}')
             LOGIN=$(curl --fail --silent -X POST https://nestfleet.dev/api/v1/auth/login \
               -H "Content-Type: application/json" \
-              -d '{"email":"${{ secrets.CANARY_EMAIL }}","password":"${{ secrets.CANARY_PASSWORD }}"}')
+              -d "$PAYLOAD")
             echo "$LOGIN" | grep -q '"token"' || (echo "Login did not return a token: $LOGIN" && exit 1)
             echo "Auth smoke passed"
 
