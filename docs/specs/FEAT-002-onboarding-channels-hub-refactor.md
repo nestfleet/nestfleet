@@ -294,7 +294,7 @@ Each channel renders as a card in a responsive grid (2 columns on ≥1280px, 1 c
 │  Auto-reply posts back to the issue thread.             │
 │                                                          │
 │  Last event: 4 minutes ago                              │
-│  Repo: alexey-kopachev/docugardener                     │
+│  Repo: your-org/docugardener                     │
 │                                              [Configure] │
 └─────────────────────────────────────────────────────────┘
 

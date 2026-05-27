@@ -7,8 +7,14 @@
 # Defaults work against the local community instance at localhost:8080.
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
-PRODUCT_ID="${PRODUCT_ID:-prod_01knvpqm6jn87f2zfsg5765d0n}"
+PRODUCT_ID="${PRODUCT_ID:-}"
 API_KEY="${API_KEY:-seed-key-freetest-2026}"
+
+if [ -z "$PRODUCT_ID" ]; then
+  echo "Error: PRODUCT_ID environment variable is required"
+  exit 1
+fi
+
 ENDPOINT="${BASE_URL}/webhooks/external/${PRODUCT_ID}"
 
 post_signal() {

@@ -6,7 +6,7 @@
  *
  * Options:
  *   --product-id      Product ID to ingest under             (default: "docugardener")
- *   --docs-dir        Path to the docs directory to scan     (default: DocuGardener docs)
+ *   --docs-dir        Path to the docs directory to scan     (required)
  *   --product-version Product version string                 (default: "1.0")
  *
  * After the main ingestion, also ingests a "stale" product variant
@@ -38,17 +38,16 @@ import type { DocumentationHealthReport } from "../src/memory/types.js"
 // ── 3. Constants ─────────────────────────────────────────────────────────────
 
 const DEFAULT_PRODUCT_ID = "docugardener"
-const DEFAULT_DOCS_DIR = "/Users/Alexey_Kopachev/Alex/AI Projects/DocuGardener/docs"
 const DEFAULT_PRODUCT_VERSION = "1.0"
 const STALE_PRODUCT_ID_SUFFIX = "-stale"
 const STALE_MS = 200 * 24 * 60 * 60 * 1000
 
 // ── 4. CLI argument parsing ──────────────────────────────────────────────────
 
-function parseArgs(): { productId: string; docsDir: string; productVersion: string } {
+function parseArgs(): { productId: string; docsDir: string | undefined; productVersion: string } {
   const args = process.argv.slice(2)
   let productId = DEFAULT_PRODUCT_ID
-  let docsDir = DEFAULT_DOCS_DIR
+  let docsDir: string | undefined = undefined
   let productVersion = DEFAULT_PRODUCT_VERSION
 
   for (let i = 0; i < args.length; i++) {
@@ -205,6 +204,11 @@ async function main(): Promise<void> {
   }
 
   const { productId, docsDir, productVersion } = parseArgs()
+
+  if (!docsDir) {
+    console.error("Usage: tsx scripts/ingest-docs.ts --docs-dir <path>")
+    process.exit(1)
+  }
 
   logger.info(
     { productId, docsDir, productVersion },

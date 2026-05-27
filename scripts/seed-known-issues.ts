@@ -12,7 +12,11 @@ import { getDb, closeDb } from "../src/infra/db/client.js"
 import { embedText } from "../src/memory/ingestion/embedder.js"
 import crypto from "node:crypto"
 
-const PRODUCT_ID = "prod_01kkyb2x4444sj4px80v3253ha"
+const PRODUCT_ID = process.env.PRODUCT_ID
+if (!PRODUCT_ID) {
+  console.error("Error: PRODUCT_ID environment variable is required")
+  process.exit(1)
+}
 const NOW = new Date()
 
 interface ChunkDef {

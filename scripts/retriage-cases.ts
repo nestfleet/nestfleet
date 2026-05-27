@@ -6,6 +6,12 @@ import { getDb } from "../src/infra/db/client.js"
 import { newId } from "../src/infra/db/id.js"
 import { dispatch } from "../src/agents/dispatcher.js"
 
+const PRODUCT_ID = process.env.PRODUCT_ID
+if (!PRODUCT_ID) {
+  console.error("Error: PRODUCT_ID environment variable is required")
+  process.exit(1)
+}
+
 async function main() {
   const db = getDb()
 
@@ -13,7 +19,7 @@ async function main() {
     SELECT case_id, product_id, title
     FROM cases
     WHERE status = 'enriching'
-    AND product_id = 'prod_01kkyb2x4444sj4px80v3253ha'
+    AND product_id = ${PRODUCT_ID}
     ORDER BY created_at ASC
   `
 

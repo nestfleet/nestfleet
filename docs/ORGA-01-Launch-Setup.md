@@ -106,7 +106,7 @@ SMTP_FROM=NestFleet <noreply@nestfleet.dev>
 6. Push the local repo:
 
 ```bash
-cd "/Users/Alexey_Kopachev/Alex/AI Projects/NestFleet"
+cd nestfleet/
 git remote add origin https://github.com/nestfleet/nestfleet.git
 git push -u origin main
 ```

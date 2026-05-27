@@ -7,7 +7,11 @@ import { newId } from "../src/infra/db/id.js"
 import { dispatch } from "../src/agents/dispatcher.js"
 
 const CASE_ID    = process.argv[2] ?? "case_01kkyxtj0j6ecgw336zxmgjmtn"
-const PRODUCT_ID = "prod_01kkyb2x4444sj4px80v3253ha"
+const PRODUCT_ID = process.env.PRODUCT_ID
+if (!PRODUCT_ID) {
+  console.error("Error: PRODUCT_ID environment variable is required")
+  process.exit(1)
+}
 
 async function main() {
   const db = getDb()

@@ -50,4 +50,10 @@ Integration Test Scenario*
 console/BACKLOG.md
 chat-test.html
 .lineage-backup-*/
-docs/archive/competitor-revenue-research.md
+
+# Internal business docs — keep private
+docs/business/
+docs/archive/
+docs/active/nf-pivot-architecture-analysis.md
+# Beta evaluation scripts — customer-specific
+scripts/beta-eval/
