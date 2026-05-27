@@ -28,11 +28,17 @@ Then open `.env` and fill in the required variables (see table below). Three are
 
 **3. Start NestFleet**
 
+**Linux / Linux VPS** — pulls pre-built images from GHCR (fastest):
 ```bash
 docker compose up -d
 ```
 
-This starts PostgreSQL, the API (runs DB migrations automatically), the console, and a Caddy reverse proxy. First startup takes 1–2 minutes while images are pulled.
+**macOS (Apple Silicon)** — builds images locally from source (native arm64):
+```bash
+docker compose up -d --build
+```
+
+This starts PostgreSQL, the API (runs DB migrations automatically), the console, and a Caddy reverse proxy. First startup takes 1–2 minutes (pull) or 3–5 minutes (local build).
 
 **4. Verify it's running**
 
