@@ -649,6 +649,7 @@ export default function HomePage() {
               <Link href="/login"     className="hover:text-gray-900 transition-colors">Console</Link>
               <a href="#how-it-works" className="hover:text-gray-900 transition-colors">How it works</a>
               <a href="#features"      className="hover:text-gray-900 transition-colors">Features</a>
+              <Link href="/docs"      className="hover:text-gray-900 transition-colors">Docs</Link>
               <a href="#integrations" className="hover:text-gray-900 transition-colors">Integrations</a>
               <a href="#pricing"      className="hover:text-gray-900 transition-colors">Pricing</a>
               <a href="#faq"          className="hover:text-gray-900 transition-colors">FAQ</a>

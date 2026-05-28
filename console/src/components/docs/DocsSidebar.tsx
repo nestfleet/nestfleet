@@ -17,6 +17,20 @@ const NAV = [
     ],
   },
   {
+    group: "Guides",
+    items: [
+      { label: "Core Concepts",           href: "/docs/concepts" },
+      { label: "Getting Started",         href: "/docs/getting-started" },
+      { label: "Managing Cases",          href: "/docs/cases" },
+      { label: "Change Requests",         href: "/docs/change-requests" },
+      { label: "Knowledge Base",          href: "/docs/knowledge-base" },
+      { label: "Team & Roles",            href: "/docs/team-and-roles" },
+      { label: "Notifications",           href: "/docs/notifications" },
+      { label: "Analytics",               href: "/docs/analytics" },
+      { label: "Settings & Configuration",href: "/docs/settings" },
+    ],
+  },
+  {
     group: "User Guide",
     items: [
       { label: "Cases & Triage",       href: "/docs/user-guide/cases" },

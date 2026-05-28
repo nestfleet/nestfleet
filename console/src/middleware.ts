@@ -17,6 +17,7 @@
  * Paths excluded from all checks:
  *   - /setup     (the wizard itself)
  *   - /login     (auth page)
+ *   - /docs/*    (public documentation — no auth or setup guard needed)
  *   - /_next/*   (Next.js internals)
  *   - /api/*     (API routes — not page navigation)
  *   - static assets (favicons, etc.)
@@ -33,7 +34,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ||
   "http://localhost:3001";
 
-const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots", "/account"];
+const BYPASS_PREFIXES = ["/_next", "/api", "/favicon", "/robots", "/account", "/docs"];
 const BYPASS_EXACT    = ["/setup", "/login", "/register", "/signup", "/terms", "/privacy"];
 
 // Matches /p/<slug> and /p/<slug>/anything

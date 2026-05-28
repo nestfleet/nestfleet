@@ -9,6 +9,7 @@ import Link from "next/link";
 const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Features",      href: "#features" },
+  { label: "Docs",          href: "/docs" },
   { label: "Integrations", href: "#integrations" },
   { label: "Pricing",      href: "#pricing" },
   { label: "FAQ",          href: "#faq" },
@@ -45,15 +46,25 @@ export function LandingNav() {
 
           {/* Nav links */}
           <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-gray-500">
-            {NAV_LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="hover:text-gray-900 transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((l) =>
+              l.href.startsWith("/") ? (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ) : (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className="hover:text-gray-900 transition-colors"
+                >
+                  {l.label}
+                </a>
+              )
+            )}
           </nav>
 
           {/* GitHub + CTA */}
