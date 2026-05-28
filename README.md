@@ -107,41 +107,44 @@ Operators see everything in the console and can intervene at any step. The AI ha
 ```mermaid
 flowchart TD
     subgraph Channels["Inbound Channels"]
-        E[📧 Email]
-        T[💬 Telegram]
-        G[🐙 GitHub]
-        W[🔗 Webhook / Contact Form]
+        E["📧 Email"]
+        T["💬 Telegram"]
+        G["🐙 GitHub"]
+        W["🔗 Webhook / Contact Form"]
     end
 
     subgraph Ingress["Ingress Layer"]
-        SI[Signal Ingress\ndedup · thread-group · normalise]
+        SI["Signal Ingress\ndedup · thread-group · normalise"]
     end
 
-    subgraph Pipeline["AI Pipeline — pg-boss job queue"]
-        TR[🔎 Triage Agent\nclassify severity · type · confidence]
-        KI[🧠 Known Issue Match\nvector search · RAG · runbooks]
+    subgraph Pipeline["AI Pipeline — pg-boss queue"]
+        TR["🔎 Triage Agent\nseverity · type · confidence"]
+        KI["🧠 Known Issue Match\nvector search · RAG · runbooks"]
 
         TR --> KI
 
-        KI -->|"known issue\nhigh confidence"| AR[✉️ Auto-Reply Agent\ndraft · send · close]
-        KI -->|"outage signals\nkeyword + type match"| OR[🚨 Outage Routing\nescalate to lead"]
-        KI -->|"novel bug\nor low confidence"| CP[🔧 Change Prep Agent\nrisk assess · CR · GitHub PR draft]
-        KI -->|"needs human\nreview"| ES[👤 Escalate to Operator]
+        KI -->|"known issue, high confidence"| AR["✉️ Auto-Reply\ndraft · send · close"]
+        KI -->|"outage signals"| OR["🚨 Outage Routing\nescalate to lead"]
+        KI -->|"novel bug"| CP["🔧 Change Prep\nrisk assess · CR · PR draft"]
+        KI -->|"low confidence"| ES["👤 Escalate to Operator"]
     end
 
     subgraph Outcomes["Outcomes"]
-        RC[✅ Resolved autonomously]
-        AP[⏳ Awaiting operator approval]
-        PR[🔀 GitHub PR drafted]
-        KB[📚 Knowledge base updated]
+        RC["✅ Resolved autonomously"]
+        AP["⏳ Awaiting operator approval"]
+        PRO["🔀 GitHub PR drafted"]
+        KB["📚 Knowledge base updated"]
     end
 
-    E & T & G & W --> SI
+    E --> SI
+    T --> SI
+    G --> SI
+    W --> SI
     SI --> TR
     AR --> RC
     AR --> KB
     OR --> AP
-    CP --> PR
+    CP --> PRO
     CP --> AP
     ES --> AP
 
