@@ -67,7 +67,7 @@ Two options: an **incoming webhook** (simplest) or a **bot token** (richer inter
 4. Click **Send test message**
 
 ```bash
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T00000000/B00000000/xxxxxxxxxxxxxxxxxxxxxxxx
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/TXXXXXXXX/BXXXXXXXX/your-webhook-token
 ```
 
 ### Bot token
@@ -80,8 +80,8 @@ A bot token unlocks interactive buttons (Approve / Reject directly from Slack) a
 4. In NestFleet, paste under **Slack → Bot token**
 
 ```bash
-SLACK_BOT_TOKEN=xoxb-1234567890-1234567890-xxxxxxxxxxxxxxxxxxxxxxxx
-SLACK_SIGNING_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+SLACK_BOT_TOKEN=xoxb-your-bot-token-here
+SLACK_SIGNING_SECRET=your-signing-secret-here
 ```
 
 > **Note:** if both webhook and bot token are configured, the bot token wins.
