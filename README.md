@@ -102,6 +102,77 @@ A support message arrives (email, Telegram, contact form, GitHub, or custom webh
 
 Operators see everything in the console and can intervene at any step. The AI handles the volume; humans handle the judgment calls.
 
+### Signal-to-Resolution Pipeline
+
+```mermaid
+flowchart TD
+    subgraph Channels["Inbound Channels"]
+        E[📧 Email]
+        T[💬 Telegram]
+        G[🐙 GitHub]
+        W[🔗 Webhook / Contact Form]
+    end
+
+    subgraph Ingress["Ingress Layer"]
+        SI[Signal Ingress\ndedup · thread-group · normalise]
+    end
+
+    subgraph Pipeline["AI Pipeline — pg-boss job queue"]
+        TR[🔎 Triage Agent\nclassify severity · type · confidence]
+        KI[🧠 Known Issue Match\nvector search · RAG · runbooks]
+
+        TR --> KI
+
+        KI -->|"known issue\nhigh confidence"| AR[✉️ Auto-Reply Agent\ndraft · send · close]
+        KI -->|"outage signals\nkeyword + type match"| OR[🚨 Outage Routing\nescalate to lead"]
+        KI -->|"novel bug\nor low confidence"| CP[🔧 Change Prep Agent\nrisk assess · CR · GitHub PR draft]
+        KI -->|"needs human\nreview"| ES[👤 Escalate to Operator]
+    end
+
+    subgraph Outcomes["Outcomes"]
+        RC[✅ Resolved autonomously]
+        AP[⏳ Awaiting operator approval]
+        PR[🔀 GitHub PR drafted]
+        KB[📚 Knowledge base updated]
+    end
+
+    E & T & G & W --> SI
+    SI --> TR
+    AR --> RC
+    AR --> KB
+    OR --> AP
+    CP --> PR
+    CP --> AP
+    ES --> AP
+
+    style Channels fill:#f0f4ff,stroke:#c7d2fe
+    style Pipeline fill:#fafafa,stroke:#e5e7eb
+    style Outcomes fill:#f0fdf4,stroke:#bbf7d0
+```
+
+### Deployment Architecture
+
+```mermaid
+flowchart LR
+    Browser -->|"80 / 443"| Caddy
+
+    subgraph Docker["Docker network — nestfleet"]
+        Caddy["🔀 Caddy\nreverse proxy + TLS"]
+        Console["🖥️ Console\nNext.js :3002"]
+        API["⚡ API\nHono :3001"]
+        DB[("🐘 PostgreSQL 16\n+ pgvector :5432")]
+
+        Caddy -->|"/api/* /webhooks/*"| API
+        Caddy -->|"everything else"| Console
+        Console -->|"internal SSR calls"| API
+        API --> DB
+    end
+
+    API -->|"LLM calls\n(your API key)"| LLM["☁️ Anthropic / OpenAI\nGemini / Ollama"]
+
+    style Docker fill:#f8fafc,stroke:#e2e8f0
+```
+
 ---
 
 ## Features
