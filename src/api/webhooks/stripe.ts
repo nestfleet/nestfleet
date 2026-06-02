@@ -22,7 +22,7 @@ export const stripeWebhookRouter = new Hono()
 
 stripeWebhookRouter.post("/webhooks/stripe", async (c) => {
   if (!config.BILLING_ENABLED) {
-    return c.json({ error: "BILLING_NOT_ENABLED" }, 404)
+    return c.json({ received: true }, 200)
   }
 
   const sig = c.req.header("stripe-signature")
