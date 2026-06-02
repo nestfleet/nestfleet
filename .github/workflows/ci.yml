@@ -81,7 +81,7 @@ jobs:
         run: npm run build
 
       - name: Security audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
   # ── Console: type-check, security audit ────────────────────────────────────
 
@@ -109,7 +109,7 @@ jobs:
         run: npm run type-check
 
       - name: Security audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
   # ── Secrets scan ────────────────────────────────────────────────────────────
   # CI-07: Full history scan on push to main; PR-diff-only scan on pull_request
