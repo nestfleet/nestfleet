@@ -78,12 +78,13 @@ vi.mock("../../../src/fleet/operator-key.js", () => ({
   isFleetOperatorAuthorized: () => false,
 }))
 
-// Mock Stripe SDK to avoid real HTTP calls
-const mockCheckoutCreate = vi.fn()
+// vi.hoisted() so mockCheckoutCreate is defined before the hoisted vi.mock() factory runs.
+const { mockCheckoutCreate } = vi.hoisted(() => ({ mockCheckoutCreate: vi.fn() }))
+
 vi.mock("stripe", () => ({
-  default: vi.fn().mockImplementation(() => ({
-    checkout: { sessions: { create: mockCheckoutCreate } },
-  })),
+  default: vi.fn(function() {
+    return { checkout: { sessions: { create: mockCheckoutCreate } } }
+  }),
 }))
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -56,9 +56,9 @@ describe("SEC-ST2 — getStripeClient() rejects test key in production", () => {
 
     // Mock Stripe SDK to avoid real HTTP calls
     vi.doMock("stripe", () => ({
-      default: vi.fn().mockImplementation(() => ({
-        checkout: { sessions: { create: vi.fn() } },
-      })),
+      default: vi.fn(function() {
+        return { checkout: { sessions: { create: vi.fn() } } }
+      }),
     }))
 
     const { getStripeClient } = await import("../../../src/billing/stripe.js")
@@ -92,9 +92,9 @@ describe("SEC-ST2 — getStripeClient() rejects test key in production", () => {
 
     // Mock Stripe constructor to avoid real network call
     vi.doMock("stripe", () => ({
-      default: vi.fn().mockImplementation(() => ({
-        checkout: { sessions: { create: vi.fn() } },
-      })),
+      default: vi.fn(function() {
+        return { checkout: { sessions: { create: vi.fn() } } }
+      }),
     }))
 
     const { getStripeClient } = await import("../../../src/billing/stripe.js")

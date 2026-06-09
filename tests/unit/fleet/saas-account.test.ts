@@ -81,15 +81,15 @@ vi.mock("../../../src/email/sender.js", () => ({
 }))
 
 // ── Stripe mock ───────────────────────────────────────────────────────────────
+// vi.hoisted() so mockPortalCreate is defined before the hoisted vi.mock() factory runs.
 
-const mockPortalCreate = vi.fn()
+const { mockPortalCreate } = vi.hoisted(() => ({ mockPortalCreate: vi.fn() }))
 
-vi.mock("stripe", () => {
-  const StripeClass = vi.fn().mockImplementation(() => ({
-    billingPortal: { sessions: { create: mockPortalCreate } },
-  }))
-  return { default: StripeClass }
-})
+vi.mock("stripe", () => ({
+  default: vi.fn(function() {
+    return { billingPortal: { sessions: { create: mockPortalCreate } } }
+  }),
+}))
 
 // ── Other fleet mocks ─────────────────────────────────────────────────────────
 

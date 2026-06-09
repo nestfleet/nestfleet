@@ -113,16 +113,17 @@ vi.mock("../../../src/infra/db/repositories/telemetry.js", () => ({
 }))
 
 // ── Stripe SDK mock ───────────────────────────────────────────────────────────
+// vi.hoisted() so the mock var is defined before the hoisted vi.mock() factory runs.
 
-const mockCheckoutSessionsCreate = vi.fn()
+const { mockCheckoutSessionsCreate } = vi.hoisted(() => ({
+  mockCheckoutSessionsCreate: vi.fn(),
+}))
 
-vi.mock("stripe", () => {
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      checkout: { sessions: { create: mockCheckoutSessionsCreate } },
-    })),
-  }
-})
+vi.mock("stripe", () => ({
+  default: vi.fn(function() {
+    return { checkout: { sessions: { create: mockCheckoutSessionsCreate } } }
+  }),
+}))
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

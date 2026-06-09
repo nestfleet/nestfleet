@@ -12,22 +12,27 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 // ── Mock ssh2 before importing the module under test ─────────────────────────
+// vi.hoisted() ensures these are defined before vi.mock() factories run.
 
-const mockSftpPut = vi.fn()
-const mockExec = vi.fn()
-const mockEnd = vi.fn()
-const mockSftp = vi.fn()
-
-const mockClient = {
-  connect: vi.fn(),
-  on:      vi.fn(),
-  sftp:    mockSftp,
-  exec:    mockExec,
-  end:     mockEnd,
-}
+const { mockSftpPut, mockExec, mockEnd, mockSftp, mockClient } = vi.hoisted(() => {
+  const mockSftpPut = vi.fn()
+  const mockExec    = vi.fn()
+  const mockEnd     = vi.fn()
+  const mockSftp    = vi.fn()
+  const mockClient  = {
+    connect: vi.fn(),
+    on:      vi.fn(),
+    sftp:    mockSftp,
+    exec:    mockExec,
+    end:     mockEnd,
+  }
+  return { mockSftpPut, mockExec, mockEnd, mockSftp, mockClient }
+})
 
 vi.mock("ssh2", () => ({
-  Client: vi.fn(() => mockClient),
+  // Regular function required — vitest 4.x uses Reflect.construct on the impl,
+  // which fails for arrow functions.
+  Client: vi.fn(function() { return mockClient }),
 }))
 
 const { sshExec, sshWriteFile } = await import("../../../src/fleet/ssh-exec.js")
