@@ -220,6 +220,32 @@
 | OPS-M-03 | ollama-ai-provider CVE — @ai-sdk/provider-utils uncontrolled resource consumption | XS | P2 | ⏳ Monitoring | Low severity. No fix available upstream. `ollama-ai-provider` pins an old `@ai-sdk/provider-utils ≤3.0.97`. CI audit gate excludes dev deps (`--omit=dev`) — this is a runtime dep so will surface when fixed upstream. Check for fix when upgrading AI SDK. |
 | OPS-M-04 | CI actions on deprecated Node 20 runtime (GitHub force-migrates to Node 24 on 2026-06-16) | XS | P1 | ✅ Done (2026-06-14) | Bumped SHA-pinned actions to Node 24 majors: `actions/checkout` v4→v6.0.3 (`df4cb1c`), `dorny/paths-filter` v3→v4.0.1 (`fbd0ab8`, now SHA-pinned), `docker/setup-buildx-action` v3→v4.1.0 (`d7f5e7f`). Others already Node 24 (`setup-node@v6.4.0`, `build-push@v6`, `cache@v5`, `upload-artifact@v7`, `login-action@v3`). Verified via PR CI: `changes`+`secrets` jobs exercise checkout v6 + paths-filter v4. `setup-buildx-action` v4 runs only on main-push `publish` job — exercised on next code deploy (low-risk official-action bump). |
 | OPS-M-05 | esbuild CVEs — RCE via NPM_CONFIG_REGISTRY (high) + arbitrary file read on Windows dev server (low) | XS | P1 | ✅ Done (2026-06-14) | Dependabot alerts #52/#53. esbuild `<0.28.1` → pinned `^0.28.1` via root `overrides`. Dev-only transitive (via `tsx@4.21` and `vite@8`←`vitest`); never in the runtime image. Verified locally: full unit suite (1509 tests) + `tsc --noEmit` green on esbuild 0.28.1 — esbuild is the vitest/tsx transform engine, so a green suite exercises it directly. |
+| OPS-M-06 | Stripe SDK v21 → v22 (Dependabot PR #47) | S | P3 (deferred — paid features on hold) | ⏸️ Deferred / analysis done (2026-06-14) | **Do not action until paid/billing comes off hold.** Full prep below so the fix needs no re-investigation. See detailed analysis in **OPS-M-06 notes** under the backlog table. |
+
+---
+
+#### OPS-M-06 notes — Stripe v21 → v22 upgrade prep (analysis 2026-06-14)
+
+> Context captured from a deep analysis so the fix can be executed without re-investigation once paid/billing is reactivated. Dependabot PR is **#47** (`stripe 21.0.1 → 22.2.0`); currently held, CI failing.
+
+**Root cause of CI failure (entire failure — nothing else):**
+Stripe SDK v22.2.0 advanced its pinned `apiVersion` literal type `2026-03-25.dahlia` → `2026-05-27.dahlia`. The code hardcodes the old string in **4 sites**, producing 4× `TS2322`:
+- `src/billing/stripe.ts:19`
+- `src/fleet/api/owner.ts:369`
+- `src/fleet/api/saas-account.ts:244`
+- `src/fleet/api/saas.ts:106`
+
+**Stripe API surface in use (small, stable):** `checkout.sessions`, `billingPortal.sessions`, `subscriptions.{list,retrieve,update}`, `webhooks.constructEvent`.
+
+**Risk assessment — three layers, all low:**
+1. *SDK v22 breaking changes* (tsc-detectable): only the apiVersion type affected us — proof that the rest don't apply. Verified non-applicable: Stripe-now-true-ES6-class (we already use `new Stripe()`), removed callbacks / plain-key-as-arg (we pass `(key,{apiVersion})`), RequestParams-first/RequestOptions-second ordering, removed `StripeResource` internals, removed per-request host override, `Stripe.StripeContext`→`StripeContextType` (all unused).
+2. *API-version behavior* `2026-03-25.dahlia` → `2026-05-27.dahlia` (GA `.dahlia` channel, not preview): all changes in that window are non-breaking/additive for our 6 methods. The breaking changes (e.g. `billed_until` default removal) are in the `.preview` channel, which we do not pin.
+3. *Tests*: 9 files mock `stripe` by replacing the default export with a constructor mock (`default: vi.fn(function(){…})`), so they are version-agnostic; none assert the apiVersion string. **No test changes needed.**
+
+**Recommended fix (XS–S, high confidence):**
+- *Minimal:* set the 4 strings to `2026-05-27.dahlia`.
+- *Better (kills the recurring break):* the 3 `fleet/api/*` files each do their own `new Stripe(...)` instead of using the existing `getStripeClient()` singleton in `src/billing/stripe.ts`. Route all instantiation through the singleton and define the apiVersion **once** as a named const. Future Stripe bumps then touch a single line. Bonus: the singleton enforces the **SEC-ST2** test-key-in-prod guard that the 3 ad-hoc instances currently bypass — fixing a latent inconsistency.
+- *Verify:* `npm run lint` + `npm test` (full suite covers all Stripe call sites via mocks). No prod-only behavior to smoke-test since the API-version delta is additive.
 
 ---
 
