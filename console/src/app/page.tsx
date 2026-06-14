@@ -8,11 +8,11 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "NestFleet — AI-native product operations platform",
   description:
-    "Self-host for free or get managed hosting. NestFleet handles support intake, triage, change management, and AI-assisted replies for your product.",
+    "Open-source, self-hosted product operations. NestFleet handles support intake, triage, change management, and AI-assisted replies for your product. Free under AGPL-3.0.",
   openGraph: {
     title: "NestFleet — AI-native product operations platform",
     description:
-      "Self-host for free or get managed hosting. AI-driven triage, auto-reply, change management, and living knowledge base for your product.",
+      "Open-source and self-hosted. AI-driven triage, auto-reply, change management, and living knowledge base for your product. Free under AGPL-3.0.",
     url: "https://nestfleet.dev",
     siteName: "NestFleet",
     type: "website",
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "NestFleet — AI-native product operations platform",
     description:
-      "Self-host for free or get managed hosting. AI-driven triage, auto-reply, and change management.",
+      "Open-source and self-hosted. AI-driven triage, auto-reply, and change management. Free under AGPL-3.0.",
     images: ["https://nestfleet.dev/og-image.png"],
   },
   alternates: { canonical: "https://nestfleet.dev" },
@@ -378,7 +378,7 @@ export default function HomePage() {
           <div className="space-y-8">
             <div className="hero-anim-1 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700">
               <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              Free to self-host · Managed cloud in early access
+              Free &amp; open source · Self-host today · AGPL-3.0
             </div>
 
             <div className="hero-anim-2">
@@ -416,12 +416,14 @@ export default function HomePage() {
               >
                 Self-host free →
               </a>
-              <Link
-                href="/signup"
+              <a
+                href="https://github.com/nestfleet/nestfleet"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="rounded-xl border border-indigo-200 bg-white px-6 py-3.5 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 active:scale-95 transition-all"
               >
-                Managed cloud →
-              </Link>
+                View on GitHub →
+              </a>
               <a
                 href="#how-it-works"
                 className="text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors"
@@ -617,17 +619,19 @@ export default function HomePage() {
               Your PostgreSQL, your data, your control.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/signup"
+              <a
+                href="https://github.com/nestfleet/nestfleet#quick-start"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-indigo-700 shadow hover:shadow-md active:scale-95 transition-all"
               >
-                Get started free →
-              </Link>
+                Self-host free on GitHub →
+              </a>
               <a
-                href="#pricing"
+                href="#how-it-works"
                 className="rounded-xl border border-indigo-400/60 px-7 py-3.5 text-sm font-semibold text-indigo-100 hover:bg-indigo-500/30 transition-all"
               >
-                View pricing
+                See how it works
               </a>
             </div>
           </div>

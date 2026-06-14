@@ -12,16 +12,15 @@ import {
   getLockedTeaserFeatures,
   getTierNote,
 } from "@/lib/feature-catalog";
-import { WaitlistButton } from "@/components/WaitlistButton";
-import { WAITLIST_MODE } from "@/lib/flags";
-
 // ── Plan metadata (pricing / limits / CTA — not in FEATURE_CATALOG) ───────────
+
+const GITHUB_REPO = "https://github.com/nestfleet/nestfleet";
 
 interface PlanMeta {
   key:      ProductTier;
   name:     string;
-  price:    string;
-  period:   string;
+  price:    string | null;   // null = pre-revenue tier, no price rendered
+  period:   string | null;
   desc:     string;
   limits:   string[];   // product count, OU quota, support — not feature catalog items
   cta:      string;
@@ -48,12 +47,12 @@ const PLANS: PlanMeta[] = [
   {
     key:     "starter",
     name:    "Starter",
-    price:   "$99",
-    period:  "per month · billed monthly or annually",
-    desc:    "Up to 3 products for solopreneurs and small teams. Includes a 30-day free trial — no card required.",
+    price:   null,
+    period:  "Managed plan — later",
+    desc:    "Up to 3 products for solopreneurs and small teams. Self-host it today; a managed option is planned.",
     limits:  ["Up to 3 active products", "1,000 Outcome Units / month", "Email support"],
-    cta:     "Start 30-day trial",
-    ctaHref: "/signup?plan=starter",
+    cta:     "Self-host free on GitHub",
+    ctaHref: GITHUB_REPO,
     popular: false,
     badge:   null,
     prev:    "Community",
@@ -61,12 +60,12 @@ const PLANS: PlanMeta[] = [
   {
     key:     "growth",
     name:    "Growth",
-    price:   "$499",
-    period:  "per month · billed monthly or annually",
-    desc:    "Up to 10 products with full analytics, GDPR tooling, and autonomous AI pipelines. 14-day trial available.",
+    price:   null,
+    period:  "Managed plan — later",
+    desc:    "Up to 10 products with full analytics, GDPR tooling, and autonomous AI pipelines. Self-host it today; a managed option is planned.",
     limits:  ["Up to 10 active products", "10,000 Outcome Units / month", "Priority email support"],
-    cta:     "Try Growth — 14 days",
-    ctaHref: "/signup?plan=growth",
+    cta:     "Self-host free on GitHub",
+    ctaHref: GITHUB_REPO,
     popular: true,
     badge:   null,
     prev:    "Starter",
@@ -74,12 +73,12 @@ const PLANS: PlanMeta[] = [
   {
     key:     "scale",
     name:    "Scale",
-    price:   "Custom",
-    period:  "starting at $2,500 / month",
+    price:   null,
+    period:  "Managed plan — later",
     desc:    "Unlimited products, full RBAC studio, SSO, custom compliance bundles, and dedicated support.",
     limits:  ["Unlimited active products", "100,000+ Outcome Units / month", "Dedicated onboarding + support"],
-    cta:     "Talk to us",
-    ctaHref: "mailto:hello@nestfleet.dev",
+    cta:     "Self-host free on GitHub",
+    ctaHref: GITHUB_REPO,
     popular: false,
     badge:   null,
     prev:    "Growth",
@@ -129,7 +128,7 @@ function LockedRow({ feature }: { feature: FeatureEntry }) {
 
 // ── Plan card ──────────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, visible, delay, blurPrice }: { plan: PlanMeta; visible: boolean; delay: string; blurPrice?: boolean }) {
+function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; delay: string }) {
   const newFeatures  = getNewFeaturesAtTier(plan.key);
   const lockedFeatures = getLockedTeaserFeatures(plan.key, 3);
 
@@ -159,8 +158,12 @@ function PlanCard({ plan, visible, delay, blurPrice }: { plan: PlanMeta; visible
       {/* Price block */}
       <div className="mb-5">
         <h3 className="text-lg font-bold text-gray-900 mb-1">{plan.name}</h3>
-        <p className={`text-2xl font-extrabold text-gray-900 ${blurPrice ? "blur-sm select-none" : ""}`}>{plan.price}</p>
-        <p className={`text-xs text-gray-400 mt-0.5 ${blurPrice ? "blur-sm select-none" : ""}`}>{plan.period}</p>
+        {plan.price && (
+          <p className="text-2xl font-extrabold text-gray-900">{plan.price}</p>
+        )}
+        {plan.period && (
+          <p className={`text-gray-400 mt-0.5 ${plan.price ? "text-xs" : "text-sm font-medium"}`}>{plan.period}</p>
+        )}
       </div>
 
       <p className="text-sm text-gray-500 leading-relaxed mb-5">{plan.desc}</p>
@@ -201,18 +204,8 @@ function PlanCard({ plan, visible, delay, blurPrice }: { plan: PlanMeta; visible
         )}
       </ul>
 
-      {/* Waitlist mode: replace paid plan CTAs with pre-registration button */}
-      {WAITLIST_MODE && (plan.key === "starter" || plan.key === "growth") ? (
-        <WaitlistButton
-          planHint={plan.key}
-          label="Join the waitlist →"
-          className={`block w-full rounded-xl py-3 text-center text-sm font-bold transition-all active:scale-95 ${
-            plan.popular
-              ? "!bg-indigo-600 !text-white hover:!bg-indigo-700 shadow-md shadow-indigo-200"
-              : "!bg-transparent border border-indigo-300 !text-indigo-700 hover:!bg-indigo-50"
-          }`}
-        />
-      ) : plan.ctaHref.startsWith("http") || plan.ctaHref.startsWith("mailto") ? (
+      {/* Landing CTA: self-host / GitHub only — no waitlist or paid-signup demand capture */}
+      {plan.ctaHref.startsWith("http") || plan.ctaHref.startsWith("mailto") ? (
         <a
           href={plan.ctaHref}
           target={plan.ctaHref.startsWith("http") ? "_blank" : undefined}
@@ -293,18 +286,14 @@ export function PricingSection() {
 
         {/* Tier cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PLANS.map((plan, i) => {
-            const blurPrice = process.env.NEXT_PUBLIC_BILLING_ENABLED !== "true" && plan.key !== "community";
-            return (
-              <PlanCard
-                key={plan.key}
-                plan={plan}
-                visible={visible}
-                delay={CARD_DELAYS[i]}
-                blurPrice={blurPrice}
-              />
-            );
-          })}
+          {PLANS.map((plan, i) => (
+            <PlanCard
+              key={plan.key}
+              plan={plan}
+              visible={visible}
+              delay={CARD_DELAYS[i]}
+            />
+          ))}
         </div>
 
         {/* Footer trust notes */}
@@ -318,7 +307,7 @@ export function PricingSection() {
             {
               icon:  "🔍",
               title: "Open source (AGPL-3.0)",
-              body:  "Full source code on GitHub. Inspect, fork, self-host. Managed SaaS available for teams that prefer zero ops.",
+              body:  "Full source code on GitHub. Inspect, fork, and self-host on your own infrastructure — no license fees, ever.",
             },
             {
               icon:  "🤖",
