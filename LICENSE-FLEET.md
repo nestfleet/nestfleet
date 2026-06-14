@@ -56,6 +56,4 @@ THE FLEET MODULE OR THE USE OR OTHER DEALINGS IN THE FLEET MODULE.
 
 ## Contact
 
-To obtain a commercial license or an operator key, contact:
-
-  **licensing@nestfleet.dev**
+A commercial license or operator key is not offered at this time.

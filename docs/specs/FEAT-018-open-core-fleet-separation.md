@@ -228,7 +228,7 @@ The files in `src/fleet/` constitute the NestFleet Fleet Management Module
 Violation of this license terminates your rights under AGPL-3.0 for the
 entire NestFleet repository.
 
-To obtain a commercial license: contact@nestfleet.dev
+A commercial license is not offered at this time.
 ```
 
 ### 5.2 File header template for all `src/fleet/**/*.ts` files
