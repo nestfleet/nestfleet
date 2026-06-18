@@ -66,6 +66,7 @@
     "@opentelemetry/core": "^2.8.0"
   },
   "notes": {
-    "otel-audit": "GHSA-q7rr-3cgh-j5r3 (Prometheus exporter crash) affects @opentelemetry/sdk-node <=0.216.0. NestFleet does not start a Prometheus metrics endpoint so this path is not reachable. Fix requires OTel ecosystem upgrade 0.57→0.217 (breaks @opentelemetry/core peer deps). Track in v0.2.0 backlog."
+    "otel-audit": "GHSA-q7rr-3cgh-j5r3 (Prometheus exporter crash) affects @opentelemetry/sdk-node <=0.216.0. NestFleet does not start a Prometheus metrics endpoint so this path is not reachable. Fix requires OTel ecosystem upgrade 0.57→0.217 (breaks @opentelemetry/core peer deps). Track in v0.2.0 backlog.",
+    "provider-utils-audit": "GHSA-866g-f22w-33x8 / CVE-2026-8769 (Uncontrolled Resource Consumption, CVSS 2.1 Low, EPSS 0.017%) affects @ai-sdk/provider-utils <=3.0.97. The only vulnerable copy (2.2.8) is pulled solely by ollama-ai-provider@1.2.0 (abandoned). All production providers (anthropic/openai/google/gateway) already use safe 4.0.x. The vulnerable JSON response-handler path is reachable only when an operator opts into the self-hosted Ollama provider (not the default) and parses responses from an Ollama endpoint they themselves run — an attacker would need to control that endpoint. No upstream patch exists for the 2.x line. The maintained fork ollama-ai-provider-v2 hard-peers zod ^4 while this repo is on zod ^3, so migrating would force repo-wide legacy-peer-deps + Dockerfile changes across all three deploy targets. Decision: won't-fix for now; revisit when NestFleet moves to zod 4 (the AI SDK stack is already heading there — @ai-sdk/anthropic peers zod ^4.1.8), at which point the fork installs cleanly. Dismiss alert #42 as low-risk."
   }
 }
