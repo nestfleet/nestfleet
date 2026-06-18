@@ -34,12 +34,18 @@ test("PD-01: console homepage returns HTML (app shell rendered)", async ({ page 
 
 // ── PD-02: Auth guard redirects unauthenticated users ────────────────────────
 
-test("PD-02: visiting a protected route redirects to /login", async ({ page }) => {
-  await page.goto("/")
-  // Allow navigation to settle
-  await page.waitForLoadState("networkidle")
-  // Should end up on /login (or /setup if first-run wizard)
-  expect(page.url()).toMatch(/\/(login|setup)/)
+test("PD-02: visiting a protected route unauthenticated redirects to /login", async ({ page }) => {
+  // /settings is a genuinely protected app route: middleware passes it through
+  // (no nf_last_product cookie in a fresh browser, needsSetup=false on the live
+  // instance), then the client-side useAuth guard in <AppLayout> redirects an
+  // unauthenticated visitor to /login. We do NOT use "/" here — with
+  // NEXT_PUBLIC_SHOW_LANDING=true the deployed build serves the public marketing
+  // landing page at "/", so it never redirects and would not exercise the guard.
+  await page.goto("/settings")
+  // The auth guard fires client-side after localStorage rehydration; wait for
+  // the redirect to /login rather than just network idle.
+  await page.waitForURL(/\/login/, { timeout: 10_000 })
+  expect(page.url()).toMatch(/\/login/)
 })
 
 // ── PD-03: Real login flow — browser UI ──────────────────────────────────────
