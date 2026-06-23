@@ -55,7 +55,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "msw": "^2.14.6",
     "testcontainers": "^12.0.0",
-    "tsx": "^4.19.3",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
   },
