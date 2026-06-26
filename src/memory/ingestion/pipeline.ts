@@ -250,7 +250,9 @@ function generateChunkId(
 
 import { discoverFiles, inferSourceType, inferAudience } from "../sources/filesystem.js"
 import type { FilesystemSourceOptions } from "../sources/filesystem.js"
-import yaml from "js-yaml"
+// js-yaml 5 is ESM named-only (no default export); namespace import keeps
+// the yaml.load(...) call site unchanged and links under native Node ESM.
+import * as yaml from "js-yaml"
 
 export interface BatchFilesystemIngestionOptions extends FilesystemSourceOptions {
   productId: string
