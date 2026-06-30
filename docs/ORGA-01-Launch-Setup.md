@@ -132,6 +132,9 @@ NestFleet's AI drafts pull requests on customers' repositories. For this, custom
 Currently the codebase has `GITHUB_APP_ID` / `GITHUB_APP_PRIVATE_KEY` config vars wired but no App
 has been registered — only a personal PAT is in use.
 
+> **⚠️ When implementing App installation-token minting (App JWT → `POST /app/installations/{id}/access_tokens`):**
+> GitHub is moving installation tokens to a stateless `ghs_` format that may be **~520 characters** (and could grow further). Do **not** hardcode any token length/format assumptions in the minting or storage path. NestFleet's current consumption path is already safe (opaque `Bearer` in `src/infra/github/client.ts`, stored encrypted in the `support_policy` JSONB column, no length validation or prefix regex), so reuse it. During development, force the new format early via the **per-request override header** from the [GitHub changelog](https://github.blog/changelog/) so you validate against `ghs_` before it becomes the default. Validated 2026-06-30: no existing length/format assumptions anywhere in the codebase or CI.
+
 > **Note:** This is NOT a GitHub Marketplace listing. NestFleet is not a GitHub-native app sold via Marketplace.
 > The App is installed by customers during onboarding (Settings → GitHub Integration).
 
