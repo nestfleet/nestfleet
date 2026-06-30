@@ -20,7 +20,7 @@ export default function ApiReferencePage() {
       </h1>
       <p className="text-gray-600 leading-relaxed mb-6 text-base">
         The NestFleet API is a REST API served by the Hono server. All endpoints are prefixed with
-        <code className="bg-gray-100 px-1 rounded text-xs ml-1">/api/v1</code> and return JSON.
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">/api/v1</code> and return JSON.
         A full OpenAPI specification is coming soon — this page covers the main endpoint groups and
         authentication flow.
       </p>
@@ -28,9 +28,9 @@ export default function ApiReferencePage() {
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
           <strong>Base URL:</strong>{" "}
-          <code className="bg-indigo-100 px-1 rounded text-xs">https://your-domain/api/v1</code>
+          <code className="bg-indigo-100 px-1 rounded-sm text-xs">https://your-domain/api/v1</code>
           {" "}for self-hosted, or{" "}
-          <code className="bg-indigo-100 px-1 rounded text-xs">https://api.nestfleet.dev/v1</code>
+          <code className="bg-indigo-100 px-1 rounded-sm text-xs">https://api.nestfleet.dev/v1</code>
           {" "}for SaaS. All requests must use HTTPS in production.
         </p>
       </div>
@@ -38,7 +38,7 @@ export default function ApiReferencePage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Authentication</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         The API uses JWT Bearer token authentication. Obtain a token by calling the login endpoint,
-        then include it in the <code className="bg-gray-100 px-1 rounded text-xs">Authorization</code> header
+        then include it in the <code className="bg-gray-100 px-1 rounded-sm text-xs">Authorization</code> header
         of every subsequent request:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">
@@ -47,7 +47,7 @@ export default function ApiReferencePage() {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Access tokens are short-lived (default: 15 minutes). Use the refresh endpoint to obtain a
         new access token using the refresh token (returned in an httpOnly cookie on login).
-        Token expiry is returned in the login response as <code className="bg-gray-100 px-1 rounded text-xs">expiresIn</code> (seconds).
+        Token expiry is returned in the login response as <code className="bg-gray-100 px-1 rounded-sm text-xs">expiresIn</code> (seconds).
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Login + list cases example</h2>
@@ -253,14 +253,14 @@ curl -s https://your-domain/api/v1/cases?productId=1&status=open \\
 }`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Validation errors (400) include a <code className="bg-gray-100 px-1 rounded text-xs">details</code> array
+        Validation errors (400) include a <code className="bg-gray-100 px-1 rounded-sm text-xs">details</code> array
         with per-field error messages from Zod.
       </p>
 
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
           A full OpenAPI 3.1 specification (Swagger UI) is coming in a future release. Until then,
-          the Hono route files in <code className="bg-indigo-100 px-1 rounded text-xs">src/api/routes/</code> are
+          the Hono route files in <code className="bg-indigo-100 px-1 rounded-sm text-xs">src/api/routes/</code> are
           the authoritative source of truth for request and response shapes — each route validates
           its inputs with Zod schemas that double as the type contract.
         </p>

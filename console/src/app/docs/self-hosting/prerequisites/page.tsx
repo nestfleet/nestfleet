@@ -24,8 +24,8 @@ export default function PrerequisitesPage() {
           <h3 className="text-sm font-bold text-gray-800 mb-1">Docker + Docker Compose v2</h3>
           <p className="text-sm text-gray-500 leading-relaxed mb-2">
             All NestFleet services run in Docker containers. Compose v2 is required (the{" "}
-            <code className="bg-gray-100 px-1 rounded text-xs">docker compose</code> sub-command, not the legacy{" "}
-            <code className="bg-gray-100 px-1 rounded text-xs">docker-compose</code>).
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">docker compose</code> sub-command, not the legacy{" "}
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">docker-compose</code>).
           </p>
           <p className="text-sm text-gray-400">Docker Engine 24+ · Docker Compose 2.20+</p>
         </div>
@@ -43,9 +43,9 @@ export default function PrerequisitesPage() {
         <div className="border border-gray-200 rounded-lg p-4">
           <h3 className="text-sm font-bold text-gray-800 mb-1">PostgreSQL 16</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
-            NestFleet uses PostgreSQL with the <code className="bg-gray-100 px-1 rounded text-xs">pgcrypto</code>{" "}
+            NestFleet uses PostgreSQL with the <code className="bg-gray-100 px-1 rounded-sm text-xs">pgcrypto</code>{" "}
             extension (installed automatically). You can use the bundled PostgreSQL container in{" "}
-            <code className="bg-gray-100 px-1 rounded text-xs">docker-compose.prod.yml</code>, or bring your
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">docker-compose.prod.yml</code>, or bring your
             own managed database (Hetzner Managed DB, RDS, etc.).
           </p>
         </div>
@@ -54,7 +54,7 @@ export default function PrerequisitesPage() {
           <h3 className="text-sm font-bold text-gray-800 mb-1">A public domain + open ports 80 and 443</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             Required for production TLS. Caddy provisions a Let&apos;s Encrypt certificate automatically
-            when <code className="bg-gray-100 px-1 rounded text-xs">NESTFLEET_DOMAIN</code> is set and
+            when <code className="bg-gray-100 px-1 rounded-sm text-xs">NESTFLEET_DOMAIN</code> is set and
             the domain resolves to your server. Ports 80 (ACME challenge) and 443 (HTTPS) must be
             reachable from the internet.
           </p>
@@ -76,11 +76,11 @@ export default function PrerequisitesPage() {
           <h3 className="text-sm font-bold text-gray-800 mb-1">SMTP / email provider</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             For inbound email ingestion and outbound auto-replies. Supported:{" "}
-            <strong>Postmark</strong> (<code className="bg-gray-100 px-1 rounded text-xs">POSTMARK_API_KEY</code>),{" "}
-            <strong>Resend</strong> (<code className="bg-gray-100 px-1 rounded text-xs">RESEND_API_KEY</code>),
-            or any SMTP relay (<code className="bg-gray-100 px-1 rounded text-xs">SMTP_HOST</code> /
-            <code className="bg-gray-100 px-1 rounded text-xs">SMTP_USER</code> /
-            <code className="bg-gray-100 px-1 rounded text-xs">SMTP_PASS</code>).
+            <strong>Postmark</strong> (<code className="bg-gray-100 px-1 rounded-sm text-xs">POSTMARK_API_KEY</code>),{" "}
+            <strong>Resend</strong> (<code className="bg-gray-100 px-1 rounded-sm text-xs">RESEND_API_KEY</code>),
+            or any SMTP relay (<code className="bg-gray-100 px-1 rounded-sm text-xs">SMTP_HOST</code> /
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">SMTP_USER</code> /
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">SMTP_PASS</code>).
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export default function PrerequisitesPage() {
           <h3 className="text-sm font-bold text-gray-800 mb-1">Telegram Bot token</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             For Telegram channel ingestion. Create a bot via <strong>@BotFather</strong> and set{" "}
-            <code className="bg-gray-100 px-1 rounded text-xs">TELEGRAM_BOT_TOKEN</code>.
+            <code className="bg-gray-100 px-1 rounded-sm text-xs">TELEGRAM_BOT_TOKEN</code>.
           </p>
         </div>
       </div>

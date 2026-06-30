@@ -81,11 +81,11 @@ export function SubscriptionTimeline({ series }: SubscriptionTimelineProps) {
       {/* Legend */}
       <div className="flex items-center gap-4 mb-3" aria-hidden="true">
         <div className="flex items-center gap-1.5">
-          <span className="block h-2.5 w-2.5 rounded-sm bg-emerald-500" />
+          <span className="block h-2.5 w-2.5 rounded-xs bg-emerald-500" />
           <span className="text-xs text-gray-500">New</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="block h-2.5 w-2.5 rounded-sm bg-rose-400" />
+          <span className="block h-2.5 w-2.5 rounded-xs bg-rose-400" />
           <span className="text-xs text-gray-500">Churned</span>
         </div>
       </div>

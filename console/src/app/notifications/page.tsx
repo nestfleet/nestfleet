@@ -261,7 +261,7 @@ function GroupByPopover({ groupBy, onChange }: { groupBy: GroupByKey; onChange: 
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 ${
           isNonDefault
             ? "border-indigo-300 bg-indigo-50 text-indigo-700"
             : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
@@ -355,7 +355,7 @@ function NotifFilterPopover({
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 ${
           activeCount > 0
             ? "border-indigo-300 bg-indigo-50 text-indigo-700"
             : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"
@@ -487,7 +487,7 @@ export default function NotificationsPage() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <p className="text-sm font-medium text-gray-900">No product configured</p>
-          <p className="mt-1 text-xs text-gray-500">Set <code className="rounded bg-gray-100 px-1.5 py-0.5">NEXT_PUBLIC_PRODUCT_ID</code> in <code className="rounded bg-gray-100 px-1.5 py-0.5">.env.local</code>.</p>
+          <p className="mt-1 text-xs text-gray-500">Set <code className="rounded-sm bg-gray-100 px-1.5 py-0.5">NEXT_PUBLIC_PRODUCT_ID</code> in <code className="rounded-sm bg-gray-100 px-1.5 py-0.5">.env.local</code>.</p>
         </div>
       </AppLayout>
     );
@@ -512,7 +512,7 @@ export default function NotificationsPage() {
             <button
               key={pill.value}
               onClick={() => setSourceTypeFilter(pill.value)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 ${
                 sourceTypeFilter === pill.value
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -545,7 +545,7 @@ export default function NotificationsPage() {
               {statusFilter && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 py-0.5 pl-2.5 pr-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200">
                   {statusFilter === "pending" ? "Queued" : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
-                  <button onClick={() => setStatusFilter("")} className="ml-0.5 rounded-full p-0.5 hover:bg-indigo-100 focus:outline-none" aria-label="Remove status filter">
+                  <button onClick={() => setStatusFilter("")} className="ml-0.5 rounded-full p-0.5 hover:bg-indigo-100 focus:outline-hidden" aria-label="Remove status filter">
                     <svg className="h-2.5 w-2.5" viewBox="0 0 8 8" fill="currentColor"><path d="M6.5 1.5l-5 5M1.5 1.5l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </button>
                 </span>
@@ -553,7 +553,7 @@ export default function NotificationsPage() {
               {priorityFilter && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 py-0.5 pl-2.5 pr-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200">
                   {priorityFilter.charAt(0).toUpperCase() + priorityFilter.slice(1)} priority
-                  <button onClick={() => setPriorityFilter("")} className="ml-0.5 rounded-full p-0.5 hover:bg-indigo-100 focus:outline-none" aria-label="Remove priority filter">
+                  <button onClick={() => setPriorityFilter("")} className="ml-0.5 rounded-full p-0.5 hover:bg-indigo-100 focus:outline-hidden" aria-label="Remove priority filter">
                     <svg className="h-2.5 w-2.5" viewBox="0 0 8 8" fill="currentColor"><path d="M6.5 1.5l-5 5M1.5 1.5l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                   </button>
                 </span>
@@ -564,19 +564,19 @@ export default function NotificationsPage() {
 
         {/* Content */}
         {isLoading && notifications.length === 0 ? (
-          <div className="flex items-center justify-center py-16 rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+          <div className="flex items-center justify-center py-16 rounded-xl bg-white shadow-xs ring-1 ring-black/5">
             <div className="flex flex-col items-center gap-3">
               <div className="h-7 w-7 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
               <p className="text-sm text-gray-400">Loading notifications…</p>
             </div>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center px-4 rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+          <div className="flex flex-col items-center justify-center py-16 text-center px-4 rounded-xl bg-white shadow-xs ring-1 ring-black/5">
             <p className="text-sm font-medium text-gray-900">Failed to load notifications</p>
             <p className="mt-1 text-xs text-gray-500">{(error as Error).message}</p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+          <div className="flex flex-col items-center justify-center py-16 text-center rounded-xl bg-white shadow-xs ring-1 ring-black/5">
             <p className="text-sm font-medium text-gray-900">No notifications</p>
             <p className="mt-1 text-xs text-gray-500">
               {statusFilter || priorityFilter || searchQuery ? "Try removing filters or clearing the search." : "Notifications will appear here as events occur."}
@@ -584,7 +584,7 @@ export default function NotificationsPage() {
           </div>
         ) : groupBy === "none" ? (
           /* ── Flat view ── */
-          <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden divide-y divide-gray-50">
+          <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden divide-y divide-gray-50">
             {notifications
               .slice()
               .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -646,11 +646,11 @@ function NotificationGroup({
     : null;
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
       {/* Group header */}
       <button
         onClick={() => setCollapsed((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50/60 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50/60 transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500"
         aria-expanded={!collapsed}
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -840,7 +840,7 @@ function NotificationCardRow({
               <button
                 onClick={handleAck}
                 disabled={acking}
-                className="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-inset ring-amber-300 hover:bg-amber-100 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-inset ring-amber-300 hover:bg-amber-100 disabled:opacity-50 focus:outline-hidden focus:ring-2 focus:ring-amber-400"
               >
                 {acking ? "…" : "Acknowledge"}
               </button>

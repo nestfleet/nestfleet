@@ -28,7 +28,7 @@ export function LandingNav() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
+          ? "bg-white/95 backdrop-blur-md shadow-xs border-b border-gray-100"
           : "bg-transparent"
       }`}
     >
@@ -36,7 +36,7 @@ export function LandingNav() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 group">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white text-sm shadow-sm group-hover:bg-indigo-700 transition-colors">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white text-sm shadow-xs group-hover:bg-indigo-700 transition-colors">
               ⚡
             </span>
             <span className="text-[15px] font-bold text-gray-900 tracking-tight">
@@ -82,7 +82,7 @@ export function LandingNav() {
             </a>
             <Link
               href="/login"
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-sm"
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-xs"
             >
               Sign in →
             </Link>

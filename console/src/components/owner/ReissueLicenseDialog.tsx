@@ -134,7 +134,7 @@ export function ReissueLicenseDialog({
           {/* Pending JWT warning */}
           {hasPendingJwt && (
             <div className="flex items-start gap-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-              <svg className="h-5 w-5 flex-shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <svg className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
               <div className="min-w-0 flex-1">
@@ -146,7 +146,7 @@ export function ReissueLicenseDialog({
                   type="button"
                   onClick={handleDownloadJwt}
                   disabled={downloading}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
                 >
                   {downloading ? "Downloading..." : "Download license.jwt"}
                 </button>
@@ -158,7 +158,7 @@ export function ReissueLicenseDialog({
           {success ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3">
-                <svg className="h-5 w-5 flex-shrink-0 text-emerald-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg className="h-5 w-5 shrink-0 text-emerald-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div>
@@ -196,7 +196,7 @@ export function ReissueLicenseDialog({
                   id="reissue-tier"
                   value={tier}
                   onChange={(e) => setTier(e.target.value as LicenseTier)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 >
                   {/* Exclude the current tier — reissue is a tier change, not a renewal.
                       To restore all options: replace availableTiers with TIER_OPTIONS. */}
@@ -211,7 +211,7 @@ export function ReissueLicenseDialog({
               {/* Downgrade warning */}
               {isDowngrade && (
                 <div className="flex items-start gap-2 rounded-lg bg-red-50 border border-red-200 px-3 py-2.5">
-                  <svg className="h-4 w-4 flex-shrink-0 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg className="h-4 w-4 shrink-0 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                   </svg>
                   <p className="text-xs text-red-700">
@@ -232,7 +232,7 @@ export function ReissueLicenseDialog({
                   value={expiresDate}
                   min={new Date().toISOString().slice(0, 10)}
                   onChange={(e) => setExpiresDate(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -250,7 +250,7 @@ export function ReissueLicenseDialog({
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="e.g. Customer requested upgrade to Growth tier"
                   className={clsx(
-                    "block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm resize-none focus:ring-1 focus:ring-indigo-500",
+                    "block w-full rounded-lg border bg-white px-3 py-2 text-sm text-gray-900 shadow-xs resize-none focus:ring-1 focus:ring-indigo-500",
                     reason.length > 0 && reason.trim().length < 10
                       ? "border-red-300 focus:border-red-400"
                       : "border-gray-300 focus:border-indigo-500"

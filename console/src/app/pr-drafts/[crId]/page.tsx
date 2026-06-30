@@ -95,7 +95,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 rounded-sm"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -108,7 +108,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
             <span className="text-gray-300" aria-hidden="true">|</span>
             <Link
               href={`${basePath}/cases/${cr.case_id}`}
-              className="inline-flex items-center gap-1.5 text-sm text-indigo-500 hover:text-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+              className="inline-flex items-center gap-1.5 text-sm text-indigo-500 hover:text-indigo-700 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 rounded-sm"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -127,7 +127,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
           </div>
         </div>
       ) : error ? (
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-8 text-center">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-8 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
             <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
@@ -140,7 +140,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
         <div className="space-y-4">
 
           {/* Header card */}
-          <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-6">
+          <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-2 min-w-0">
                 <h1 className="text-xl font-semibold text-gray-900 leading-snug">{cr.title}</h1>
@@ -181,7 +181,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
                     href={cr.github_pr_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 ring-1 ring-inset ring-gray-200 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-400 transition-colors"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
@@ -192,7 +192,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
                 {isPrDrafted && canComplete && (
                   <button
                     onClick={() => setConfirmOpen(true)}
-                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -258,7 +258,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
                           href={cr.github_pr_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
                         >
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
@@ -318,11 +318,11 @@ export default function PrDraftDetailPage({ params }: PageProps) {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {/* Left — metadata */}
             <div className="space-y-4">
-              <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+              <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
                 <h2 className="mb-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Details</h2>
                 <dl className="space-y-3 text-sm">
                   <DetailRow label="CR ID">
-                    <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono text-gray-600 break-all">
+                    <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono text-gray-600 break-all">
                       {cr.change_request_id}
                     </code>
                   </DetailRow>
@@ -333,7 +333,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
                     {cr.case_id ? (
                       <Link
                         href={`${basePath}/cases/${cr.case_id}`}
-                        className="font-mono text-xs text-indigo-600 hover:underline focus:outline-none focus:underline"
+                        className="font-mono text-xs text-indigo-600 hover:underline focus:outline-hidden focus:underline"
                       >
                         {cr.case_id}
                       </Link>
@@ -390,7 +390,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
 
               {/* Affected surfaces */}
               {cr.affected_surfaces.length > 0 && (
-                <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+                <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
                   <h2 className="mb-4 text-sm font-semibold text-gray-700 uppercase tracking-wide">Affected Surfaces</h2>
                   <div className="flex flex-wrap gap-2">
                     {cr.affected_surfaces.map((s) => (
@@ -402,7 +402,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
 
               {/* Impact summary */}
               {cr.impact_summary && (
-                <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+                <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
                   <h2 className="mb-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">Impact Summary</h2>
                   <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{cr.impact_summary}</p>
                 </div>
@@ -413,7 +413,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
             <div className="space-y-4">
               {/* Proposed scope */}
               {cr.proposed_scope && (
-                <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+                <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
                   <h2 className="mb-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">Proposed Scope</h2>
                   <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{cr.proposed_scope}</p>
                 </div>
@@ -421,7 +421,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
 
               {/* Implementation notes — structured if JSON, plain if text */}
               {cr.implementation_notes && (
-                <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+                <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
                   <h2 className="mb-3 text-sm font-semibold text-gray-700 uppercase tracking-wide">Implementation Notes</h2>
                   {implData ? (
                     <StructuredImplNotes data={implData} />
@@ -435,7 +435,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
 
               {/* Empty state when preparing */}
               {isPreparing && !cr.implementation_notes && (
-                <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5 flex flex-col items-center justify-center py-10 text-center">
+                <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5 flex flex-col items-center justify-center py-10 text-center">
                   <div className="h-6 w-6 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600 mb-3" />
                   <p className="text-sm text-gray-500">Agent is assembling implementation context…</p>
                 </div>
@@ -465,14 +465,14 @@ export default function PrDraftDetailPage({ params }: PageProps) {
               <button
                 onClick={() => setConfirmOpen(false)}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleComplete}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />

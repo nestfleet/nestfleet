@@ -135,8 +135,8 @@ export default function KnowledgeBasePage() {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         If your product has a GitHub repository connected, you can configure NestFleet to periodically
         sync specific files or directories into the knowledge base. Go to <strong>Settings → Knowledge Sources → GitHub Sync</strong> and
-        specify the file paths to import (e.g. <code className="bg-gray-100 px-1 rounded text-xs">docs/**/*.md</code>,
-        <code className="bg-gray-100 px-1 rounded text-xs">CHANGELOG.md</code>, <code className="bg-gray-100 px-1 rounded text-xs">README.md</code>).
+        specify the file paths to import (e.g. <code className="bg-gray-100 px-1 rounded-sm text-xs">docs/**/*.md</code>,
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">CHANGELOG.md</code>, <code className="bg-gray-100 px-1 rounded-sm text-xs">README.md</code>).
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Synced files are re-embedded every 24 hours (or on webhook push if the GitHub App is configured).

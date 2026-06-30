@@ -252,7 +252,7 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
               placeholder="e.g. Acme, Acme Corp"
               maxLength={60}
               autoFocus
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
             <p className="mt-1 text-xs text-gray-400">
               {form.name.trim().length}/60 characters

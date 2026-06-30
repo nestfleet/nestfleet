@@ -114,7 +114,7 @@ function ToastCard({ item, onDismiss }: ToastCardProps) {
       <span className="flex-1">{item.message}</span>
       <button
         onClick={() => onDismiss(item.id)}
-        className="ml-2 rounded p-0.5 opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-white/50"
+        className="ml-2 rounded-sm p-0.5 opacity-70 hover:opacity-100 focus:outline-hidden focus:ring-1 focus:ring-white/50"
         aria-label="Dismiss notification"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">

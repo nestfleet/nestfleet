@@ -266,8 +266,8 @@ export default function QueuePage() {
           </div>
           <h2 className="text-base font-semibold text-gray-900">No product configured</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Set <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code> to load the queue.
+            Set <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
+            <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code> to load the queue.
           </p>
         </div>
       </AppLayout>
@@ -373,14 +373,14 @@ export default function QueuePage() {
               <button
                 onClick={closeModal}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendToChange}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
@@ -447,7 +447,7 @@ export default function QueuePage() {
                 placeholder="Key details — customer name, org size, requirements, urgency, follow-up owner…"
                 disabled={isSubmitting}
                 required
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-amber-500 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 disabled:bg-gray-50 resize-none"
               />
               {forwardNote.trim().length < 10 && (
                 <p className="text-xs text-gray-400">
@@ -462,14 +462,14 @@ export default function QueuePage() {
               <button
                 onClick={closeModal}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleForwardToTeam}
                 disabled={isSubmitting || !forwardTeam || forwardNote.trim().length < 10}
-                className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 transition-colors"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
@@ -506,7 +506,7 @@ export default function QueuePage() {
                 placeholder="Explain why no engineering change is needed..."
                 disabled={isSubmitting}
                 required
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
               />
               {resolution.trim().length < 5 && (
                 <p className="text-xs text-gray-400">
@@ -521,14 +521,14 @@ export default function QueuePage() {
               <button
                 onClick={closeModal}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResolve}
                 disabled={isSubmitting || resolution.trim().length < 5}
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
@@ -561,7 +561,7 @@ function LeadReviewPanel({ cases, pendingHandoffCases, isLoading, error, onSendT
   const total = cases.length + pendingHandoffCases.length;
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
       {isLoading && total === 0 ? (
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-3">
@@ -624,7 +624,7 @@ function LeadReviewPanel({ cases, pendingHandoffCases, isLoading, error, onSendT
                         <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">
                           Pending Handoff — awaiting response from external team
                         </span>
-                        <span className="inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-amber-200 px-1 text-[10px] font-bold text-amber-800">
+                        <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-200 px-1 text-[10px] font-bold text-amber-800">
                           {pendingHandoffCases.length}
                         </span>
                       </div>
@@ -662,7 +662,7 @@ interface LiveChatsPanelProps {
 
 function LiveChatsPanel({ cases, isLoading, error, onViewCase }: LiveChatsPanelProps) {
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
       {isLoading && cases.length === 0 ? (
         <div className="flex items-center justify-center py-16">
           <div className="flex flex-col items-center gap-3">
@@ -730,7 +730,7 @@ function LiveChatRow({ c, onOpen }: LiveChatRowProps) {
       <td className="px-4 py-3 max-w-sm min-w-0">
         <button
           onClick={onOpen}
-          className="w-full truncate font-medium text-gray-900 hover:text-teal-600 transition-colors text-left block focus:outline-none focus:underline"
+          className="w-full truncate font-medium text-gray-900 hover:text-teal-600 transition-colors text-left block focus:outline-hidden focus:underline"
         >
           {c.title}
         </button>
@@ -825,7 +825,7 @@ function QueueRow({ c, onViewCase, onSendToChange, onResolve, onForward }: Queue
       <td className="px-4 py-3 max-w-sm min-w-0">
         <button
           onClick={onViewCase}
-          className="w-full truncate font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left block focus:outline-none focus:underline"
+          className="w-full truncate font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left block focus:outline-hidden focus:underline"
         >
           {c.title}
         </button>

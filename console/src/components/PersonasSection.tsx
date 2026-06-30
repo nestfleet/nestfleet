@@ -190,7 +190,7 @@ export function PersonasSection() {
           <p className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-400">
             Feature access by role
           </p>
-          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -263,7 +263,7 @@ export function PersonasSection() {
         {/* Divider */}
         <div className={`flex items-center gap-4 my-8 transition-all duration-700 delay-250 ${visible ? "opacity-100" : "opacity-0"}`}>
           <div className="flex-1 border-t border-dashed border-gray-200" />
-          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 shadow-sm">
+          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 shadow-xs">
             <svg className="h-3.5 w-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
             </svg>

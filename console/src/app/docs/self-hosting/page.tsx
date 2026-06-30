@@ -47,7 +47,7 @@ export default function SelfHostingPage() {
           <Link
             key={step.href}
             href={step.href}
-            className="group flex items-start gap-4 border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-sm transition-all"
+            className="group flex items-start gap-4 border border-gray-200 rounded-lg p-4 hover:border-indigo-300 hover:shadow-xs transition-all"
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-xs font-bold text-indigo-600 ring-1 ring-indigo-200">
               {i + 1}

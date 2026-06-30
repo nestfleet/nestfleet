@@ -20,7 +20,7 @@ export function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) {
         {/* Mobile menu toggle */}
         <button
           onClick={onMenuToggle}
-          className="lg:hidden rounded-md p-1.5 text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="lg:hidden rounded-md p-1.5 text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
           aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={isMobileMenuOpen}
         >
@@ -66,7 +66,7 @@ export function Header({ onMenuToggle, isMobileMenuOpen }: HeaderProps) {
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />

@@ -144,7 +144,7 @@ export function LineageGraph({ response, productId, onActionComplete }: LineageG
           <select
             value={actorFilter}
             onChange={(e) => setActorFilter(e.target.value as ActorFilter)}
-            className="border-0 bg-transparent text-xs text-zinc-300 focus:outline-none focus:ring-0 pr-1"
+            className="border-0 bg-transparent text-xs text-zinc-300 focus:outline-hidden focus:ring-0 pr-1"
           >
             <option value="all">All actors</option>
             <option value="agent">Agent only</option>
@@ -161,7 +161,7 @@ export function LineageGraph({ response, productId, onActionComplete }: LineageG
           <select
             value={groupFilter}
             onChange={(e) => setGroupFilter(e.target.value as NodeGroupFilter)}
-            className="border-0 bg-transparent text-xs text-zinc-300 focus:outline-none focus:ring-0 pr-1"
+            className="border-0 bg-transparent text-xs text-zinc-300 focus:outline-hidden focus:ring-0 pr-1"
           >
             <option value="all">All events</option>
             <option value="agent_events">Agent events</option>
@@ -228,16 +228,16 @@ export function LineageGraph({ response, productId, onActionComplete }: LineageG
           <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" /> Start
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm ring-1 ring-emerald-500/70 bg-transparent" /> End ✓
+          <span className="h-2 w-2 rounded-xs ring-1 ring-emerald-500/70 bg-transparent" /> End ✓
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm ring-1 ring-red-500/70 bg-transparent" /> End ✗
+          <span className="h-2 w-2 rounded-xs ring-1 ring-red-500/70 bg-transparent" /> End ✗
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm ring-1 ring-amber-500/50 bg-transparent" /> In progress
+          <span className="h-2 w-2 rounded-xs ring-1 ring-amber-500/50 bg-transparent" /> In progress
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-3 rounded-sm border border-dashed border-zinc-600/50 bg-transparent" /> Side effect
+          <span className="h-2 w-3 rounded-xs border border-dashed border-zinc-600/50 bg-transparent" /> Side effect
         </span>
         {hasAttempts && (
           <span className="flex items-center gap-1 text-amber-600/70">
@@ -273,9 +273,9 @@ export function LineageGraph({ response, productId, onActionComplete }: LineageG
               nodesDraggable={!isLargeGraph}
             >
               <Background variant={"dots" as never} gap={compact ? 12 : 16} size={1} color="#3f3f46" />
-              <Controls className="!bg-zinc-800 !border-zinc-700 !shadow-lg [&>button]:!bg-zinc-800 [&>button]:!border-zinc-700 [&>button]:!text-zinc-400 [&>button:hover]:!bg-zinc-700" />
+              <Controls className="bg-zinc-800! border-zinc-700! shadow-lg! [&>button]:bg-zinc-800! [&>button]:border-zinc-700! [&>button]:text-zinc-400! [&>button:hover]:bg-zinc-700!" />
               <MiniMap
-                className="!bg-zinc-800 !border-zinc-700"
+                className="bg-zinc-800! border-zinc-700!"
                 nodeColor={(node) => {
                   if (node.type === "attemptFrame") return "transparent";
                   const d = node.data as Record<string, unknown>;

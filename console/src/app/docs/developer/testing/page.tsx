@@ -41,7 +41,7 @@ export default function TestingPage() {
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         This runs Vitest in single-run mode, printing a pass/fail summary. Test files follow the
-        naming convention <code className="bg-gray-100 px-1 rounded text-xs">*.unit.test.ts</code> and live
+        naming convention <code className="bg-gray-100 px-1 rounded-sm text-xs">*.unit.test.ts</code> and live
         alongside the source files they test.
       </p>
 
@@ -68,7 +68,7 @@ export default function TestingPage() {
         <p className="text-sm text-amber-900 leading-relaxed">
           Docker must be running before executing integration tests. On macOS, use{" "}
           <a href="https://github.com/abiosoft/colima" className="text-amber-800 font-medium hover:underline" target="_blank" rel="noopener noreferrer">Colima</a>:{" "}
-          <code className="bg-amber-100 px-1 rounded text-xs">colima start</code>. Testcontainers detects the
+          <code className="bg-amber-100 px-1 rounded-sm text-xs">colima start</code>. Testcontainers detects the
           Docker socket automatically. First run is slow (~30s) while the PostgreSQL image is pulled;
           subsequent runs use the cached image and start in ~3s.
         </p>
@@ -78,8 +78,8 @@ export default function TestingPage() {
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Integration test files use the naming convention{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">*.integration.test.ts</code>.
-        They are excluded from the default <code className="bg-gray-100 px-1 rounded text-xs">npm test</code> run
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">*.integration.test.ts</code>.
+        They are excluded from the default <code className="bg-gray-100 px-1 rounded-sm text-xs">npm test</code> run
         to keep the fast unit test loop unaffected.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
@@ -96,7 +96,7 @@ export default function TestingPage() {
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`cd console && npm run type-check`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        This runs <code className="bg-gray-100 px-1 rounded text-xs">tsc --noEmit</code> with the project&apos;s
+        This runs <code className="bg-gray-100 px-1 rounded-sm text-xs">tsc --noEmit</code> with the project&apos;s
         strict tsconfig. It is faster than a full Next.js build and catches most errors that would
         break the production build.
       </p>
@@ -157,7 +157,7 @@ export default function TestingPage() {
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`npm run test:coverage`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        This produces an HTML report in <code className="bg-gray-100 px-1 rounded text-xs">coverage/</code> and
+        This produces an HTML report in <code className="bg-gray-100 px-1 rounded-sm text-xs">coverage/</code> and
         prints a summary table to the terminal. Coverage is measured by Vitest&apos;s built-in V8 provider.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">

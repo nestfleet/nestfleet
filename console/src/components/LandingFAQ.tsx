@@ -110,7 +110,7 @@ function AccordionItem({ item, open, onToggle }: {
     <div className="border-b border-gray-100 last:border-0">
       <button
         onClick={onToggle}
-        className="w-full flex items-start justify-between gap-4 py-5 text-left group focus:outline-none"
+        className="w-full flex items-start justify-between gap-4 py-5 text-left group focus:outline-hidden"
         aria-expanded={open}
       >
         <span className={`text-sm font-semibold leading-snug transition-colors ${open ? "text-indigo-700" : "text-gray-900 group-hover:text-indigo-700"}`}>

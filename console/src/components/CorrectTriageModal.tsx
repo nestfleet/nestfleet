@@ -197,8 +197,8 @@ export function CorrectTriageModal({
                   aria-pressed={isSelected}
                   className={
                     isSelected
-                      ? "rounded-full px-3 py-1 text-sm font-medium bg-indigo-600 text-white ring-1 ring-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
-                      : "rounded-full px-3 py-1 text-sm font-medium bg-white text-gray-600 ring-1 ring-gray-300 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                      ? "rounded-full px-3 py-1 text-sm font-medium bg-indigo-600 text-white ring-1 ring-indigo-600 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                      : "rounded-full px-3 py-1 text-sm font-medium bg-white text-gray-600 ring-1 ring-gray-300 hover:bg-gray-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
                   }
                 >
                   {opt.label}
@@ -222,8 +222,8 @@ export function CorrectTriageModal({
                   aria-pressed={isSelected}
                   className={
                     isSelected
-                      ? "rounded-full px-3 py-1 text-sm font-medium bg-indigo-600 text-white ring-1 ring-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
-                      : "rounded-full px-3 py-1 text-sm font-medium bg-white text-gray-600 ring-1 ring-gray-300 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                      ? "rounded-full px-3 py-1 text-sm font-medium bg-indigo-600 text-white ring-1 ring-indigo-600 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
+                      : "rounded-full px-3 py-1 text-sm font-medium bg-white text-gray-600 ring-1 ring-gray-300 hover:bg-gray-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1"
                   }
                 >
                   {opt.label}
@@ -249,7 +249,7 @@ export function CorrectTriageModal({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             disabled={submitting}
-            className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-60"
+            className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 disabled:opacity-60"
             aria-describedby="correct-triage-reason-counter"
           />
           <p
@@ -275,7 +275,7 @@ export function CorrectTriageModal({
             type="button"
             onClick={handleClose}
             disabled={submitting}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors disabled:opacity-50"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -283,7 +283,7 @@ export function CorrectTriageModal({
             type="button"
             onClick={handleApply}
             disabled={!canSubmit || submitting}
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-busy={submitting}
           >
             {submitting && (

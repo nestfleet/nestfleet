@@ -235,7 +235,7 @@ export default function NewCustomerPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="client@company.com"
-            className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-violet-500 focus:outline-hidden focus:ring-1 focus:ring-violet-500"
           />
         </div>
 
@@ -250,7 +250,7 @@ export default function NewCustomerPage() {
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             placeholder="Acme Corp"
-            className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            className="w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-violet-500 focus:outline-hidden focus:ring-1 focus:ring-violet-500"
           />
         </div>
 
@@ -269,7 +269,7 @@ export default function NewCustomerPage() {
               placeholder="acme-corp"
               autoComplete="off"
               className={clsx(
-                "w-full rounded-md border bg-slate-800 px-3 py-2 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1",
+                "w-full rounded-md border bg-slate-800 px-3 py-2 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:outline-hidden focus:ring-1",
                 slugState.status === "available"
                   ? "border-emerald-600 focus:border-emerald-500 focus:ring-emerald-500"
                   : slugState.status === "taken" || slugState.status === "invalid"

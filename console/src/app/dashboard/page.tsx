@@ -34,7 +34,7 @@ function KpiCard({
     <div className={`rounded-xl p-5 ring-1 ${colorMap[color]} ${href ? "hover:shadow-md transition-shadow cursor-pointer" : ""}`}>
       <p className="text-xs font-medium opacity-70">{label}</p>
       {value === undefined ? (
-        <div className="mt-1 h-8 w-16 animate-pulse rounded bg-current opacity-10" />
+        <div className="mt-1 h-8 w-16 animate-pulse rounded-sm bg-current opacity-10" />
       ) : (
         <p className="mt-1 text-3xl font-bold">{value}</p>
       )}
@@ -89,7 +89,7 @@ function ActivityRow({ event }: { event: DashboardActivity }) {
 
   return (
     <li className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
-      <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50">
+      <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-50">
         <span className="h-2 w-2 rounded-full bg-indigo-400" />
       </div>
       <div className="flex-1 min-w-0">
@@ -99,7 +99,7 @@ function ActivityRow({ event }: { event: DashboardActivity }) {
           {" · "}{actor}
         </p>
       </div>
-      <span className="flex-shrink-0 text-xs text-gray-400 whitespace-nowrap">{timeAgo(event.occurredAt)}</span>
+      <span className="shrink-0 text-xs text-gray-400 whitespace-nowrap">{timeAgo(event.occurredAt)}</span>
     </li>
   );
 }
@@ -159,7 +159,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent activity */}
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-200 bg-white shadow-xs">
           <div className="border-b border-gray-100 px-5 py-4">
             <h2 className="text-sm font-semibold text-gray-700">Recent Activity</h2>
           </div>

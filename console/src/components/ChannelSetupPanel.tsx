@@ -42,7 +42,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="ml-2 inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors shrink-0"
+      className="ml-2 inline-flex items-center rounded-sm px-1.5 py-0.5 text-xs font-medium text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors shrink-0"
       aria-label={copied ? "Copied" : "Copy to clipboard"}
     >
       {copied ? "Copied!" : "Copy"}
@@ -132,7 +132,7 @@ function ChannelContent({
               <CodeRow value={`${origin}/webhooks/github/events/${productId}`} />
             </div>
             <div className="text-sm text-gray-600 space-y-0.5">
-              <p>Content type: <code className="text-xs bg-gray-100 rounded px-1 py-0.5">application/json</code></p>
+              <p>Content type: <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">application/json</code></p>
               <p>Events: <span className="text-gray-700">&#10003; Issues, &#10003; Pull requests</span></p>
             </div>
           </StepBlock>
@@ -191,8 +191,8 @@ function ChannelContent({
           <StepBlock>
             <StepHeading>Step 1 — Create a bot</StepHeading>
             <p className="text-sm text-gray-600">
-              Message <code className="text-xs bg-gray-100 rounded px-1 py-0.5">@BotFather</code> in
-              Telegram → <code className="text-xs bg-gray-100 rounded px-1 py-0.5">/newbot</code> →
+              Message <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">@BotFather</code> in
+              Telegram → <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">/newbot</code> →
               copy the token.
             </p>
           </StepBlock>
@@ -211,8 +211,8 @@ function ChannelContent({
             <StepHeading>Step 1 — Set your API key in product support policy</StepHeading>
             <p className="text-sm text-gray-600">
               Contact your NestFleet admin to set{" "}
-              <code className="text-xs bg-gray-100 rounded px-1 py-0.5">externalWebhookApiKey</code>{" "}
-              in <code className="text-xs bg-gray-100 rounded px-1 py-0.5">support_policy</code>.
+              <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">externalWebhookApiKey</code>{" "}
+              in <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">support_policy</code>.
             </p>
           </StepBlock>
           <StepBlock>
@@ -221,7 +221,7 @@ function ChannelContent({
             <div className="text-sm text-gray-600 space-y-1">
               <p>
                 <span className="font-medium">Authorization:</span>{" "}
-                <code className="text-xs bg-gray-100 rounded px-1 py-0.5">Bearer &lt;your-api-key&gt;</code>
+                <code className="text-xs bg-gray-100 rounded-sm px-1 py-0.5">Bearer &lt;your-api-key&gt;</code>
               </p>
               <p className="font-medium">Body:</p>
               <pre className="rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 overflow-x-auto">

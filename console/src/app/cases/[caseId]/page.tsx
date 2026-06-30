@@ -102,7 +102,7 @@ function ChatReplyPanel({
     : null;
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
       {/* ── Collapsed / expanded header ── */}
       <div
         className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer hover:bg-gray-50/60 transition-colors select-none"
@@ -138,7 +138,7 @@ function ChatReplyPanel({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); openAndFocus(); }}
-              className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-400"
             >
               Reply →
             </button>
@@ -195,7 +195,7 @@ function ChatReplyPanel({
                 onKeyDown={handleKeyDown}
                 placeholder="Type a reply… (Enter to send, Shift+Enter for newline)"
                 rows={2}
-                className="flex-1 resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+                className="flex-1 resize-none rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-100"
               />
               <button
                 type="button"
@@ -293,7 +293,7 @@ function EmailReplyPanel({
     : null;
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
       {/* ── Collapsed / expanded header ── */}
       <div
         className="flex items-center gap-2.5 px-4 py-2.5 cursor-pointer hover:bg-gray-50/60 transition-colors select-none"
@@ -328,7 +328,7 @@ function EmailReplyPanel({
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); openAndFocus(); }}
-              className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-400"
             >
               Send Reply →
             </button>
@@ -424,7 +424,7 @@ function ProcessingFailedPanel({
   }
 
   return (
-    <div className="rounded-xl bg-red-50 ring-1 ring-red-200 shadow-sm px-4 py-4">
+    <div className="rounded-xl bg-red-50 ring-1 ring-red-200 shadow-xs px-4 py-4">
       <div className="flex items-start gap-3">
         {/* Error icon */}
         <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
@@ -445,7 +445,7 @@ function ProcessingFailedPanel({
             <button
               onClick={handleRetry}
               disabled={retrying}
-              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-red-400"
             >
               {retrying ? (
                 <>
@@ -480,7 +480,7 @@ function ProcessingFailedPanel({
                 <span className="font-medium text-red-600">Job ID</span>
                 <span className="font-mono break-all">{processingError.jobId}</span>
                 <span className="font-medium text-red-600">Error</span>
-                <span className="break-words">{processingError.error}</span>
+                <span className="wrap-break-word">{processingError.error}</span>
               </div>
             </div>
           )}
@@ -571,7 +571,7 @@ export default function CaseDetailPage({ params }: PageProps) {
       <div className="mb-4">
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500 rounded-sm"
         >
           <svg
             className="h-4 w-4"
@@ -595,7 +595,7 @@ export default function CaseDetailPage({ params }: PageProps) {
           </div>
         </div>
       ) : error ? (
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-8 text-center">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-8 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-50">
             <svg
               className="h-6 w-6 text-red-500"
@@ -614,7 +614,7 @@ export default function CaseDetailPage({ params }: PageProps) {
       ) : !lineage ? null : (
         <div className="space-y-5">
           {/* ── Header card ── */}
-          <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+          <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 space-y-2">
                 {/* Title: email subject from signal > case_created metadata > fallback */}
@@ -663,7 +663,7 @@ export default function CaseDetailPage({ params }: PageProps) {
               </div>
 
               <div className="shrink-0 flex flex-col items-end gap-2">
-                <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono text-gray-500 break-all">
+                <code className="rounded-sm bg-gray-100 px-2 py-1 text-xs font-mono text-gray-500 break-all">
                   {lineage.caseId}
                 </code>
                 {relativeUpdated && (
@@ -680,7 +680,7 @@ export default function CaseDetailPage({ params }: PageProps) {
                       onClick={() => setCorrectTriageOpen(true)}
                       disabled={isTerminal}
                       title={isTerminal ? "Not available for resolved cases" : "Correct the AI triage classification"}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg
                         className="h-3.5 w-3.5"
@@ -741,7 +741,7 @@ export default function CaseDetailPage({ params }: PageProps) {
             const confidence = triageNode?.metadata?.confidence;
             if (typeof summary !== "string" || !summary.trim()) return null;
             return (
-              <div className="rounded-xl bg-violet-50 ring-1 ring-violet-100 shadow-sm px-4 py-3.5 flex items-start gap-3">
+              <div className="rounded-xl bg-violet-50 ring-1 ring-violet-100 shadow-xs px-4 py-3.5 flex items-start gap-3">
                 <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600">
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
@@ -762,7 +762,7 @@ export default function CaseDetailPage({ params }: PageProps) {
 
           {/* ── Artifacts card (CR / GitHub Issue / PR) ── */}
           {lineage.changeRequests.length > 0 && (
-            <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 px-4 py-3.5 space-y-2.5">
+            <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 px-4 py-3.5 space-y-2.5">
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Linked Artifacts</p>
               {lineage.changeRequests.map((cr) => (
                 <div key={cr.changeRequestId} className="flex flex-wrap items-center gap-2">
@@ -810,7 +810,7 @@ export default function CaseDetailPage({ params }: PageProps) {
 
           {/* ── Signal card ── */}
           {lineage.signal && (
-            <div className="rounded-xl bg-blue-50 ring-1 ring-blue-100 shadow-sm overflow-hidden">
+            <div className="rounded-xl bg-blue-50 ring-1 ring-blue-100 shadow-xs overflow-hidden">
               <div className="flex items-start gap-3 p-4">
                 <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                   <svg
@@ -837,7 +837,7 @@ export default function CaseDetailPage({ params }: PageProps) {
                   {lineage.signal.body.length > 200 && (
                     <button
                       onClick={() => setSignalExpanded((v) => !v)}
-                      className="text-xs font-medium text-blue-600 hover:underline focus:outline-none focus:underline"
+                      className="text-xs font-medium text-blue-600 hover:underline focus:outline-hidden focus:underline"
                     >
                       {signalExpanded ? "Show less" : "Show more"}
                     </button>
@@ -879,10 +879,10 @@ export default function CaseDetailPage({ params }: PageProps) {
 
           {/* ── Conversation thread (only shown for non-chat cases with >1 message) ── */}
           {messages.length > 1 && !messages.some((m) => m.source_type === "chat") && (
-            <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+            <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
               <button
                 onClick={() => setConversationExpanded((v) => !v)}
-                className="flex w-full items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50/60 transition-colors focus:outline-none"
+                className="flex w-full items-center justify-between gap-3 px-4 py-3 hover:bg-gray-50/60 transition-colors focus:outline-hidden"
                 aria-expanded={conversationExpanded}
               >
                 <span className="text-sm font-medium text-gray-900">
@@ -975,7 +975,7 @@ export default function CaseDetailPage({ params }: PageProps) {
                     <span className="text-gray-700 truncate">
                       {link.title ?? link.caseId}
                     </span>
-                    <span className="flex-shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
                       {link.status}
                     </span>
                   </li>

@@ -188,7 +188,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">7. Cookies and Tracking</h2>
             <p className="text-gray-600 leading-relaxed">
-              The NestFleet console uses a single session cookie (<code className="bg-gray-100 px-1 rounded text-xs">nf_last_product</code>)
+              The NestFleet console uses a single session cookie (<code className="bg-gray-100 px-1 rounded-sm text-xs">nf_last_product</code>)
               to remember your last-visited product. No third-party tracking cookies, no analytics
               pixels. The landing page (nestfleet.dev) does not use any tracking scripts.
             </p>

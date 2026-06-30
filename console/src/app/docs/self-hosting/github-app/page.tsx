@@ -25,9 +25,9 @@ export default function GitHubAppPage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">1. Create the GitHub App</h2>
       <ol className="list-decimal pl-6 text-gray-600 space-y-2 mb-6 text-sm leading-relaxed">
         <li>Go to <strong>GitHub → Settings → Developer settings → GitHub Apps → New GitHub App</strong>.</li>
-        <li>Set <strong>Homepage URL</strong> to your NestFleet domain (e.g. <code className="bg-gray-100 px-1 rounded text-xs">https://ops.yourcompany.com</code>).</li>
-        <li>Set <strong>Webhook URL</strong> to <code className="bg-gray-100 px-1 rounded text-xs">https://&lt;your-domain&gt;/api/v1/github/webhook</code>.</li>
-        <li>Generate a <strong>Webhook secret</strong> (e.g. <code className="bg-gray-100 px-1 rounded text-xs">openssl rand -hex 32</code>) and save it — you&apos;ll need it for <code className="bg-gray-100 px-1 rounded text-xs">GITHUB_WEBHOOK_SECRET</code>.</li>
+        <li>Set <strong>Homepage URL</strong> to your NestFleet domain (e.g. <code className="bg-gray-100 px-1 rounded-sm text-xs">https://ops.yourcompany.com</code>).</li>
+        <li>Set <strong>Webhook URL</strong> to <code className="bg-gray-100 px-1 rounded-sm text-xs">https://&lt;your-domain&gt;/api/v1/github/webhook</code>.</li>
+        <li>Generate a <strong>Webhook secret</strong> (e.g. <code className="bg-gray-100 px-1 rounded-sm text-xs">openssl rand -hex 32</code>) and save it — you&apos;ll need it for <code className="bg-gray-100 px-1 rounded-sm text-xs">GITHUB_WEBHOOK_SECRET</code>.</li>
         <li>Uncheck <strong>Expire user authorization tokens</strong>.</li>
       </ol>
 
@@ -69,7 +69,7 @@ export default function GitHubAppPage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">4. Generate a private key</h2>
       <p className="text-gray-600 leading-relaxed mb-2 text-sm">
         After saving the app, scroll to <strong>Private keys</strong> and click{" "}
-        <strong>Generate a private key</strong>. A <code className="bg-gray-100 px-1 rounded text-xs">.pem</code>{" "}
+        <strong>Generate a private key</strong>. A <code className="bg-gray-100 px-1 rounded-sm text-xs">.pem</code>{" "}
         file will download. Keep it safe — you need it for the environment variable below.
       </p>
 
@@ -80,7 +80,7 @@ GITHUB_APP_PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----\\nMIIE...\\n-----END RSA
 GITHUB_WEBHOOK_SECRET=your-webhook-secret`}</pre>
       </div>
       <p className="text-sm text-gray-500 mb-4">
-        The private key value must have literal <code className="bg-gray-100 px-1 rounded text-xs">\n</code> newlines
+        The private key value must have literal <code className="bg-gray-100 px-1 rounded-sm text-xs">\n</code> newlines
         (not actual line breaks) when set as an environment variable. You can convert it with:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">

@@ -137,18 +137,18 @@ function PlanCard({ plan, visible, delay }: { plan: PlanMeta; visible: boolean; 
       className={`relative rounded-2xl border p-7 flex flex-col transition-all duration-700 ${delay} hover:-translate-y-1 hover:shadow-xl ${
         plan.popular
           ? "border-indigo-300 shadow-lg shadow-indigo-100 bg-white ring-2 ring-indigo-500/20"
-          : "border-gray-200 bg-white shadow-sm hover:shadow-md"
+          : "border-gray-200 bg-white shadow-xs hover:shadow-md"
       } ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
     >
       {(plan.popular || plan.badge) && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex gap-1.5">
           {plan.popular && (
-            <span className="rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow whitespace-nowrap">
+            <span className="rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow-sm whitespace-nowrap">
               Most popular
             </span>
           )}
           {plan.badge && (
-            <span className="rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow whitespace-nowrap">
+            <span className="rounded-full bg-emerald-600 px-4 py-1 text-xs font-bold text-white shadow-sm whitespace-nowrap">
               {plan.badge}
             </span>
           )}

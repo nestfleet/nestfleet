@@ -22,7 +22,7 @@ interface KpiCardProps {
 
 function KpiCard({ label, value, icon, valueClassName }: KpiCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 flex items-start gap-4">
+    <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 flex items-start gap-4">
       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 text-slate-500 shrink-0">
         {icon}
       </div>
@@ -138,7 +138,7 @@ export function RevenueKPIs({ data }: RevenueKPIsProps) {
       {/* Churn 30d — spans full row on small screens as a standalone alert card */}
       <div
         className={clsx(
-          "bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 flex items-start gap-4",
+          "bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 flex items-start gap-4",
           "sm:col-span-2 xl:col-span-4"
         )}
       >

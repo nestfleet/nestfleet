@@ -85,7 +85,7 @@ export default function AutoReplyPage() {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         The top-k results (default: 5) are passed as context to the reply generation step. The LLM
         uses this context to answer accurately without hallucinating — if no relevant context is found,
-        the reply generation step is skipped and the case is routed to <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code>.
+        the reply generation step is skipped and the case is routed to <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code>.
       </p>
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
@@ -128,7 +128,7 @@ export default function AutoReplyPage() {
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li><strong>Approve as-is</strong> — sends the reply to the customer immediately</li>
         <li><strong>Edit and approve</strong> — modify the draft inline before sending</li>
-        <li><strong>Reject</strong> — discard the draft and move the case to <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code></li>
+        <li><strong>Reject</strong> — discard the draft and move the case to <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code></li>
         <li><strong>Regenerate</strong> — ask the LLM to produce a new draft (useful if context has changed)</li>
       </ul>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
@@ -143,7 +143,7 @@ export default function AutoReplyPage() {
       </p>
       <ol className="list-decimal pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li>The draft is archived (visible in the case history but not sent)</li>
-        <li>The case state changes to <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code></li>
+        <li>The case state changes to <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code></li>
         <li>The rejecting team member can add an optional note explaining why</li>
         <li>An audit event is recorded with the actor, timestamp, and note</li>
         <li>The assigned Support Lead receives an email notification</li>

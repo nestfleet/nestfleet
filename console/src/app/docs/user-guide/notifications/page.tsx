@@ -58,10 +58,10 @@ export default function NotificationsPage() {
       </table>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Email notifications require a configured email backend. Set one of the following in your{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">.env</code>:
-        <code className="bg-gray-100 px-1 rounded text-xs ml-2">SMTP_HOST</code>,
-        <code className="bg-gray-100 px-1 rounded text-xs ml-2">POSTMARK_API_KEY</code>, or
-        <code className="bg-gray-100 px-1 rounded text-xs ml-2">RESEND_API_KEY</code>.
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code>:
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">SMTP_HOST</code>,
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">POSTMARK_API_KEY</code>, or
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">RESEND_API_KEY</code>.
         See the <a href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">Environment Variables</a> reference.
         Without an email backend, no notifications are sent and a warning is logged at startup.
       </p>
@@ -77,7 +77,7 @@ export default function NotificationsPage() {
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li>A new P0 or P1 case arrives (immediately after triage, not after full processing)</li>
-        <li>A P0 or P1 case has been open in <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code> for more than 15 minutes without acknowledgement</li>
+        <li>A P0 or P1 case has been open in <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code> for more than 15 minutes without acknowledgement</li>
         <li>An outage-type case is detected regardless of severity</li>
       </ul>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
@@ -85,16 +85,16 @@ export default function NotificationsPage() {
       </p>
       <ol className="list-decimal pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li>Create a Telegram bot via <a href="https://t.me/BotFather" className="text-indigo-600 hover:underline" target="_blank" rel="noopener noreferrer">@BotFather</a> and copy the bot token</li>
-        <li>Set <code className="bg-gray-100 px-1 rounded text-xs">TELEGRAM_BOT_TOKEN</code> in your <code className="bg-gray-100 px-1 rounded text-xs">.env</code></li>
+        <li>Set <code className="bg-gray-100 px-1 rounded-sm text-xs">TELEGRAM_BOT_TOKEN</code> in your <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code></li>
         <li>Add the bot to your team Telegram group or channel</li>
         <li>Configure the target chat ID in <strong>Settings → Channels → Telegram → Alert Channel</strong></li>
       </ol>
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
           To find your Telegram chat ID, send a message to the group and call the Telegram Bot API:{" "}
-          <code className="bg-indigo-100 px-1 rounded text-xs">https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code>.
-          The chat ID appears in the response as <code className="bg-indigo-100 px-1 rounded text-xs">message.chat.id</code>.
-          Group chat IDs are negative numbers (e.g. <code className="bg-indigo-100 px-1 rounded text-xs">-1001234567890</code>).
+          <code className="bg-indigo-100 px-1 rounded-sm text-xs">https://api.telegram.org/bot&lt;TOKEN&gt;/getUpdates</code>.
+          The chat ID appears in the response as <code className="bg-indigo-100 px-1 rounded-sm text-xs">message.chat.id</code>.
+          Group chat IDs are negative numbers (e.g. <code className="bg-indigo-100 px-1 rounded-sm text-xs">-1001234567890</code>).
         </p>
       </div>
 
@@ -102,8 +102,8 @@ export default function NotificationsPage() {
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
         <p className="text-sm text-amber-900 leading-relaxed">
           <strong>Coming soon.</strong> Slack integration is planned for an upcoming release. The{" "}
-          <code className="bg-amber-100 px-1 rounded text-xs">SLACK_WEBHOOK_URL</code> and{" "}
-          <code className="bg-amber-100 px-1 rounded text-xs">SLACK_BOT_TOKEN</code> environment variables
+          <code className="bg-amber-100 px-1 rounded-sm text-xs">SLACK_WEBHOOK_URL</code> and{" "}
+          <code className="bg-amber-100 px-1 rounded-sm text-xs">SLACK_BOT_TOKEN</code> environment variables
           are already defined in the schema in preparation. Follow the{" "}
           <a href="https://github.com/nestfleet/nestfleet/releases" className="text-amber-800 font-medium hover:underline" target="_blank" rel="noopener noreferrer">release notes</a> for updates.
         </p>
@@ -145,8 +145,8 @@ export default function NotificationsPage() {
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li>Confirm an email backend is configured (check for a startup warning in API logs)</li>
-        <li>Verify the <code className="bg-gray-100 px-1 rounded text-xs">SMTP_FROM</code> address is authorised by your email provider (SPF/DKIM)</li>
-        <li>Check the API logs for <code className="bg-gray-100 px-1 rounded text-xs">email.send.error</code> events</li>
+        <li>Verify the <code className="bg-gray-100 px-1 rounded-sm text-xs">SMTP_FROM</code> address is authorised by your email provider (SPF/DKIM)</li>
+        <li>Check the API logs for <code className="bg-gray-100 px-1 rounded-sm text-xs">email.send.error</code> events</li>
         <li>For Postmark: check the Postmark dashboard for bounce or spam block events</li>
         <li>For Resend: check the Resend dashboard for delivery status and error codes</li>
       </ul>

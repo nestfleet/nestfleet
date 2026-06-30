@@ -169,7 +169,7 @@ export function SeverityDot({ severity, className }: SeverityDotProps) {
   const text = SEVERITY_TEXT_COLOR[severity] ?? "text-gray-500";
   return (
     <span className={clsx("inline-flex items-center gap-1.5", className)}>
-      <span className={clsx("h-2 w-2 shrink-0 rounded-sm", dot)} aria-hidden="true" />
+      <span className={clsx("h-2 w-2 shrink-0 rounded-xs", dot)} aria-hidden="true" />
       <span className={clsx("text-xs capitalize font-medium", text)}>{severity}</span>
     </span>
   );
@@ -196,7 +196,7 @@ export function RiskDot({ riskLevel, className }: RiskBadgeProps) {
   const text = RISK_TEXT_COLOR[riskLevel] ?? "text-gray-500";
   return (
     <span className={clsx("inline-flex items-center gap-1.5", className)}>
-      <span className={clsx("h-2 w-2 shrink-0 rounded-sm", dot)} aria-hidden="true" />
+      <span className={clsx("h-2 w-2 shrink-0 rounded-xs", dot)} aria-hidden="true" />
       <span className={clsx("text-xs capitalize font-medium", text)}>{riskLevel}</span>
     </span>
   );

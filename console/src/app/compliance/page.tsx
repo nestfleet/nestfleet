@@ -28,7 +28,7 @@ function SectionCard({ title, description, children }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+    <div className="rounded-lg border border-zinc-200 bg-white shadow-xs">
       <div className="px-6 py-4 border-b border-zinc-100">
         <h2 className="text-base font-semibold text-zinc-900">{title}</h2>
         <p className="text-sm text-zinc-500 mt-0.5">{description}</p>
@@ -209,7 +209,7 @@ function DsarHistoryEntry({
             tabIndex={0}
             onClick={(e) => { e.stopPropagation(); onRemove(); }}
             onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); onRemove(); } }}
-            className="ml-1 rounded p-0.5 text-zinc-300 hover:text-zinc-500 hover:bg-zinc-100 cursor-pointer"
+            className="ml-1 rounded-sm p-0.5 text-zinc-300 hover:text-zinc-500 hover:bg-zinc-100 cursor-pointer"
             title="Remove from history"
             aria-label="Remove"
           >
@@ -294,7 +294,7 @@ function DsarSection({ productId, token }: { productId: string; token: string })
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="email, name, or @telegram"
-            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="flex-1 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
           />
           <button
             onClick={handleSearch}
@@ -414,7 +414,7 @@ function RetentionSection({ productId }: { productId: string }) {
               max={3650}
               value={retentionDays !== "" ? retentionDays : (retention?.retentionDays ?? 365)}
               onChange={(e) => setRetentionDays(e.target.value === "" ? "" : Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
             <p className="text-xs text-zinc-400 mt-1">Closed cases older than this are eligible for deletion (min 30, max 3650).</p>
           </div>
@@ -428,7 +428,7 @@ function RetentionSection({ productId }: { productId: string }) {
               max={365}
               value={autoCloseDays !== "" ? autoCloseDays : (retention?.autoCloseDays ?? 7)}
               onChange={(e) => setAutoCloseDays(e.target.value === "" ? "" : Number(e.target.value))}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
             />
             <p className="text-xs text-zinc-400 mt-1">Days of inactivity after resolved before auto-close triggers.</p>
           </div>

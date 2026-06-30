@@ -211,7 +211,7 @@ function ProductSwitcherDropdown() {
         <button
           onClick={() => setOpen((o) => !o)}
           style={{ borderLeftColor: product.accentColor ?? "#6366f1" }}
-          className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 border-l-2 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          className="flex w-full items-center justify-between gap-2 rounded-lg border border-gray-200 border-l-2 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-xs hover:bg-gray-50"
           aria-haspopup="listbox"
           aria-expanded={open}
         >
@@ -225,7 +225,7 @@ function ProductSwitcherDropdown() {
             )}
             <span className="truncate">{product.name}</span>
           </span>
-          <svg className="h-4 w-4 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+          <svg className="h-4 w-4 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
           </svg>
         </button>
@@ -268,7 +268,7 @@ function ProductSwitcherDropdown() {
                       </span>
 
                       {isActive && (
-                        <svg className="h-4 w-4 flex-shrink-0 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                        <svg className="h-4 w-4 shrink-0 text-indigo-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                       )}
@@ -378,7 +378,7 @@ export function Sidebar({ onNavClick }: SidebarProps) {
               >
                 {item.icon}
                 <span>{item.label}</span>
-                <span className="ml-auto text-xs bg-gray-100 text-gray-400 rounded px-1.5 py-0.5">
+                <span className="ml-auto text-xs bg-gray-100 text-gray-400 rounded-sm px-1.5 py-0.5">
                   Soon
                 </span>
               </div>

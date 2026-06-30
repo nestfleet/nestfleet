@@ -31,7 +31,7 @@ function EnvTable({ rows }: { rows: VarRow[] }) {
         {rows.map((row) => (
           <tr key={row.name}>
             <td className="px-3 py-2 border border-gray-200 align-top">
-              <code className="bg-gray-100 px-1 rounded text-xs">{row.name}</code>
+              <code className="bg-gray-100 px-1 rounded-sm text-xs">{row.name}</code>
             </td>
             <td className="px-3 py-2 border border-gray-200 align-top">
               <span className={row.required === "Required"
@@ -42,7 +42,7 @@ function EnvTable({ rows }: { rows: VarRow[] }) {
             </td>
             <td className="px-3 py-2 border border-gray-200 text-gray-600 align-top leading-relaxed">{row.description}</td>
             <td className="px-3 py-2 border border-gray-200 align-top">
-              <code className="bg-gray-100 px-1 rounded text-xs break-all">{row.example}</code>
+              <code className="bg-gray-100 px-1 rounded-sm text-xs break-all">{row.example}</code>
             </td>
           </tr>
         ))}
@@ -62,8 +62,8 @@ export default function EnvironmentPage() {
       </h1>
       <p className="text-gray-600 leading-relaxed mb-6 text-base">
         All configuration is provided via environment variables. Copy{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">.env.example</code> to{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">.env</code> and fill in the values
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">.env.example</code> to{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code> and fill in the values
         described below. Variables marked <span className="text-xs font-semibold text-red-600">Required</span> must
         be set or the API will refuse to start.
       </p>
@@ -71,9 +71,9 @@ export default function EnvironmentPage() {
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
           Generate cryptographic secrets with:{" "}
-          <code className="bg-indigo-100 px-1 rounded text-xs">openssl rand -hex 32</code>{" "}
-          (produces 64 hex chars — suitable for <code className="bg-indigo-100 px-1 rounded text-xs">JWT_SECRET</code> and{" "}
-          <code className="bg-indigo-100 px-1 rounded text-xs">ENCRYPTION_KEY</code>).
+          <code className="bg-indigo-100 px-1 rounded-sm text-xs">openssl rand -hex 32</code>{" "}
+          (produces 64 hex chars — suitable for <code className="bg-indigo-100 px-1 rounded-sm text-xs">JWT_SECRET</code> and{" "}
+          <code className="bg-indigo-100 px-1 rounded-sm text-xs">ENCRYPTION_KEY</code>).
         </p>
       </div>
 
@@ -259,9 +259,9 @@ export default function EnvironmentPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Email</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Set exactly one email backend. Use either <code className="bg-gray-100 px-1 rounded text-xs">SMTP_HOST</code> for
-        generic SMTP, <code className="bg-gray-100 px-1 rounded text-xs">POSTMARK_API_KEY</code> for Postmark,
-        or <code className="bg-gray-100 px-1 rounded text-xs">RESEND_API_KEY</code> for Resend.
+        Set exactly one email backend. Use either <code className="bg-gray-100 px-1 rounded-sm text-xs">SMTP_HOST</code> for
+        generic SMTP, <code className="bg-gray-100 px-1 rounded-sm text-xs">POSTMARK_API_KEY</code> for Postmark,
+        or <code className="bg-gray-100 px-1 rounded-sm text-xs">RESEND_API_KEY</code> for Resend.
       </p>
       <EnvTable rows={[
         {
@@ -397,7 +397,7 @@ export default function EnvironmentPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Stripe (Billing)</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Only required when <code className="bg-gray-100 px-1 rounded text-xs">BILLING_ENABLED=true</code>.
+        Only required when <code className="bg-gray-100 px-1 rounded-sm text-xs">BILLING_ENABLED=true</code>.
         Self-hosted Community tier installations do not need these.
       </p>
       <EnvTable rows={[
@@ -441,9 +441,9 @@ export default function EnvironmentPage() {
 
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
         <p className="text-sm text-amber-900 leading-relaxed">
-          Never commit <code className="bg-amber-100 px-1 rounded text-xs">.env</code> to version control.
-          The repository includes <code className="bg-amber-100 px-1 rounded text-xs">.env</code> in{" "}
-          <code className="bg-amber-100 px-1 rounded text-xs">.gitignore</code>. If you accidentally commit secrets,
+          Never commit <code className="bg-amber-100 px-1 rounded-sm text-xs">.env</code> to version control.
+          The repository includes <code className="bg-amber-100 px-1 rounded-sm text-xs">.env</code> in{" "}
+          <code className="bg-amber-100 px-1 rounded-sm text-xs">.gitignore</code>. If you accidentally commit secrets,
           rotate them immediately — git history is public.
         </p>
       </div>

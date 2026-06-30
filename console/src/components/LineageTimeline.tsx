@@ -335,7 +335,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
 
       {/* Right column: content */}
       <div
-        className={`mb-2 min-w-0 flex-1 rounded-lg bg-white shadow-sm ring-1 ring-black/5 overflow-hidden ${nodeRowBg(node.actorType, node.type)}`}
+        className={`mb-2 min-w-0 flex-1 rounded-lg bg-white shadow-xs ring-1 ring-black/5 overflow-hidden ${nodeRowBg(node.actorType, node.type)}`}
       >
         {/* Header row */}
         <div className="flex items-center justify-between gap-2 px-3 pt-2 pb-0.5">
@@ -377,21 +377,21 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
               {oldType && newType && (
                 <div className="flex items-center gap-1.5 text-xs text-amber-800">
                   <span className="font-medium text-amber-600">Type:</span>
-                  <span className="rounded bg-amber-100 px-1.5 py-0.5">{typeLabel(oldType)}</span>
+                  <span className="rounded-sm bg-amber-100 px-1.5 py-0.5">{typeLabel(oldType)}</span>
                   <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
-                  <span className="rounded bg-amber-200 px-1.5 py-0.5 font-medium">{typeLabel(newType)}</span>
+                  <span className="rounded-sm bg-amber-200 px-1.5 py-0.5 font-medium">{typeLabel(newType)}</span>
                 </div>
               )}
               {oldSeverity && newSeverity && (
                 <div className="flex items-center gap-1.5 text-xs text-amber-800">
                   <span className="font-medium text-amber-600">Severity:</span>
-                  <span className="rounded bg-amber-100 px-1.5 py-0.5">{sevLabel(oldSeverity)}</span>
+                  <span className="rounded-sm bg-amber-100 px-1.5 py-0.5">{sevLabel(oldSeverity)}</span>
                   <svg className="h-3 w-3 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
-                  <span className="rounded bg-amber-200 px-1.5 py-0.5 font-medium">{sevLabel(newSeverity)}</span>
+                  <span className="rounded-sm bg-amber-200 px-1.5 py-0.5 font-medium">{sevLabel(newSeverity)}</span>
                 </div>
               )}
               {reason && (
@@ -421,7 +421,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
           <div className="border-t border-gray-100">
             <button
               onClick={() => setIsExpanded((v) => !v)}
-              className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="flex w-full items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-indigo-500"
               aria-expanded={isExpanded}
               aria-controls={`details-${node.nodeId}`}
             >
@@ -519,7 +519,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="approve"
                     onClick={() => handleActionClick("approve")}
-                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
                   >
                     Approve
                   </button>
@@ -530,7 +530,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="reject"
                     onClick={() => handleActionClick("reject")}
-                    className="flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
                   >
                     Reject
                   </button>
@@ -541,7 +541,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="send_to_change"
                     onClick={() => handleActionClick("send_to_change")}
-                    className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 focus:outline-hidden focus:ring-2 focus:ring-violet-500 focus:ring-offset-1 transition-colors"
                   >
                     Send to Change
                   </button>
@@ -552,7 +552,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="resolve"
                     onClick={() => handleActionClick("resolve")}
-                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
                   >
                     Mark Resolved
                   </button>
@@ -563,7 +563,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="escalate"
                     onClick={() => handleActionClick("escalate")}
-                    className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-600 focus:outline-hidden focus:ring-2 focus:ring-orange-500 focus:ring-offset-1 transition-colors"
                   >
                     Escalate to Lead
                   </button>
@@ -574,7 +574,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="reopen"
                     onClick={() => handleActionClick("reopen")}
-                    className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-sky-700 focus:outline-hidden focus:ring-2 focus:ring-sky-500 focus:ring-offset-1 transition-colors"
                   >
                     Reopen Case
                   </button>
@@ -585,7 +585,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="send_followup"
                     onClick={() => handleActionClick("send_followup")}
-                    className="flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
                   >
                     Send Follow-up
                   </button>
@@ -596,7 +596,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                   <button
                     key="view_cr"
                     onClick={() => handleActionClick("view_cr")}
-                    className="flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
                   >
                     View Change Request
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
@@ -617,7 +617,7 @@ function NodeRow({ node, isLast, changeRequests, onOpenModal, onEscalate, onReso
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
+                    className="flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 transition-colors"
                   >
                     View PR
                     <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
@@ -760,7 +760,7 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
     const canResolveFromEmpty = RESOLVABLE_STATUSES.includes(response.currentStatus)
     return (
       <>
-        <div className="flex flex-col items-center justify-center rounded-xl bg-white py-16 shadow-sm ring-1 ring-black/5">
+        <div className="flex flex-col items-center justify-center rounded-xl bg-white py-16 shadow-xs ring-1 ring-black/5">
           <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
             <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -771,7 +771,7 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
           {canResolveFromEmpty ? (
             <button
               onClick={() => handleResolve("")}
-              className="mt-5 flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
+              className="mt-5 flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 transition-colors"
             >
               Mark Resolved
             </button>
@@ -794,14 +794,14 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
                   onChange={(e) => setResolveNote(e.target.value)}
                   placeholder="What was done to resolve this? Leave blank to use default."
                   disabled={isSubmitting}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
                 />
               </div>
               <div className="flex items-center justify-end gap-3 pt-1">
-                <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+                <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
                   Cancel
                 </button>
-                <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+                <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
                   {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
                   Mark Resolved
                 </button>
@@ -891,21 +891,21 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Add an approval note..."
                 disabled={isSubmitting}
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 resize-none"
               />
             </div>
             <div className="flex items-center justify-end gap-3 pt-1">
               <button
                 onClick={closeModal}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleApprove}
                 disabled={isSubmitting}
-                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
@@ -941,7 +941,7 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
                 placeholder="Explain why this change request is being rejected..."
                 disabled={isSubmitting}
                 required
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-red-400 focus:outline-hidden focus:ring-2 focus:ring-red-400/20 disabled:bg-gray-50 resize-none"
               />
               {reason.trim().length < 10 && (
                 <p className="text-xs text-gray-400">{reason.trim().length === 0 ? "A reason is required." : `${10 - reason.trim().length} more character${10 - reason.trim().length === 1 ? "" : "s"} needed.`}</p>
@@ -951,14 +951,14 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
               <button
                 onClick={closeModal}
                 disabled={isSubmitting}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleReject}
                 disabled={isSubmitting || reason.trim().length < 10}
-                className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
               >
                 {isSubmitting && (
                   <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
@@ -985,14 +985,14 @@ export function LineageTimeline({ response, productId, onActionComplete }: Linea
                 onChange={(e) => setResolveNote(e.target.value)}
                 placeholder="What was done to resolve this? Leave blank to use default."
                 disabled={isSubmitting}
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-emerald-500 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 disabled:bg-gray-50 resize-none"
               />
             </div>
             <div className="flex items-center justify-end gap-3 pt-1">
-              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+              <button onClick={handleResolveSubmit} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
                 {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
                 Mark Resolved
               </button>

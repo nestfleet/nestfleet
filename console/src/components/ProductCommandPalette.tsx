@@ -121,7 +121,7 @@ export function ProductCommandPalette() {
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 text-sm text-gray-900 placeholder-gray-400 outline-none bg-transparent"
+            className="flex-1 text-sm text-gray-900 placeholder-gray-400 outline-hidden bg-transparent"
             placeholder="Switch product…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -129,7 +129,7 @@ export function ProductCommandPalette() {
             autoComplete="off"
             spellCheck={false}
           />
-          <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-500">
+          <kbd className="hidden sm:inline-flex items-center gap-1 rounded-sm border border-gray-200 bg-gray-50 px-1.5 py-0.5 text-[10px] text-gray-500">
             esc
           </kbd>
         </div>
@@ -176,7 +176,7 @@ export function ProductCommandPalette() {
 
                 {/* Stage chip */}
                 {p.stage && (
-                  <span className="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                  <span className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 uppercase tracking-wide">
                     {p.stage}
                   </span>
                 )}

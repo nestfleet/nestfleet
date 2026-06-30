@@ -32,7 +32,7 @@ function EndChip({ kind }: { kind: TerminalKind }) {
   const s = END_CHIP[kind];
   return (
     <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none">
-      <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold ${s.bg} ${s.text}`}>
+      <span className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${s.bg} ${s.text}`}>
         {s.label}
       </span>
     </div>
@@ -152,11 +152,11 @@ export function LineageGraphNode({
       <div className="relative" style={{ opacity, transition: "opacity 0.25s ease" }}>
         {isRoot     && <StartChip />}
         {isTerminal && <EndChip kind={terminalKind} />}
-        <Handle type="target" position={Position.Left}  className="!bg-zinc-600 !border-zinc-500 !w-1.5 !h-1.5" />
+        <Handle type="target" position={Position.Left}  className="bg-zinc-600! border-zinc-500! w-1.5! h-1.5!" />
         <div
           className={[
-            "rounded border px-2 py-1.5 min-w-[160px] max-w-[180px]",
-            "bg-zinc-800 shadow-sm cursor-pointer transition-all relative",
+            "rounded-sm border px-2 py-1.5 min-w-[160px] max-w-[180px]",
+            "bg-zinc-800 shadow-xs cursor-pointer transition-all relative",
             isSatellite ? satelliteBorderCls : borderCls,
             termRingCls,
             selected ? "ring-2 ring-indigo-400 scale-[1.02]" : "hover:border-zinc-500",
@@ -165,7 +165,7 @@ export function LineageGraphNode({
           {showSeq && <SeqBadge n={sequenceNumber!} compact />}
           {isRetry  && <RetryBadge />}
           <div className="flex items-center gap-1.5 mt-0.5">
-            <div className={`flex-shrink-0 rounded-full p-0.5 ${iconCls}`}>
+            <div className={`shrink-0 rounded-full p-0.5 ${iconCls}`}>
               <NodeIcon type={node.type} actorType={node.actorType} />
             </div>
             <span className="text-[11px] font-medium text-zinc-200 truncate leading-tight">{title}</span>
@@ -177,7 +177,7 @@ export function LineageGraphNode({
             <span className={`text-[9px] px-1 py-0.5 rounded-full ${actorCls}`}>{actorLabel}</span>
           </div>
         </div>
-        <Handle type="source" position={Position.Right} className="!bg-zinc-600 !border-zinc-500 !w-1.5 !h-1.5" />
+        <Handle type="source" position={Position.Right} className="bg-zinc-600! border-zinc-500! w-1.5! h-1.5!" />
       </div>
     );
   }
@@ -188,7 +188,7 @@ export function LineageGraphNode({
     <div className="relative" style={{ opacity, transition: "opacity 0.25s ease" }}>
       {isRoot     && <StartChip />}
       {isTerminal && <EndChip kind={terminalKind} />}
-      <Handle type="target" position={Position.Left}  className="!bg-zinc-600 !border-zinc-500 !w-2 !h-2" />
+      <Handle type="target" position={Position.Left}  className="bg-zinc-600! border-zinc-500! w-2! h-2!" />
       <div
         className={[
           "rounded-lg border px-3 py-2 min-w-[200px] max-w-[220px]",
@@ -201,7 +201,7 @@ export function LineageGraphNode({
         {showSeq && <SeqBadge n={sequenceNumber!} compact={false} />}
         {isRetry  && <RetryBadge />}
         <div className="flex items-center gap-2 mb-1 mt-1">
-          <div className={`flex-shrink-0 rounded-full p-1 ${iconCls}`}>
+          <div className={`shrink-0 rounded-full p-1 ${iconCls}`}>
             <NodeIcon type={node.type} actorType={node.actorType} />
           </div>
           <span className="text-xs font-medium text-zinc-200 truncate">{title}</span>
@@ -213,7 +213,7 @@ export function LineageGraphNode({
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${actorCls}`}>{actorLabel}</span>
         </div>
       </div>
-      <Handle type="source" position={Position.Right} className="!bg-zinc-600 !border-zinc-500 !w-2 !h-2" />
+      <Handle type="source" position={Position.Right} className="bg-zinc-600! border-zinc-500! w-2! h-2!" />
     </div>
   );
 }

@@ -51,7 +51,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/40 backdrop-blur-xs"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -68,13 +68,13 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
         <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
           <h2
             id="modal-title"
-            className="text-base font-semibold text-gray-900 min-w-0 break-words"
+            className="text-base font-semibold text-gray-900 min-w-0 wrap-break-word"
           >
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             aria-label="Close modal"
           >
             <svg

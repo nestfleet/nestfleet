@@ -69,7 +69,7 @@ function NotificationsSnippet({
       ) : (
         <div className="space-y-1.5">
           {items.map((n) => (
-            <div key={n.notification_id} className="rounded bg-zinc-800/60 px-2 py-1.5">
+            <div key={n.notification_id} className="rounded-sm bg-zinc-800/60 px-2 py-1.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-medium text-zinc-200 truncate">{n.recipient_ref}</span>
                 <StatusBadge value={n.status} map={NOTIF_STATUS_COLORS} />
@@ -363,7 +363,7 @@ export function NodeDetailPanel({
         <button
           key={action}
           onClick={() => handleAction(action)}
-          className={`px-3 py-1.5 rounded text-xs font-medium ${styles[action] ?? "bg-zinc-700 text-zinc-300"}`}
+          className={`px-3 py-1.5 rounded-sm text-xs font-medium ${styles[action] ?? "bg-zinc-700 text-zinc-300"}`}
         >
           {labels[action] ?? action}
         </button>
@@ -378,7 +378,7 @@ export function NodeDetailPanel({
         animate={{ x: 0 }}
         exit={{ x: 384 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="w-96 h-full bg-zinc-900 border-l border-zinc-700 overflow-y-auto flex-shrink-0"
+        className="w-96 h-full bg-zinc-900 border-l border-zinc-700 overflow-y-auto shrink-0"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
@@ -451,19 +451,19 @@ export function NodeDetailPanel({
                 {node.agentRun.modelId}
               </span>
               <div className="grid grid-cols-2 gap-1.5">
-                <div className="rounded bg-zinc-800/80 px-2 py-1.5">
+                <div className="rounded-sm bg-zinc-800/80 px-2 py-1.5">
                   <p className="text-[10px] text-zinc-500">Input tokens</p>
                   <p className="text-xs font-medium text-zinc-300">{node.agentRun.inputTokens.toLocaleString()}</p>
                 </div>
-                <div className="rounded bg-zinc-800/80 px-2 py-1.5">
+                <div className="rounded-sm bg-zinc-800/80 px-2 py-1.5">
                   <p className="text-[10px] text-zinc-500">Output tokens</p>
                   <p className="text-xs font-medium text-zinc-300">{node.agentRun.outputTokens.toLocaleString()}</p>
                 </div>
-                <div className="rounded bg-zinc-800/80 px-2 py-1.5">
+                <div className="rounded-sm bg-zinc-800/80 px-2 py-1.5">
                   <p className="text-[10px] text-zinc-500">Duration</p>
                   <p className="text-xs font-medium text-zinc-300">{(node.agentRun.durationMs / 1000).toFixed(2)}s</p>
                 </div>
-                <div className="rounded bg-zinc-800/80 px-2 py-1.5">
+                <div className="rounded-sm bg-zinc-800/80 px-2 py-1.5">
                   <p className="text-[10px] text-zinc-500">Outcome</p>
                   {/* A step with success + 0 output tokens + 0 duration means the LLM
                       call was intentionally skipped (e.g. known_issue_match with no DB entries). */}
@@ -512,7 +512,7 @@ export function NodeDetailPanel({
               <summary className="text-xs font-medium text-zinc-500 uppercase tracking-wider cursor-pointer hover:text-zinc-400">
                 Metadata
               </summary>
-              <pre className="mt-2 p-2 rounded bg-zinc-800/50 text-xs text-zinc-400 overflow-x-auto max-h-48">
+              <pre className="mt-2 p-2 rounded-sm bg-zinc-800/50 text-xs text-zinc-400 overflow-x-auto max-h-48">
                 {JSON.stringify(node.metadata, null, 2)}
               </pre>
             </details>
@@ -524,7 +524,7 @@ export function NodeDetailPanel({
               <summary className="text-xs font-medium text-zinc-500 uppercase tracking-wider cursor-pointer hover:text-zinc-400">
                 Output Snapshot
               </summary>
-              <pre className="mt-2 p-2 rounded bg-zinc-800/50 text-xs text-zinc-400 overflow-x-auto max-h-48">
+              <pre className="mt-2 p-2 rounded-sm bg-zinc-800/50 text-xs text-zinc-400 overflow-x-auto max-h-48">
                 {JSON.stringify(node.agentRun.outputSnapshot, null, 2)}
               </pre>
             </details>
@@ -550,14 +550,14 @@ export function NodeDetailPanel({
                 value={modalNote}
                 onChange={(e) => setModalNote(e.target.value)}
                 placeholder={activeModal === "approve" ? "Optional note..." : "Reason for rejection (min 10 chars)..."}
-                className="w-full h-24 rounded bg-zinc-800 border border-zinc-700 text-sm text-zinc-200 p-2 focus:border-indigo-500 focus:outline-none"
+                className="w-full h-24 rounded-sm bg-zinc-800 border border-zinc-700 text-sm text-zinc-200 p-2 focus:border-indigo-500 focus:outline-hidden"
               />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setActiveModal(null)} className="px-3 py-1.5 rounded text-xs bg-zinc-700 text-zinc-300 hover:bg-zinc-600">Cancel</button>
+                <button onClick={() => setActiveModal(null)} className="px-3 py-1.5 rounded-sm text-xs bg-zinc-700 text-zinc-300 hover:bg-zinc-600">Cancel</button>
                 <button
                   onClick={handleModalSubmit}
                   disabled={submitting || (activeModal === "reject" && modalNote.length < 10)}
-                  className={`px-3 py-1.5 rounded text-xs text-white ${activeModal === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} disabled:opacity-50`}
+                  className={`px-3 py-1.5 rounded-sm text-xs text-white ${activeModal === "approve" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} disabled:opacity-50`}
                 >
                   {submitting ? "..." : activeModal === "approve" ? "Approve" : "Reject"}
                 </button>

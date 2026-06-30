@@ -27,8 +27,8 @@ export default function UpgradingPage() {
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
         <p className="text-sm text-amber-900 leading-relaxed">
           <strong>Always back up before upgrading.</strong> Run{" "}
-          <code className="bg-amber-100 px-1 rounded text-xs">bash scripts/backup.sh</code> and verify the backup
-          file exists in <code className="bg-amber-100 px-1 rounded text-xs">backups/</code> before proceeding.
+          <code className="bg-amber-100 px-1 rounded-sm text-xs">bash scripts/backup.sh</code> and verify the backup
+          file exists in <code className="bg-amber-100 px-1 rounded-sm text-xs">backups/</code> before proceeding.
           See the <a href="/docs/self-hosting/backup" className="text-amber-800 font-medium hover:underline">Backup & Restore</a> guide.
         </p>
       </div>
@@ -40,7 +40,7 @@ export default function UpgradingPage() {
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`git pull origin main`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        If you track a specific release tag rather than <code className="bg-gray-100 px-1 rounded text-xs">main</code>,
+        If you track a specific release tag rather than <code className="bg-gray-100 px-1 rounded-sm text-xs">main</code>,
         fetch and check out the new tag:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">
@@ -53,11 +53,11 @@ git checkout v1.5.0`}</pre>
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`docker compose -f docker-compose.prod.yml build`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        This rebuilds the <code className="bg-gray-100 px-1 rounded text-xs">api</code>,{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">worker</code>, and{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">console</code> images from the updated source.
-        The <code className="bg-gray-100 px-1 rounded text-xs">postgres</code> and{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">caddy</code> images are pulled from their registries
+        This rebuilds the <code className="bg-gray-100 px-1 rounded-sm text-xs">api</code>,{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">worker</code>, and{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">console</code> images from the updated source.
+        The <code className="bg-gray-100 px-1 rounded-sm text-xs">postgres</code> and{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">caddy</code> images are pulled from their registries
         and do not need a build step.
       </p>
 
@@ -65,8 +65,8 @@ git checkout v1.5.0`}</pre>
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
           <strong>Migrations run automatically on API startup.</strong> You do not need to run any migration
-          command manually. When the <code className="bg-indigo-100 px-1 rounded text-xs">api</code> container starts,
-          it applies all pending migrations from <code className="bg-indigo-100 px-1 rounded text-xs">src/infra/db/migrations/</code> in
+          command manually. When the <code className="bg-indigo-100 px-1 rounded-sm text-xs">api</code> container starts,
+          it applies all pending migrations from <code className="bg-indigo-100 px-1 rounded-sm text-xs">src/infra/db/migrations/</code> in
           order before accepting traffic. This is safe because migrations are idempotent — already-applied
           migrations are skipped.
         </p>
@@ -78,8 +78,8 @@ git checkout v1.5.0`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Docker Compose performs a rolling restart — it stops and replaces each container with the new image
-        while keeping the PostgreSQL data volume intact. The <code className="bg-gray-100 px-1 rounded text-xs">--detach</code> flag
-        returns immediately; use <code className="bg-gray-100 px-1 rounded text-xs">docker compose logs -f api</code> to watch
+        while keeping the PostgreSQL data volume intact. The <code className="bg-gray-100 px-1 rounded-sm text-xs">--detach</code> flag
+        returns immediately; use <code className="bg-gray-100 px-1 rounded-sm text-xs">docker compose logs -f api</code> to watch
         the startup and migration output.
       </p>
 

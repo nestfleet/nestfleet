@@ -90,7 +90,7 @@ export default async function GuidePage({ params }: PageProps) {
               )
             }
             return (
-              <code className="bg-gray-100 px-1 rounded text-xs font-mono text-gray-800">
+              <code className="bg-gray-100 px-1 rounded-sm text-xs font-mono text-gray-800">
                 {children}
               </code>
             )

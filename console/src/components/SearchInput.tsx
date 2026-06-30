@@ -24,13 +24,13 @@ export function SearchInput({ value, onChange, placeholder = "Search…", classN
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-8 w-48 rounded-lg border border-gray-300 bg-white pl-8 pr-7 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className="h-8 w-48 rounded-lg border border-gray-300 bg-white pl-8 pr-7 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
         aria-label={placeholder}
       />
       {value && (
         <button
           onClick={() => { onChange(""); ref.current?.focus(); }}
-          className="absolute right-2 text-gray-400 hover:text-gray-600 focus:outline-none"
+          className="absolute right-2 text-gray-400 hover:text-gray-600 focus:outline-hidden"
           aria-label="Clear search"
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">

@@ -70,7 +70,7 @@ function CommunitySignupForm() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-xs">
       <h1 className="text-xl font-bold text-gray-900 mb-1">Create your account</h1>
       <p className="text-sm text-gray-500 mb-6">Free forever — no credit card required.</p>
 
@@ -87,7 +87,7 @@ function CommunitySignupForm() {
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Alex Smith"
             maxLength={100}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -103,7 +103,7 @@ function CommunitySignupForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -119,7 +119,7 @@ function CommunitySignupForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 8 characters"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -135,7 +135,7 @@ function CommunitySignupForm() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Repeat password"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -229,7 +229,7 @@ function SaasSignupForm({ plan }: { plan: string }) {
   const planLabel = PLAN_LABELS[plan] ?? "14-day free trial";
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-xs">
       <h1 className="text-xl font-bold text-gray-900 mb-1">Start your free trial</h1>
       <p className="text-sm text-gray-500 mb-1">{planLabel}</p>
       <p className="text-xs text-gray-400 mb-6">
@@ -253,7 +253,7 @@ function SaasSignupForm({ plan }: { plan: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -269,7 +269,7 @@ function SaasSignupForm({ plan }: { plan: string }) {
             onChange={(e) => handleCompanyChange(e.target.value)}
             placeholder="Acme Corp"
             maxLength={200}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -289,7 +289,7 @@ function SaasSignupForm({ plan }: { plan: string }) {
               value={slug}
               onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 32))}
               placeholder="acme"
-              className="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none bg-white"
+              className="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-hidden bg-white"
             />
           </div>
           <p className="mt-1 text-xs text-gray-400">Lowercase letters, numbers, and hyphens. 3–32 characters.</p>
@@ -353,7 +353,7 @@ function WaitlistSignupForm({ plan }: { plan: string }) {
 
   if (done) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white px-8 py-10 shadow-sm text-center">
+      <div className="rounded-2xl border border-gray-200 bg-white px-8 py-10 shadow-xs text-center">
         <div className="mb-4 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
           <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -372,7 +372,7 @@ function WaitlistSignupForm({ plan }: { plan: string }) {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-white px-8 py-8 shadow-xs">
       <h1 className="text-xl font-bold text-gray-900 mb-1">Reserve your spot</h1>
       <p className="text-sm text-gray-500 mb-1">{planLabel}</p>
       <p className="text-xs text-gray-400 mb-5">
@@ -396,7 +396,7 @@ function WaitlistSignupForm({ plan }: { plan: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@company.com"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -412,7 +412,7 @@ function WaitlistSignupForm({ plan }: { plan: string }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="Alex Smith"
             maxLength={100}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 
@@ -428,7 +428,7 @@ function WaitlistSignupForm({ plan }: { plan: string }) {
             onChange={(e) => setCompany(e.target.value)}
             placeholder="Acme Corp"
             maxLength={200}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-colors"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-hidden transition-colors"
           />
         </div>
 

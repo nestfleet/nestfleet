@@ -178,7 +178,7 @@ export default function SettingsPage() {
 
           {/* Right: content panel */}
           <div className="flex-1 min-w-0 max-w-2xl">
-            <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-5">
+            <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-5">
               {/* Product section reads from context — independent of settings API */}
               {/* Plan section fetches its own data — independent of product settings API */}
               {activeSection === "product" ? (
@@ -352,7 +352,7 @@ function ProductSection() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={60}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500"
         />
         <p className="mt-1 text-xs text-gray-400">{name.trim().length}/60 · Changing the name does not change the URL slug.</p>
       </div>
@@ -825,7 +825,7 @@ function LlmSection({
                       )}
                     </label>
                     {embeddingKeyLocked && settings.llm.embeddingApiKeyLast4 && provider === savedProvider ? (
-                      <div className="flex items-center rounded border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-500 select-none">
+                      <div className="flex items-center rounded-sm border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-500 select-none">
                         <span className="flex-1 font-mono tracking-widest">{settings.llm.embeddingApiKeyLast4}</span>
                         <button
                           type="button"
@@ -842,7 +842,7 @@ function LlmSection({
                         value={embeddingApiKey}
                         onChange={(e) => setEmbeddingApiKey(e.target.value)}
                         placeholder={settings.llm.embeddingApiKeyLast4 && provider === savedProvider ? "Enter new key to replace saved key" : "Paste your OpenAI API key"}
-                        className="w-full rounded border border-gray-200 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
+                        className="w-full rounded-sm border border-gray-200 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
                       />
                     )}
                   </div>
@@ -864,7 +864,7 @@ function LlmSection({
                       value={embeddingModel}
                       onChange={(e) => setEmbeddingModel(e.target.value)}
                       placeholder="Auto-detected"
-                      className="w-full rounded border border-gray-200 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
+                      className="w-full rounded-sm border border-gray-200 px-2.5 py-1.5 text-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
                     />
                   </div>
                   <div className="w-20 text-center text-[10px] text-gray-400 pt-1.5">{settings.llm.embeddingDimensions}d</div>
@@ -1239,7 +1239,7 @@ function NotificationsSection({
                 onChange={(e) => setWeekendSupp(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-2 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
             </div>
             <div>
               <span className="text-sm text-gray-700">Weekend suppression</span>
@@ -1464,7 +1464,7 @@ function ToggleRow({
           onChange={(e) => onChange(e.target.checked)}
           className="sr-only peer"
         />
-        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
+        <div className="w-9 h-5 bg-gray-200 peer-focus:outline-hidden peer-focus:ring-2 peer-focus:ring-indigo-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600" />
       </div>
       <div>
         <span className="text-sm text-gray-700">{label}</span>
@@ -1621,7 +1621,7 @@ function UsersSection() {
                         <div className="flex items-center gap-1.5">
                           <p className="text-xs font-medium text-gray-900 truncate">{primaryName}</p>
                           {u.isSystem && (
-                            <span className="shrink-0 inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500 uppercase tracking-wide leading-3">system</span>
+                            <span className="shrink-0 inline-block px-1.5 py-0.5 rounded-sm text-[9px] font-medium bg-slate-100 text-slate-500 uppercase tracking-wide leading-3">system</span>
                           )}
                         </div>
                         {u.displayName?.trim() && (
@@ -1637,7 +1637,7 @@ function UsersSection() {
                       {visibleRoles.map((r) => (
                         <span
                           key={r}
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium leading-4 ${roleBadgeClass(r)}`}
+                          className={`inline-block px-2 py-0.5 rounded-sm text-[10px] font-medium leading-4 ${roleBadgeClass(r)}`}
                         >
                           {ROLE_INFO[r]?.label ?? r}
                         </span>
@@ -1741,7 +1741,7 @@ function UsersSection() {
                 value={formDisplayName}
                 onChange={(e) => setFormDisplayName(e.target.value)}
                 placeholder="Jane Smith"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-hidden focus:ring-1 focus:ring-indigo-300"
               />
             </div>
 
@@ -1752,7 +1752,7 @@ function UsersSection() {
                 type="email"
                 value={formEmail}
                 onChange={(e) => setFormEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-hidden focus:ring-1 focus:ring-indigo-300"
               />
             </div>
 
@@ -1765,7 +1765,7 @@ function UsersSection() {
                   value={formPassword}
                   onChange={(e) => setFormPassword(e.target.value)}
                   placeholder="Min 8 characters"
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-indigo-400 focus:outline-hidden focus:ring-1 focus:ring-indigo-300"
                 />
               </div>
             )}
@@ -1788,7 +1788,7 @@ function UsersSection() {
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleRole(role)}
-                        className="mt-0.5 shrink-0 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                        className="mt-0.5 shrink-0 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500"
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
@@ -2146,13 +2146,13 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
             <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-0.5">
               <button
                 onClick={() => setBillingInterval("monthly")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${billingInterval === "monthly" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${billingInterval === "monthly" ? "bg-white text-gray-900 shadow-xs" : "text-gray-500 hover:text-gray-700"}`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setBillingInterval("annual")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${billingInterval === "annual" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${billingInterval === "annual" ? "bg-white text-gray-900 shadow-xs" : "text-gray-500 hover:text-gray-700"}`}
               >
                 Annual <span className="text-indigo-600 font-semibold">−20%</span>
               </button>
@@ -2175,7 +2175,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
                   <ul className="space-y-1">
                     {(TIER_HIGHLIGHTS[planKey] ?? []).map((h) => (
                       <li key={h.label} className="flex items-start gap-1.5 text-xs text-gray-600">
-                        <svg className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                         </svg>
                         {h.label}{h.note && <span className="text-gray-400"> ({h.note})</span>}
@@ -2214,7 +2214,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
           <button
             onClick={() => void handlePortal()}
             disabled={portalLoading}
-            className="flex-shrink-0 rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-colors shadow-sm"
+            className="shrink-0 rounded-lg border border-gray-300 bg-white px-4 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60 transition-colors shadow-xs"
           >
             {portalLoading ? "Loading…" : "Manage →"}
           </button>
@@ -2597,7 +2597,7 @@ function RolesSection() {
                       {role.name}
                     </p>
                     {isRoleCustom && (
-                      <span className="shrink-0 text-[9px] px-1 rounded bg-purple-100 text-purple-600">custom</span>
+                      <span className="shrink-0 text-[9px] px-1 rounded-sm bg-purple-100 text-purple-600">custom</span>
                     )}
                   </div>
                   <p className={`text-[10px] mt-0.5 ${activeRoleId === role.id ? "text-indigo-500" : "text-gray-400"}`}>
@@ -2610,7 +2610,7 @@ function RolesSection() {
                     <button
                       onClick={(e) => { e.stopPropagation(); openEditModal(role); }}
                       title="Rename role"
-                      className="rounded p-0.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
+                      className="rounded-sm p-0.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors"
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
@@ -2619,7 +2619,7 @@ function RolesSection() {
                     <button
                       onClick={(e) => { e.stopPropagation(); openDeleteConfirm(role); }}
                       title="Delete role"
-                      className="rounded p-0.5 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="rounded-sm p-0.5 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
                     >
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -2673,11 +2673,11 @@ function RolesSection() {
           {/* Badge legend */}
           <div className="flex items-center gap-3 mb-2 flex-wrap">
             <span className="text-[10px] text-gray-400">Badges:</span>
-            <span className="px-1 py-px rounded text-[10px] font-medium bg-red-50 text-red-600 ring-1 ring-red-100">destructive</span>
+            <span className="px-1 py-px rounded-sm text-[10px] font-medium bg-red-50 text-red-600 ring-1 ring-red-100">destructive</span>
             <span className="text-[10px] text-gray-400">— permanent, irreversible action</span>
-            <span className="px-1 py-px rounded text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-amber-100">sensitive</span>
+            <span className="px-1 py-px rounded-sm text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-amber-100">sensitive</span>
             <span className="text-[10px] text-gray-400">— may expose PII or secrets</span>
-            <span className="px-1 py-px rounded text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100">pipeline</span>
+            <span className="px-1 py-px rounded-sm text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100">pipeline</span>
             <span className="text-[10px] text-gray-400">— exercised by the AI agent, no direct console button</span>
           </div>
 
@@ -2762,7 +2762,7 @@ function RolesSection() {
                                     type="checkbox"
                                     checked={isGranted}
                                     onChange={(e) => handlePermToggle(perm.id, e.target.checked)}
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                    className="h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                                   />
                                 ) : isGranted ? (
                                   <svg className="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -2782,17 +2782,17 @@ function RolesSection() {
                                     {perm.label}
                                   </span>
                                   {perm.destructive && (
-                                    <span className="px-1 py-px rounded text-[10px] font-medium bg-red-50 text-red-600 ring-1 ring-red-100">
+                                    <span className="px-1 py-px rounded-sm text-[10px] font-medium bg-red-50 text-red-600 ring-1 ring-red-100">
                                       destructive
                                     </span>
                                   )}
                                   {perm.sensitive && (
-                                    <span className="px-1 py-px rounded text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-amber-100">
+                                    <span className="px-1 py-px rounded-sm text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-amber-100">
                                       sensitive
                                     </span>
                                   )}
                                   {PIPELINE_PERMISSIONS[perm.id] && (
-                                    <span title={PIPELINE_PERMISSIONS[perm.id]} className="px-1 py-px rounded text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100 cursor-help">
+                                    <span title={PIPELINE_PERMISSIONS[perm.id]} className="px-1 py-px rounded-sm text-[10px] font-medium bg-sky-50 text-sky-600 ring-1 ring-sky-100 cursor-help">
                                       pipeline
                                     </span>
                                   )}
@@ -2869,7 +2869,7 @@ function RolesSection() {
                 value={newRoleName}
                 onChange={(e) => setNewRoleName(e.target.value)}
                 placeholder="e.g. Data Protection Officer"
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             <div>
@@ -2879,7 +2879,7 @@ function RolesSection() {
                 value={newRoleKey}
                 onChange={(e) => setNewRoleKey(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
                 placeholder="e.g. dpo-role"
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-mono focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             <div>
@@ -2889,7 +2889,7 @@ function RolesSection() {
                 value={newRoleDesc}
                 onChange={(e) => setNewRoleDesc(e.target.value)}
                 placeholder="Short description of role responsibilities"
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             <div>
@@ -2897,7 +2897,7 @@ function RolesSection() {
               <select
                 value={newRoleCloneFrom}
                 onChange={(e) => setNewRoleCloneFrom(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               >
                 <option value="">— start empty —</option>
                 <option value="admin">admin</option>
@@ -2945,7 +2945,7 @@ function RolesSection() {
                 value={ssoGroupName}
                 onChange={(e) => setSsoGroupName(e.target.value)}
                 placeholder="e.g. okta-admins"
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             {ssoError && (
@@ -2980,7 +2980,7 @@ function RolesSection() {
                 type="text"
                 value={editRoleName}
                 onChange={(e) => setEditRoleName(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             <div>
@@ -2990,7 +2990,7 @@ function RolesSection() {
                 value={editRoleDesc}
                 onChange={(e) => setEditRoleDesc(e.target.value)}
                 placeholder="What is this role for?"
-                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-300"
               />
             </div>
             {editError && <p className="text-xs text-red-600">{editError}</p>}
@@ -3279,7 +3279,7 @@ function ChatWidgetSection({ settings }: { settings: SettingsResponse }) {
           role="switch"
           aria-checked={enabled}
           onClick={() => setEnabled((v) => !v)}
-          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-hidden ${
             enabled ? "bg-indigo-600" : "bg-gray-200"
           }`}
         >
@@ -3299,7 +3299,7 @@ function ChatWidgetSection({ settings }: { settings: SettingsResponse }) {
           value={welcomeMessage}
           onChange={(e) => setWelcomeMessage(e.target.value)}
           placeholder="Hi! How can we help you today?"
-          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:border-indigo-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-100"
         />
         <p className="text-[10px] text-gray-400">
           Shown to visitors before they send their first message.
@@ -3321,7 +3321,7 @@ function ChatWidgetSection({ settings }: { settings: SettingsResponse }) {
             value={color}
             onChange={(e) => setColor(e.target.value)}
             placeholder="#4f46e5"
-            className="w-32 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-mono text-gray-800 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+            className="w-32 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-mono text-gray-800 focus:border-indigo-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-100"
           />
         </div>
         <p className="text-[10px] text-gray-400">

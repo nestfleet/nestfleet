@@ -166,7 +166,7 @@ export function DocsSidebar({ mobileOpen, onMobileClose }: DocsSidebarProps) {
               <span className="text-sm font-semibold text-gray-900">Docs Navigation</span>
               <button
                 onClick={onMobileClose}
-                className="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-sm hover:bg-gray-100 transition-colors"
                 aria-label="Close navigation"
               >
                 <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
@@ -186,7 +186,7 @@ export function DocsSidebarToggle({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="md:hidden p-2 rounded hover:bg-gray-100 transition-colors"
+      className="md:hidden p-2 rounded-sm hover:bg-gray-100 transition-colors"
       aria-label="Open navigation menu"
     >
       <svg className="w-5 h-5 text-gray-700" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>

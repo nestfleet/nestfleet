@@ -141,7 +141,7 @@ function LicenseHistoryPanel({ slug, onDownloadJwt }: LicenseHistoryPanelProps) 
   const records: LicenseReissue[] = data?.data ?? [];
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+    <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -166,7 +166,7 @@ function LicenseHistoryPanel({ slug, onDownloadJwt }: LicenseHistoryPanelProps) 
           {isLoading && (
             <div className="space-y-2">
               {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="h-10 w-full bg-gray-100 rounded animate-pulse" />
+                <div key={i} className="h-10 w-full bg-gray-100 rounded-sm animate-pulse" />
               ))}
             </div>
           )}
@@ -214,7 +214,7 @@ function LicenseHistoryPanel({ slug, onDownloadJwt }: LicenseHistoryPanelProps) 
                           <button
                             type="button"
                             onClick={() => onDownloadJwt(r.id)}
-                            className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
+                            className="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors"
                           >
                             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -367,12 +367,12 @@ export default function FleetDetailPage({ params }: FleetDetailPageProps) {
 
       {/* Loading skeleton */}
       {isLoading && !p && (
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-6 animate-pulse" aria-hidden="true">
+        <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-6 animate-pulse" aria-hidden="true">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i}>
-                <div className="h-2.5 w-16 bg-gray-200 rounded mb-2" />
-                <div className="h-4 w-32 bg-gray-200 rounded" />
+                <div className="h-2.5 w-16 bg-gray-200 rounded-sm mb-2" />
+                <div className="h-4 w-32 bg-gray-200 rounded-sm" />
               </div>
             ))}
           </div>
@@ -392,7 +392,7 @@ export default function FleetDetailPage({ params }: FleetDetailPageProps) {
           {/* Reissue failed warning + download */}
           {p.reissue_status === "failed" && (
             <div className="flex items-start gap-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
-              <svg className="h-5 w-5 flex-shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <svg className="h-5 w-5 shrink-0 text-amber-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
               </svg>
               <div className="min-w-0 flex-1">
@@ -404,7 +404,7 @@ export default function FleetDetailPage({ params }: FleetDetailPageProps) {
                   type="button"
                   onClick={() => handleDownloadJwt()}
                   disabled={downloading}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 disabled:opacity-50 transition-colors"
                 >
                   {downloading ? "Downloading..." : "Download license.jwt"}
                 </button>
@@ -413,7 +413,7 @@ export default function FleetDetailPage({ params }: FleetDetailPageProps) {
           )}
 
           {/* Provisioning detail card */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-6">
+          <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-6">
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <DetailRow label="ID">
                 <span className="font-mono text-xs text-gray-700">{p.id}</span>
@@ -455,7 +455,7 @@ export default function FleetDetailPage({ params }: FleetDetailPageProps) {
           </div>
 
           {/* License card */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-6">
+          <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-6">
             <h2 className="text-sm font-semibold text-gray-800 mb-4">License</h2>
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <DetailRow label="License Tier">

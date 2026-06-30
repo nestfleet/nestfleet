@@ -254,7 +254,7 @@ function IntegrationsSection() {
                     key={intg.name}
                     className={`relative flex items-center gap-3 rounded-xl border bg-white p-4 transition-all duration-200 ${
                       intg.status === "live"
-                        ? "border-gray-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-indigo-200"
+                        ? "border-gray-200 shadow-xs hover:shadow-md hover:-translate-y-0.5 hover:border-indigo-200"
                         : "border-gray-100 opacity-60"
                     }`}
                   >
@@ -320,7 +320,7 @@ const GRAPH_COLORS: Record<string, { bg: string; ring: string; text: string }> =
 function GraphNode({ emoji, label, color, status, badge }: { emoji: string; label: string; color: string; status: string; badge?: string }) {
   const c = GRAPH_COLORS[color] ?? GRAPH_COLORS.indigo;
   return (
-    <div className={`relative flex items-center gap-2 rounded-xl ${c.bg} ring-1 ${c.ring} px-3 py-2 shadow-sm`}>
+    <div className={`relative flex items-center gap-2 rounded-xl ${c.bg} ring-1 ${c.ring} px-3 py-2 shadow-xs`}>
       <span className="text-base">{emoji}</span>
       <div className="min-w-0">
         <p className={`text-[11px] font-semibold ${c.text} whitespace-nowrap`}>{label}</p>
@@ -369,7 +369,8 @@ export default function HomePage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-16">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-50/70 via-white to-amber-50/30" />
+        {/* /srgb keeps v3's sRGB interpolation; v4 defaults to OKLab which washes out this faint via-white tint */}
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-br/srgb from-indigo-50/70 via-white to-amber-50/30" />
         <div className="pointer-events-none absolute top-0 right-0 w-[700px] h-[700px] rounded-full bg-indigo-100/25 blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="pointer-events-none absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-amber-50/50 blur-3xl translate-y-1/3 -translate-x-1/4" />
 
@@ -491,7 +492,7 @@ export default function HomePage() {
                 loading="lazy"
               />
               {/* Badge */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur px-3 py-1.5 text-[10px] font-semibold text-gray-500 ring-1 ring-gray-200 shadow-sm">
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur-sm px-3 py-1.5 text-[10px] font-semibold text-gray-500 ring-1 ring-gray-200 shadow-xs">
                 <svg className="h-3 w-3 text-violet-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
                 </svg>
@@ -529,7 +530,7 @@ export default function HomePage() {
               return (
                 <div
                   key={i}
-                  className={`group rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${ac.border}`}
+                  className={`group rounded-2xl border border-gray-100 bg-white p-6 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${ac.border}`}
                 >
                   <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl text-xl ${ac.icon}`}>
                     {f.icon}
@@ -566,7 +567,7 @@ export default function HomePage() {
             {PRIVACY_POINTS.map((p, i) => (
               <div
                 key={i}
-                className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                className="flex items-start gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
               >
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-xl">
                   {p.icon}
@@ -608,7 +609,7 @@ export default function HomePage() {
       {/* ── CTA BANNER ───────────────────────────────────────────────────── */}
       <section className="py-24 px-5 sm:px-8 bg-gray-50">
         <div className="mx-auto max-w-3xl">
-          <div className="rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-700 px-8 sm:px-14 py-16 shadow-2xl shadow-indigo-200 text-center">
+          <div className="rounded-3xl bg-linear-to-br from-indigo-600 to-indigo-700 px-8 sm:px-14 py-16 shadow-2xl shadow-indigo-200 text-center">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
               Ready to stop managing
               <br />
@@ -623,7 +624,7 @@ export default function HomePage() {
                 href="https://github.com/nestfleet/nestfleet#quick-start"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-indigo-700 shadow hover:shadow-md active:scale-95 transition-all"
+                className="rounded-xl bg-white px-7 py-3.5 text-sm font-bold text-indigo-700 shadow-sm hover:shadow-md active:scale-95 transition-all"
               >
                 Self-host free on GitHub →
               </a>

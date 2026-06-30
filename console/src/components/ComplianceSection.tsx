@@ -79,7 +79,7 @@ export function ComplianceSection() {
           {BADGES.map((b, i) => (
             <div
               key={i}
-              className="flex items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+              className="flex items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-xs hover:shadow-md transition-all hover:-translate-y-0.5"
             >
               <span className="text-xl">{b.icon}</span>
               <div>
@@ -95,7 +95,7 @@ export function ComplianceSection() {
           {PILLARS.map((p, i) => (
             <div
               key={i}
-              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
             >
               <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl">
                 {p.icon}

@@ -740,7 +740,7 @@ export default function SetupPage() {
         {step < 5 && <Stepper current={step} />}
 
         {/* Card */}
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-6 sm:p-7">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 p-6 sm:p-7">
           {/* Error banner */}
           {submitError && (
             <div role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-red-100">

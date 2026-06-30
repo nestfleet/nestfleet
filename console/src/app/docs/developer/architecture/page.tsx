@@ -90,7 +90,7 @@ export default function ArchitecturePage() {
         logic, and support at-least-once delivery semantics.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Workers are registered at startup in <code className="bg-gray-100 px-1 rounded text-xs">src/workers/index.ts</code>.
+        Workers are registered at startup in <code className="bg-gray-100 px-1 rounded-sm text-xs">src/workers/index.ts</code>.
         Each worker is a function that receives a job payload and returns a result. Workers are
         registered with a queue name that corresponds to the job type:
       </p>
@@ -144,21 +144,21 @@ boss.work("auto_reply", async (job) => {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Authentication is JWT-based. The login endpoint issues a signed access token (short-lived)
         and a refresh token (long-lived, stored in an httpOnly cookie). All other API routes require
-        a valid Bearer token in the <code className="bg-gray-100 px-1 rounded text-xs">Authorization</code> header.
+        a valid Bearer token in the <code className="bg-gray-100 px-1 rounded-sm text-xs">Authorization</code> header.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Authorization is enforced by a <code className="bg-gray-100 px-1 rounded text-xs">requireAuth</code> middleware
-        in <code className="bg-gray-100 px-1 rounded text-xs">src/auth/</code>. It:
+        Authorization is enforced by a <code className="bg-gray-100 px-1 rounded-sm text-xs">requireAuth</code> middleware
+        in <code className="bg-gray-100 px-1 rounded-sm text-xs">src/auth/</code>. It:
       </p>
       <ol className="list-decimal pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
-        <li>Verifies the JWT signature using <code className="bg-gray-100 px-1 rounded text-xs">JWT_SECRET</code></li>
+        <li>Verifies the JWT signature using <code className="bg-gray-100 px-1 rounded-sm text-xs">JWT_SECRET</code></li>
         <li>Loads the user and their roles from the database</li>
         <li>Checks the required role(s) for the route</li>
         <li>Attaches the authenticated user to the Hono context for downstream handlers</li>
       </ol>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Every API route calls <code className="bg-gray-100 px-1 rounded text-xs">requireAuth()</code> — there is an ESLint
-        rule (<code className="bg-gray-100 px-1 rounded text-xs">no-unprotected-route</code>) that flags routes missing auth middleware
+        Every API route calls <code className="bg-gray-100 px-1 rounded-sm text-xs">requireAuth()</code> — there is an ESLint
+        rule (<code className="bg-gray-100 px-1 rounded-sm text-xs">no-unprotected-route</code>) that flags routes missing auth middleware
         during CI.
       </p>
 
@@ -166,9 +166,9 @@ boss.work("auto_reply", async (job) => {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Sensitive values — LLM API keys, webhook secrets, SMTP passwords — are encrypted at rest
         using AES-256-GCM before being stored in the database. Encryption is performed by
-        <code className="bg-gray-100 px-1 rounded text-xs ml-1">src/infra/crypto.ts</code> using Node.js&apos;s built-in
-        <code className="bg-gray-100 px-1 rounded text-xs ml-1">crypto</code> module with a random IV per value.
-        The <code className="bg-gray-100 px-1 rounded text-xs">ENCRYPTION_KEY</code> env var (64 hex chars = 32 bytes)
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">src/infra/crypto.ts</code> using Node.js&apos;s built-in
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">crypto</code> module with a random IV per value.
+        The <code className="bg-gray-100 px-1 rounded-sm text-xs">ENCRYPTION_KEY</code> env var (64 hex chars = 32 bytes)
         is the key material. Without it, secrets are stored in plaintext with a startup warning.
       </p>
 
@@ -201,12 +201,12 @@ boss.work("auto_reply", async (job) => {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Database migrations</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Migrations are plain SQL files in <code className="bg-gray-100 px-1 rounded text-xs">src/infra/db/migrations/</code>,
-        named sequentially: <code className="bg-gray-100 px-1 rounded text-xs">001_initial_schema.sql</code>,
-        <code className="bg-gray-100 px-1 rounded text-xs ml-1">002_add_cases.sql</code>, etc.
+        Migrations are plain SQL files in <code className="bg-gray-100 px-1 rounded-sm text-xs">src/infra/db/migrations/</code>,
+        named sequentially: <code className="bg-gray-100 px-1 rounded-sm text-xs">001_initial_schema.sql</code>,
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">002_add_cases.sql</code>, etc.
         The API applies all pending migrations at startup using a simple migration runner — no ORM,
         no migration framework dependency. Migrations are idempotent (applied only once, tracked in a
-        <code className="bg-gray-100 px-1 rounded text-xs ml-1">_migrations</code> table).
+        <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">_migrations</code> table).
       </p>
     </DocsLayout>
   )

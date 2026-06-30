@@ -111,19 +111,19 @@ export default function CasesPage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Case types</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         The triage agent classifies each case into one of the following types. Type influences routing
-        — a <code className="bg-gray-100 px-1 rounded text-xs">feature-request</code> is routed to the Product Lead queue;
-        an <code className="bg-gray-100 px-1 rounded text-xs">outage</code> is escalated immediately regardless of confidence.
+        — a <code className="bg-gray-100 px-1 rounded-sm text-xs">feature-request</code> is routed to the Product Lead queue;
+        an <code className="bg-gray-100 px-1 rounded-sm text-xs">outage</code> is escalated immediately regardless of confidence.
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
-        <li><code className="bg-gray-100 px-1 rounded text-xs">bug</code> — A defect in existing behaviour</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">feature-request</code> — A request for new or changed functionality</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">question</code> — A &quot;how do I&quot; or &quot;does it support&quot; inquiry</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">outage</code> — A reported system-wide or widespread failure</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">sales-inquiry</code> — Pre-sales or pricing question</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">feedback</code> — General praise, criticism, or suggestion</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">security</code> — Potential security vulnerability report</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">spam</code> — Automated or irrelevant noise</li>
-        <li><code className="bg-gray-100 px-1 rounded text-xs">other</code> — Catch-all for unclassified signals</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">bug</code> — A defect in existing behaviour</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">feature-request</code> — A request for new or changed functionality</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">question</code> — A &quot;how do I&quot; or &quot;does it support&quot; inquiry</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">outage</code> — A reported system-wide or widespread failure</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">sales-inquiry</code> — Pre-sales or pricing question</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">feedback</code> — General praise, criticism, or suggestion</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">security</code> — Potential security vulnerability report</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">spam</code> — Automated or irrelevant noise</li>
+        <li><code className="bg-gray-100 px-1 rounded-sm text-xs">other</code> — Catch-all for unclassified signals</li>
       </ul>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Confidence score</h2>
@@ -138,7 +138,7 @@ export default function CasesPage() {
         <li>
           <strong>Auto-reply gate</strong> — If confidence meets or exceeds the product&apos;s configured threshold
           (default: 0.80), and a matching known issue is found, NestFleet proceeds to auto-reply.
-          Below the threshold, the case moves to <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code>.
+          Below the threshold, the case moves to <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code>.
         </li>
         <li>
           <strong>Visual indicator</strong> — In the queue view, cases with confidence below 0.60 display
@@ -152,7 +152,7 @@ export default function CasesPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">The triage agent</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        When a new case arrives, a <code className="bg-gray-100 px-1 rounded text-xs">triage</code> job is enqueued via pg-boss.
+        When a new case arrives, a <code className="bg-gray-100 px-1 rounded-sm text-xs">triage</code> job is enqueued via pg-boss.
         The triage agent performs the following steps in a single LLM call with structured output:
       </p>
       <ol className="list-decimal pl-6 text-gray-600 space-y-2 mb-4 text-sm leading-relaxed">
@@ -169,7 +169,7 @@ export default function CasesPage() {
       </p>
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
-          The triage model uses the fast LLM tier (<code className="bg-indigo-100 px-1 rounded text-xs">LLM_MODEL_FAST</code>)
+          The triage model uses the fast LLM tier (<code className="bg-indigo-100 px-1 rounded-sm text-xs">LLM_MODEL_FAST</code>)
           when configured. For high-volume products, set this to a cheaper model (e.g. claude-haiku) to reduce costs
           while reserving the standard model for auto-reply generation.
         </p>
@@ -204,7 +204,7 @@ export default function CasesPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Escalation</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Any team member can escalate a case to move it to the <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code> state
+        Any team member can escalate a case to move it to the <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code> state
         and notify a Support Lead or Change Lead. Escalation is appropriate when:
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">

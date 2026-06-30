@@ -31,7 +31,7 @@ function relativeTime(isoString: string): string {
 
 function ActiveInstancesKpi({ count }: { count: number }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 flex items-start gap-4">
+    <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 flex items-start gap-4">
       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 text-slate-500 shrink-0">
         <svg
           className="h-5 w-5"
@@ -79,7 +79,7 @@ function VersionDistribution({ distribution }: VersionDistributionProps) {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5">
+    <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5">
       <h2 className="text-sm font-semibold text-gray-700 mb-4">
         Version Distribution
       </h2>
@@ -128,7 +128,7 @@ interface InstanceListProps {
 
 function InstanceList({ instances }: InstanceListProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5">
+    <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5">
       <h2 className="text-sm font-semibold text-gray-700 mb-4">
         Instance Activity
       </h2>
@@ -183,17 +183,17 @@ export function TelemetryPanelSkeleton() {
   return (
     <div className="space-y-4" aria-hidden="true">
       {/* KPI skeleton */}
-      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 h-20 animate-pulse">
-        <div className="h-3 w-32 bg-gray-200 rounded mb-3" />
-        <div className="h-6 w-16 bg-gray-200 rounded" />
+      <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 h-20 animate-pulse">
+        <div className="h-3 w-32 bg-gray-200 rounded-sm mb-3" />
+        <div className="h-6 w-16 bg-gray-200 rounded-sm" />
       </div>
       {/* Bar chart skeleton */}
-      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 animate-pulse">
-        <div className="h-3 w-40 bg-gray-200 rounded mb-4" />
+      <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 animate-pulse">
+        <div className="h-3 w-40 bg-gray-200 rounded-sm mb-4" />
         <div className="space-y-3">
           {[80, 50].map((w, i) => (
             <div key={i}>
-              <div className="h-2.5 w-24 bg-gray-200 rounded mb-1.5" />
+              <div className="h-2.5 w-24 bg-gray-200 rounded-sm mb-1.5" />
               <div
                 className="h-2 bg-gray-200 rounded-full"
                 style={{ width: `${w}%` }}
@@ -203,13 +203,13 @@ export function TelemetryPanelSkeleton() {
         </div>
       </div>
       {/* Table skeleton */}
-      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 animate-pulse">
-        <div className="h-3 w-32 bg-gray-200 rounded mb-4" />
+      <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 animate-pulse">
+        <div className="h-3 w-32 bg-gray-200 rounded-sm mb-4" />
         <div className="space-y-2.5">
           {[1, 2, 3].map((n) => (
             <div key={n} className="flex justify-between">
-              <div className="h-2.5 w-24 bg-gray-200 rounded" />
-              <div className="h-2.5 w-16 bg-gray-200 rounded" />
+              <div className="h-2.5 w-24 bg-gray-200 rounded-sm" />
+              <div className="h-2.5 w-16 bg-gray-200 rounded-sm" />
             </div>
           ))}
         </div>

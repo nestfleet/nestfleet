@@ -214,7 +214,7 @@ function BulkRenewDialog({ slugs, onSuccess, onClose }: BulkRenewDialogProps) {
           {queued !== null ? (
             <div className="space-y-4">
               <div className="flex items-start gap-3 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3">
-                <svg className="h-5 w-5 flex-shrink-0 text-emerald-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg className="h-5 w-5 shrink-0 text-emerald-500 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-emerald-800">
@@ -229,7 +229,7 @@ function BulkRenewDialog({ slugs, onSuccess, onClose }: BulkRenewDialogProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="max-h-24 overflow-y-auto rounded-lg bg-gray-50 border border-gray-200 px-3 py-2">
                 {slugs.map((s) => (
-                  <span key={s} className="inline-block mr-2 mb-1 font-mono text-xs text-gray-700 bg-white rounded px-1.5 py-0.5 border border-gray-200">{s}</span>
+                  <span key={s} className="inline-block mr-2 mb-1 font-mono text-xs text-gray-700 bg-white rounded-sm px-1.5 py-0.5 border border-gray-200">{s}</span>
                 ))}
               </div>
               <p className="text-xs text-gray-500">Each VPS keeps its current tier. Only the expiry date is updated.</p>
@@ -242,7 +242,7 @@ function BulkRenewDialog({ slugs, onSuccess, onClose }: BulkRenewDialogProps) {
                   value={expiresDate}
                   min={new Date().toISOString().slice(0, 10)}
                   onChange={(e) => setExpiresDate(e.target.value)}
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-xs focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
               <div>
@@ -257,7 +257,7 @@ function BulkRenewDialog({ slugs, onSuccess, onClose }: BulkRenewDialogProps) {
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="e.g. Annual renewal for all active customers"
                   className={clsx(
-                    "block w-full rounded-lg border bg-white px-3 py-2 text-sm resize-none shadow-sm focus:ring-1 focus:ring-indigo-500",
+                    "block w-full rounded-lg border bg-white px-3 py-2 text-sm resize-none shadow-xs focus:ring-1 focus:ring-indigo-500",
                     reason.length > 0 && reason.trim().length < 10 ? "border-red-300 focus:border-red-400" : "border-gray-300 focus:border-indigo-500"
                   )}
                 />
@@ -335,7 +335,7 @@ function FleetRowActions({ row, onActionDone, onReissue }: FleetRowActionsProps)
           <button
             onClick={handleRetry}
             disabled={retrying}
-            className="rounded px-2 py-1 text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+            className="rounded-sm px-2 py-1 text-xs font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition-colors"
             aria-label={`Retry provisioning ${row.org_slug}`}
           >
             {retrying ? "Retrying..." : "Retry"}
@@ -345,7 +345,7 @@ function FleetRowActions({ row, onActionDone, onReissue }: FleetRowActionsProps)
           <button
             onClick={() => onReissue(row)}
             disabled={row.reissue_status === "in_progress"}
-            className="rounded px-2 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="rounded-sm px-2 py-1 text-xs font-medium bg-indigo-50 text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             aria-label={`Reissue license for ${row.org_slug}`}
           >
             Reissue
@@ -354,7 +354,7 @@ function FleetRowActions({ row, onActionDone, onReissue }: FleetRowActionsProps)
         <button
           onClick={handleReset}
           disabled={resetting}
-          className="rounded px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          className="rounded-sm px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors"
           aria-label={`Reset ${row.org_slug}`}
         >
           {resetting ? "Resetting..." : "Reset"}
@@ -362,7 +362,7 @@ function FleetRowActions({ row, onActionDone, onReissue }: FleetRowActionsProps)
         <button
           onClick={() => setShowConfirm(true)}
           disabled={row.status === "deprovisioned" || row.status === "deprovisioning"}
-          className="rounded px-2 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="rounded-sm px-2 py-1 text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           aria-label={`Deprovision ${row.org_slug}`}
         >
           Deprovision
@@ -469,7 +469,7 @@ export default function FleetPage() {
         {selectedSlugs.length > 0 && (
           <button
             onClick={() => setShowBulkRenew(true)}
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-xs"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
@@ -490,7 +490,7 @@ export default function FleetPage() {
               onClick={() => setStatusFilter(value)}
               className={clsx(
                 "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors",
-                active ? "bg-indigo-600 text-white shadow-sm" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"
+                active ? "bg-indigo-600 text-white shadow-xs" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"
               )}
             >
               {label}
@@ -510,7 +510,7 @@ export default function FleetPage() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead>
@@ -520,7 +520,7 @@ export default function FleetPage() {
                     type="checkbox"
                     checked={allActiveSelected}
                     onChange={toggleSelectAll}
-                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     aria-label="Select all active rows"
                     title="Select all active"
                   />
@@ -541,7 +541,7 @@ export default function FleetPage() {
                   <tr key={i} aria-hidden="true">
                     {Array.from({ length: 8 }).map((__, j) => (
                       <td key={j} className="px-4 py-3">
-                        <div className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
+                        <div className="h-4 w-16 bg-gray-100 rounded-sm animate-pulse" />
                       </td>
                     ))}
                   </tr>
@@ -567,7 +567,7 @@ export default function FleetPage() {
                           checked={isSelected}
                           onChange={() => toggleRow(row.org_slug)}
                           disabled={!isActive}
-                          className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-30"
+                          className="rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-30"
                           aria-label={`Select ${row.org_slug}`}
                         />
                       </td>
@@ -618,7 +618,7 @@ export default function FleetPage() {
               <button
                 onClick={() => setOffset(Math.max(0, offset - PAGE_LIMIT))}
                 disabled={offset === 0}
-                className="rounded px-3 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-sm px-3 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 aria-label="Previous page"
               >
                 Previous
@@ -626,7 +626,7 @@ export default function FleetPage() {
               <button
                 onClick={() => setOffset(offset + PAGE_LIMIT)}
                 disabled={offset + PAGE_LIMIT >= total}
-                className="rounded px-3 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="rounded-sm px-3 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 aria-label="Next page"
               >
                 Next

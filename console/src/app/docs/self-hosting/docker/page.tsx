@@ -49,8 +49,8 @@ nano .env`}</pre>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Step 3 — Generate secrets</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        You need cryptographically random values for <code className="bg-gray-100 px-1 rounded text-xs">JWT_SECRET</code> and{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">ENCRYPTION_KEY</code>. Run this command twice — once for each:
+        You need cryptographically random values for <code className="bg-gray-100 px-1 rounded-sm text-xs">JWT_SECRET</code> and{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">ENCRYPTION_KEY</code>. Run this command twice — once for each:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`openssl rand -hex 32`}</pre>
@@ -61,7 +61,7 @@ nano .env`}</pre>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Step 4 — Set the minimum required variables</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        At minimum, you must set these variables in your <code className="bg-gray-100 px-1 rounded text-xs">.env</code> file
+        At minimum, you must set these variables in your <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code> file
         before starting the stack:
       </p>
       <table className="w-full text-sm border-collapse mb-6">
@@ -83,7 +83,7 @@ nano .env`}</pre>
           ].map(([name, val]) => (
             <tr key={name}>
               <td className="px-3 py-2 border border-gray-200 align-top">
-                <code className="bg-gray-100 px-1 rounded text-xs">{name}</code>
+                <code className="bg-gray-100 px-1 rounded-sm text-xs">{name}</code>
               </td>
               <td className="px-3 py-2 border border-gray-200 text-gray-600 align-top">{val}</td>
             </tr>
@@ -122,7 +122,7 @@ nano .env`}</pre>
           ].map(([svc, desc]) => (
             <tr key={svc}>
               <td className="px-3 py-2 border border-gray-200 align-top font-medium text-gray-700">
-                <code className="bg-gray-100 px-1 rounded text-xs">{svc}</code>
+                <code className="bg-gray-100 px-1 rounded-sm text-xs">{svc}</code>
               </td>
               <td className="px-3 py-2 border border-gray-200 text-gray-600 align-top">{desc}</td>
             </tr>
@@ -136,26 +136,26 @@ nano .env`}</pre>
       </p>
       <ol className="list-decimal pl-6 text-gray-600 space-y-2 mb-4 text-sm leading-relaxed">
         <li>
-          Set <code className="bg-gray-100 px-1 rounded text-xs">REGISTRATION_ENABLED=true</code> in your{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">.env</code> file.
+          Set <code className="bg-gray-100 px-1 rounded-sm text-xs">REGISTRATION_ENABLED=true</code> in your{" "}
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code> file.
         </li>
         <li>
           Restart the API:{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">docker compose -f docker-compose.prod.yml restart api</code>
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">docker compose -f docker-compose.prod.yml restart api</code>
         </li>
         <li>
-          Navigate to <code className="bg-gray-100 px-1 rounded text-xs">https://your-domain/signup</code> and create your account.
+          Navigate to <code className="bg-gray-100 px-1 rounded-sm text-xs">https://your-domain/signup</code> and create your account.
         </li>
         <li>
           Assign yourself the Admin role via the database or by promoting your account through the API.
         </li>
         <li>
-          Set <code className="bg-gray-100 px-1 rounded text-xs">REGISTRATION_ENABLED=false</code> and restart the API again.
+          Set <code className="bg-gray-100 px-1 rounded-sm text-xs">REGISTRATION_ENABLED=false</code> and restart the API again.
         </li>
       </ol>
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
         <p className="text-sm text-amber-900 leading-relaxed">
-          Leave <code className="bg-amber-100 px-1 rounded text-xs">REGISTRATION_ENABLED=false</code> in production.
+          Leave <code className="bg-amber-100 px-1 rounded-sm text-xs">REGISTRATION_ENABLED=false</code> in production.
           With it enabled, anyone who can reach your domain can create an account. Invite additional users
           from Settings → Team Members once you are logged in as admin.
         </p>
@@ -190,7 +190,7 @@ docker compose -f docker-compose.prod.yml logs -f api`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         This stops and removes containers but preserves the PostgreSQL data volume. Add{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">-v</code> to also remove volumes (destructive — deletes all data).
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">-v</code> to also remove volumes (destructive — deletes all data).
       </p>
     </DocsLayout>
   )

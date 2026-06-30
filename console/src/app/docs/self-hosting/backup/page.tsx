@@ -20,7 +20,7 @@ export default function BackupPage() {
       </h1>
       <p className="text-gray-600 leading-relaxed mb-6 text-base">
         NestFleet stores all state in PostgreSQL. A full backup consists of a compressed
-        database dump. The included <code className="bg-gray-100 px-1 rounded text-xs">scripts/backup.sh</code> script
+        database dump. The included <code className="bg-gray-100 px-1 rounded-sm text-xs">scripts/backup.sh</code> script
         automates this and rotates old backups automatically.
       </p>
 
@@ -33,27 +33,27 @@ export default function BackupPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">The backup script</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        <code className="bg-gray-100 px-1 rounded text-xs">scripts/backup.sh</code> does the following:
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">scripts/backup.sh</code> does the following:
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
-        <li>Runs <code className="bg-gray-100 px-1 rounded text-xs">pg_dump</code> against the running PostgreSQL container using <code className="bg-gray-100 px-1 rounded text-xs">docker compose exec</code></li>
+        <li>Runs <code className="bg-gray-100 px-1 rounded-sm text-xs">pg_dump</code> against the running PostgreSQL container using <code className="bg-gray-100 px-1 rounded-sm text-xs">docker compose exec</code></li>
         <li>Compresses the dump with gzip (typically 5–20x compression for text-heavy data)</li>
-        <li>Names the file with a timestamp: <code className="bg-gray-100 px-1 rounded text-xs">backups/nestfleet_YYYYMMDD_HHMMSS.sql.gz</code></li>
+        <li>Names the file with a timestamp: <code className="bg-gray-100 px-1 rounded-sm text-xs">backups/nestfleet_YYYYMMDD_HHMMSS.sql.gz</code></li>
         <li>Rotates the backup directory to keep only the most recent 7 backups, deleting older ones automatically</li>
         <li>Exits with a non-zero status code on failure, making it safe to use in cron with error logging</li>
       </ul>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Backup location</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Backups are written to the <code className="bg-gray-100 px-1 rounded text-xs">backups/</code> directory
-        at the root of the repository. This directory is listed in <code className="bg-gray-100 px-1 rounded text-xs">.gitignore</code> and
+        Backups are written to the <code className="bg-gray-100 px-1 rounded-sm text-xs">backups/</code> directory
+        at the root of the repository. This directory is listed in <code className="bg-gray-100 px-1 rounded-sm text-xs">.gitignore</code> and
         will never be committed to version control.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         For off-site durability, sync this directory to object storage (S3, Backblaze B2, Hetzner Object Storage)
         after each backup run. A simple approach is to pipe the script output into{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">rclone</code> or use a cron job that runs{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">rclone sync backups/ remote:bucket/nestfleet-backups/</code> after the dump.
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">rclone</code> or use a cron job that runs{" "}
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">rclone sync backups/ remote:bucket/nestfleet-backups/</code> after the dump.
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Run a backup manually</h2>
@@ -62,24 +62,24 @@ export default function BackupPage() {
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         The script must be run from the root of the NestFleet repository directory, where
-        the <code className="bg-gray-100 px-1 rounded text-xs">docker-compose.prod.yml</code> file is located.
-        It reads the <code className="bg-gray-100 px-1 rounded text-xs">POSTGRES_PASSWORD</code> from your
-        <code className="bg-gray-100 px-1 rounded text-xs">.env</code> file automatically.
+        the <code className="bg-gray-100 px-1 rounded-sm text-xs">docker-compose.prod.yml</code> file is located.
+        It reads the <code className="bg-gray-100 px-1 rounded-sm text-xs">POSTGRES_PASSWORD</code> from your
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">.env</code> file automatically.
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Automate with cron</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Add a cron entry to run backups nightly at 02:00 local time. Edit your crontab with{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">crontab -e</code> and add:
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">crontab -e</code> and add:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">
         <pre className="text-sm text-gray-100 font-mono whitespace-pre">{`0 2 * * * /path/to/nestfleet/scripts/backup.sh >> /var/log/nestfleet-backup.log 2>&1`}</pre>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Replace <code className="bg-gray-100 px-1 rounded text-xs">/path/to/nestfleet</code> with the absolute
+        Replace <code className="bg-gray-100 px-1 rounded-sm text-xs">/path/to/nestfleet</code> with the absolute
         path to your cloned repository. The script output (including errors) is appended to the log file.
         Monitor that file or configure a log rotation policy with{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">logrotate</code> to prevent it from growing unbounded.
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">logrotate</code> to prevent it from growing unbounded.
       </p>
 
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">

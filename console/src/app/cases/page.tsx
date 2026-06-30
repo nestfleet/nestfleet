@@ -162,9 +162,9 @@ export default function CasesPage() {
           <h2 className="text-base font-semibold text-gray-900">No product configured</h2>
           <p className="mt-1 text-sm text-gray-500">
             Set{" "}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code>
+            <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code>
             {" "}in your{" "}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code>
+            <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code>
             {" "}to load cases.
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function CasesPage() {
             {(pendingHandoffCount > 0 || pendingHandoffFilter) && (
               <button
                 onClick={() => setPendingHandoffFilter((v) => !v)}
-                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500/20 ${
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 ${
                   pendingHandoffFilter
                     ? "border-amber-400 bg-amber-50 text-amber-800"
                     : "border-amber-200 bg-amber-50/50 text-amber-700 hover:bg-amber-50"
@@ -208,7 +208,7 @@ export default function CasesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 3M21 7.5H7.5" />
                 </svg>
                 Pending Handoff
-                <span className={`inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full px-1 text-[10px] font-bold ${
+                <span className={`inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold ${
                   pendingHandoffFilter ? "bg-amber-600 text-white" : "bg-amber-200 text-amber-800"
                 }`}>
                   {pendingHandoffCount}
@@ -262,7 +262,7 @@ export default function CasesPage() {
         )}
 
         {/* Table card */}
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
           {isLoading && visibleCases.length === 0 ? (
             <div className="flex items-center justify-center py-14">
               <div className="flex flex-col items-center gap-3">
@@ -405,7 +405,7 @@ function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried
           {hasPendingNotif && (
             <span className="group relative shrink-0 flex items-center" aria-label="Pending notification">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-xs opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 Unacknowledged notification — action may be needed
               </span>
             </span>
@@ -416,7 +416,7 @@ function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" aria-hidden="true" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500" />
               </span>
-              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-xs opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 Last activity &lt; 2 hours ago
               </span>
             </span>
@@ -424,7 +424,7 @@ function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried
           {freshness === "warm" && (
             <span className="group relative shrink-0 flex items-center" aria-label="Active in the last 24 hours">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="pointer-events-none absolute bottom-full left-0 mb-1.5 whitespace-nowrap rounded-md bg-gray-600/95 px-2 py-1 text-[10px] text-white shadow-xs opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 Last activity &lt; 24 hours ago
               </span>
             </span>
@@ -438,7 +438,7 @@ function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried
               <svg className="h-3 w-3 text-violet-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2l2.09 6.26L20.18 9.27l-4.64 4.53L16.54 20 12 16.77 7.46 20l1-6.2L3.82 9.27l6.09-1.01L12 2z" />
               </svg>
-              <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="pointer-events-none absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-sm bg-gray-900 px-2 py-1 text-[10px] text-white opacity-0 group-hover:opacity-100 transition-opacity z-10">
                 AI-resolved
               </span>
             </span>
@@ -461,7 +461,7 @@ function CaseTableRow({ caseItem, hasPendingNotif, productId, onClick, onRetried
             <button
               onClick={handleRetry}
               disabled={retrying}
-              className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-red-400"
+              className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 transition-colors focus:outline-hidden focus:ring-1 focus:ring-red-400"
               aria-label="Retry processing"
             >
               {retrying ? (
@@ -541,7 +541,7 @@ function FilterPopover({ statusFilter, severityFilter, onStatusChange, onSeverit
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${
+        className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 ${
           activeCount > 0
             ? "border-indigo-300 bg-indigo-50 text-indigo-700"
             : "border-gray-300 bg-white text-gray-600 hover:bg-gray-50"

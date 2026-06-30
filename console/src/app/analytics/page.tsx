@@ -296,8 +296,8 @@ function CasesTab({ data }: { data: AnalyticsCases }) {
         <div className="flex justify-between mt-1 text-[10px] text-gray-400">
           <span>{data.daily[0]?.day?.slice(5) ?? ""}</span>
           <span className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 bg-indigo-300 rounded" /> created
-            <span className="inline-block h-2 w-2 bg-emerald-300 rounded" /> resolved
+            <span className="inline-block h-2 w-2 bg-indigo-300 rounded-sm" /> created
+            <span className="inline-block h-2 w-2 bg-emerald-300 rounded-sm" /> resolved
           </span>
           <span>{data.daily[data.daily.length - 1]?.day?.slice(5) ?? ""}</span>
         </div>
@@ -414,8 +414,8 @@ function OperationsTab({ data }: { data: AnalyticsOperations }) {
         <div className="flex justify-between mt-1 text-[10px] text-gray-400">
           <span>{data.queue.daily[0]?.day?.slice(5) ?? ""}</span>
           <span className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 bg-amber-300 rounded" /> requested
-            <span className="inline-block h-2 w-2 bg-emerald-300 rounded" /> acted
+            <span className="inline-block h-2 w-2 bg-amber-300 rounded-sm" /> requested
+            <span className="inline-block h-2 w-2 bg-emerald-300 rounded-sm" /> acted
           </span>
           <span>{data.queue.daily[data.queue.daily.length - 1]?.day?.slice(5) ?? ""}</span>
         </div>
@@ -540,7 +540,7 @@ export default function AnalyticsPage() {
               >
                 {t.label}
                 {locked && badge && (
-                  <span className="relative -top-1.5 text-[9px] font-semibold bg-amber-100 text-amber-700 rounded px-1 py-0.5 leading-none">
+                  <span className="relative -top-1.5 text-[9px] font-semibold bg-amber-100 text-amber-700 rounded-sm px-1 py-0.5 leading-none">
                     {badge}
                   </span>
                 )}

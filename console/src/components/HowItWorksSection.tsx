@@ -16,7 +16,7 @@ interface Step {
 
 function SignalVisual() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="flex items-center gap-2 bg-gray-50 border-b border-gray-100 px-4 py-2.5">
         <div className="flex gap-1">
           <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
@@ -49,7 +49,7 @@ function SignalVisual() {
 
 function TriageVisual() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-950 shadow-sm overflow-hidden font-mono">
+    <div className="rounded-xl border border-gray-200 bg-gray-950 shadow-xs overflow-hidden font-mono">
       <div className="flex items-center gap-2 bg-gray-900 border-b border-gray-800 px-4 py-2.5">
         <div className="flex gap-1">
           <div className="h-2.5 w-2.5 rounded-full bg-red-500/60" />
@@ -74,7 +74,7 @@ function TriageVisual() {
 
 function RoutingVisual() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="flex items-center gap-2 bg-gray-50 border-b border-gray-100 px-4 py-2.5">
         <span className="text-xs text-gray-400 font-mono">steward · routing decision</span>
       </div>
@@ -110,7 +110,7 @@ function RoutingVisual() {
 
 function ResolutionVisual() {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-xl border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="flex items-center justify-between bg-emerald-50 border-b border-emerald-100 px-4 py-2.5">
         <div className="flex items-center gap-2">
           <svg className="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
@@ -286,7 +286,7 @@ export function HowItWorksSection({ lifecycle }: { lifecycle?: LifecycleStep[] }
                 {lifecycle.map((step, i) => (
                   <div key={i} className="flex items-center gap-2 sm:gap-3">
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-gray-200 shadow-sm text-lg hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-gray-200 shadow-xs text-lg hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default">
                         {step.icon}
                       </div>
                       <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide text-center">
@@ -315,7 +315,7 @@ export function HowItWorksSection({ lifecycle }: { lifecycle?: LifecycleStep[] }
             <div key={i} className="flex items-center">
               <button
                 onClick={() => goTo(i)}
-                className={`flex flex-col items-center gap-1.5 group transition-all duration-200 focus:outline-none`}
+                className={`flex flex-col items-center gap-1.5 group transition-all duration-200 focus:outline-hidden`}
               >
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition-all duration-300 ${

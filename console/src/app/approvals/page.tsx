@@ -144,8 +144,8 @@ export default function ApprovalsPage() {
           </div>
           <h2 className="text-base font-semibold text-gray-900">No product configured</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Set <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code> to load approvals.
+            Set <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
+            <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code> to load approvals.
           </p>
         </div>
       </AppLayout>
@@ -180,7 +180,7 @@ export default function ApprovalsPage() {
         </div>
 
         {/* Table card */}
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
           {isLoading && visibleRequests.length === 0 ? (
             <div className="flex items-center justify-center py-14">
               <div className="flex flex-col items-center gap-3">
@@ -274,14 +274,14 @@ export default function ApprovalsPage() {
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Add an approval note…"
                 disabled={isSubmitting}
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-indigo-500 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 disabled:bg-gray-50 resize-none"
               />
             </div>
             <div className="flex items-center justify-end gap-3 pt-1">
-              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleApprove} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+              <button onClick={handleApprove} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
                 {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
                 Approve
               </button>
@@ -309,7 +309,7 @@ export default function ApprovalsPage() {
                 placeholder="Explain why this change request is being rejected…"
                 disabled={isSubmitting}
                 required
-                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400/20 disabled:bg-gray-50 resize-none"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-xs focus:border-red-400 focus:outline-hidden focus:ring-2 focus:ring-red-400/20 disabled:bg-gray-50 resize-none"
               />
               {reason.trim().length < 10 && (
                 <p className="text-xs text-gray-400">
@@ -320,10 +320,10 @@ export default function ApprovalsPage() {
               )}
             </div>
             <div className="flex items-center justify-end gap-3 pt-1">
-              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleReject} disabled={isSubmitting || reason.trim().length < 10} className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+              <button onClick={handleReject} disabled={isSubmitting || reason.trim().length < 10} className="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 transition-colors">
                 {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
                 Reject
               </button>
@@ -343,10 +343,10 @@ export default function ApprovalsPage() {
               Change request: <span className="font-medium text-gray-900">{activeModal.crTitle}</span>
             </p>
             <div className="flex items-center justify-end gap-3 pt-1">
-              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
+              <button onClick={closeModal} disabled={isSubmitting} className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-300 disabled:opacity-50 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleEscalate} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 transition-colors">
+              <button onClick={handleEscalate} disabled={isSubmitting} className="flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white hover:bg-amber-600 focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 transition-colors">
                 {isSubmitting && <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />}
                 Escalate to Lead
               </button>
@@ -398,7 +398,7 @@ function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, o
           )}
           <button
             onClick={onViewDetail}
-            className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left truncate block max-w-xs focus:outline-none focus:underline"
+            className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left truncate block max-w-xs focus:outline-hidden focus:underline"
           >
             {cr.title}
           </button>
@@ -421,7 +421,7 @@ function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, o
               <span className="text-gray-300">·</span>
               <button
                 onClick={(e) => { e.stopPropagation(); router.push(`${basePath}/cases/${cr.case_id}`); }}
-                className="font-mono text-indigo-500 hover:text-indigo-700 hover:underline focus:outline-none"
+                className="font-mono text-indigo-500 hover:text-indigo-700 hover:underline focus:outline-hidden"
                 title="Go to originating case"
               >
                 {shortCaseId}
@@ -467,20 +467,20 @@ function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, o
             <>
               <button
                 onClick={onApprove}
-                className="rounded-md bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors"
+                className="rounded-md bg-emerald-50 px-2.5 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-100 focus:outline-hidden focus:ring-2 focus:ring-emerald-500 transition-colors"
               >
                 Approve
               </button>
               <button
                 onClick={onReject}
-                className="rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors"
+                className="rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-200 hover:bg-red-100 focus:outline-hidden focus:ring-2 focus:ring-red-500 transition-colors"
               >
                 Reject
               </button>
               {cr.case_id && (
                 <button
                   onClick={onEscalate}
-                  className="rounded-md bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 transition-colors"
+                  className="rounded-md bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-100 focus:outline-hidden focus:ring-2 focus:ring-amber-400 transition-colors"
                   title="Send case back to Lead review"
                 >
                   Escalate
@@ -490,7 +490,7 @@ function ApprovalRow({ cr, hasPendingNotif, onViewDetail, onApprove, onReject, o
           )}
           <button
             onClick={onViewDetail}
-            className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors"
+            className="rounded-md bg-gray-50 px-2.5 py-1.5 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-gray-400 transition-colors"
             title="View full detail"
           >
             Detail

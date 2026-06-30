@@ -88,7 +88,7 @@ export default function DocsOverview() {
           <Link
             key={card.href}
             href={card.href}
-            className="group block border border-gray-200 rounded-lg p-5 hover:border-indigo-300 hover:shadow-sm transition-all"
+            className="group block border border-gray-200 rounded-lg p-5 hover:border-indigo-300 hover:shadow-xs transition-all"
           >
             <h3 className="text-base font-bold text-gray-900 group-hover:text-indigo-600 transition-colors mb-1">
               {card.title}

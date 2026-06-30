@@ -111,7 +111,7 @@ export function OuUsageBanner() {
           type="button"
           onClick={() => setDismissed(true)}
           aria-label="Dismiss usage warning"
-          className="ml-auto shrink-0 rounded p-0.5 text-amber-500 hover:bg-amber-100 transition-colors"
+          className="ml-auto shrink-0 rounded-sm p-0.5 text-amber-500 hover:bg-amber-100 transition-colors"
         >
           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

@@ -200,7 +200,7 @@ function ReviewModal({
               <p className="text-xs font-medium text-gray-500 mb-1">Source references</p>
               <ul className="space-y-1">
                 {asset.sourceRefs.map((ref, i) => (
-                  <li key={i} className="text-xs text-indigo-600 bg-indigo-50 rounded px-2 py-1 font-mono">{ref}</li>
+                  <li key={i} className="text-xs text-indigo-600 bg-indigo-50 rounded-sm px-2 py-1 font-mono">{ref}</li>
                 ))}
               </ul>
             </div>
@@ -528,7 +528,7 @@ function SearchProbe({ productId }: { productId: string }) {
                   <div key={chunk.chunkId} className="rounded-lg bg-gray-50 border border-gray-100 px-4 py-3">
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ring-1 ${TIER_STYLES[chunk.tier]?.cls}`}>
+                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-sm ring-1 ${TIER_STYLES[chunk.tier]?.cls}`}>
                           {TIER_STYLES[chunk.tier]?.label}
                         </span>
                         <span className="text-xs text-gray-500 font-mono truncate max-w-48">{chunk.sourceUri}</span>
@@ -740,12 +740,12 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-sm">
                       {SOURCE_TYPE_LABEL[src.sourceType] ?? src.sourceType}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex text-[11px] font-medium px-1.5 py-0.5 rounded ring-1 ${TIER_STYLES[src.tier]?.cls}`}>
+                    <span className={`inline-flex text-[11px] font-medium px-1.5 py-0.5 rounded-sm ring-1 ${TIER_STYLES[src.tier]?.cls}`}>
                       {TIER_STYLES[src.tier]?.label}
                     </span>
                   </td>
@@ -757,7 +757,7 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
                   </td>
                   <td className="px-4 py-3 text-center">
                     {src.hasConflicts ? (
-                      <span className="text-[11px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded ring-1 ring-red-200">Yes</span>
+                      <span className="text-[11px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-sm ring-1 ring-red-200">Yes</span>
                     ) : (
                       <span className="text-[11px] text-gray-400">—</span>
                     )}
@@ -814,7 +814,7 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
                     return (
                       <div key={key} className="flex items-center justify-between">
                         <span className="text-xs text-gray-600">{HEALTH_DIMENSION_LABELS[key] ?? key}</span>
-                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded ring-1 ${s.cls}`}>
+                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-sm ring-1 ${s.cls}`}>
                           {s.label}
                         </span>
                       </div>
@@ -849,7 +849,7 @@ function MemorySourcesTab({ productId, isAdmin }: { productId: string; isAdmin: 
                 <ul className="space-y-1.5">
                   {health.recommendedActions.map((rec, i) => (
                     <li key={i} className="flex items-start gap-2 text-xs text-gray-700">
-                      <span className="mt-0.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-400" />
+                      <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
                       {rec}
                     </li>
                   ))}
@@ -973,7 +973,7 @@ function KnowledgeAssetsTab({ productId, isKnowledgeLead }: { productId: string;
             className={`px-3 py-1.5 text-sm rounded-lg font-medium border transition-colors ${
               statusFilter === f.value
                 ? "border-indigo-200 bg-indigo-50 text-indigo-700"
-                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-800 shadow-sm"
+                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-800 shadow-xs"
             }`}
           >
             {f.label}
@@ -1020,7 +1020,7 @@ function KnowledgeAssetsTab({ productId, isKnowledgeLead }: { productId: string;
                     <p className="text-xs text-gray-400 mt-0.5 font-mono">case: {asset.caseId.slice(-8)}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-sm">
                       {TYPE_LABELS[asset.assetType] ?? asset.assetType}
                     </span>
                   </td>

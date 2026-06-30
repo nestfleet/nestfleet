@@ -77,8 +77,8 @@ export default function PrDraftsPage() {
           </div>
           <h2 className="text-base font-semibold text-gray-900">No product configured</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Set <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
-            <code className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code>.
+            Set <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">NEXT_PUBLIC_PRODUCT_ID</code> in your{" "}
+            <code className="rounded-sm bg-gray-100 px-1.5 py-0.5 text-xs font-mono">.env.local</code>.
           </p>
         </div>
       </AppLayout>
@@ -125,7 +125,7 @@ export default function PrDraftsPage() {
         )}
 
         {/* Table card */}
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
+        <div className="rounded-xl bg-white shadow-xs ring-1 ring-black/5 overflow-hidden">
           {isLoading && visibleReady.length === 0 && visibleInPrep.length === 0 ? (
             <div className="flex items-center justify-center py-16">
               <div className="flex flex-col items-center gap-3">
@@ -209,7 +209,7 @@ function PrDraftRow({ cr, hasPendingNotif, onView }: { cr: ChangeRequest; hasPen
           )}
           <button
             onClick={isPreparing ? undefined : onView}
-            className="font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left truncate block max-w-xs focus:outline-none focus:underline"
+            className="font-medium text-gray-900 hover:text-indigo-600 transition-colors text-left truncate block max-w-xs focus:outline-hidden focus:underline"
           >
             {cr.title}
           </button>
@@ -256,7 +256,7 @@ function PrDraftRow({ cr, hasPendingNotif, onView }: { cr: ChangeRequest; hasPen
             href={cr.github_pr_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-indigo-600 hover:underline text-xs focus:outline-none focus:underline"
+            className="inline-flex items-center gap-1 text-indigo-600 hover:underline text-xs focus:outline-hidden focus:underline"
           >
             #{cr.github_pr_number}
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -280,7 +280,7 @@ function PrDraftRow({ cr, hasPendingNotif, onView }: { cr: ChangeRequest; hasPen
         ) : (
           <button
             onClick={onView}
-            className="rounded-md bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+            className="rounded-md bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
             Review
           </button>

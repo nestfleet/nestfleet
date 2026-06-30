@@ -111,7 +111,7 @@ export default function SettingsPage() {
         </li>
         <li>
           <strong>Severity policy</strong> — override the default P0/P1 escalation behaviour. For example,
-          you can configure a product so that all <code className="bg-gray-100 px-1 rounded text-xs">outage</code>-type
+          you can configure a product so that all <code className="bg-gray-100 px-1 rounded-sm text-xs">outage</code>-type
           cases are always P0 regardless of confidence.
         </li>
         <li>
@@ -120,7 +120,7 @@ export default function SettingsPage() {
         </li>
         <li>
           <strong>Auto-close spam</strong> — automatically close cases classified as{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">spam</code> with high confidence. Default: off.
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">spam</code> with high confidence. Default: off.
         </li>
       </ul>
 
@@ -151,9 +151,9 @@ export default function SettingsPage() {
         </p>
       </div>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        If <code className="bg-gray-100 px-1 rounded text-xs">BILLING_ENABLED=true</code> is set (SaaS deployments only),
+        If <code className="bg-gray-100 px-1 rounded-sm text-xs">BILLING_ENABLED=true</code> is set (SaaS deployments only),
         the Billing section provides Stripe subscription management. Self-hosted operators should
-        leave <code className="bg-gray-100 px-1 rounded text-xs">BILLING_ENABLED=false</code>.
+        leave <code className="bg-gray-100 px-1 rounded-sm text-xs">BILLING_ENABLED=false</code>.
       </p>
     </DocsLayout>
   )

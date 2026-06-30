@@ -143,7 +143,7 @@ export default function RolesPage() {
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Admins can invite new team members from <strong>Settings → Team Members → Invite</strong>. An invitation
         email is sent with a one-time signup link. When{" "}
-        <code className="bg-gray-100 px-1 rounded text-xs">REGISTRATION_ENABLED=false</code> (the default for self-hosted),
+        <code className="bg-gray-100 px-1 rounded-sm text-xs">REGISTRATION_ENABLED=false</code> (the default for self-hosted),
         this invitation mechanism is the only way new users can join. The invited user&apos;s role is assigned
         at invitation time.
       </p>

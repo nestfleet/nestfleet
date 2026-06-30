@@ -36,11 +36,11 @@ function KpiSkeleton() {
       {[1, 2, 3, 4].map((n) => (
         <div
           key={n}
-          className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 h-24 animate-pulse"
+          className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 h-24 animate-pulse"
           aria-hidden="true"
         >
-          <div className="h-3 w-20 bg-gray-200 rounded mb-3" />
-          <div className="h-6 w-28 bg-gray-200 rounded" />
+          <div className="h-3 w-20 bg-gray-200 rounded-sm mb-3" />
+          <div className="h-6 w-28 bg-gray-200 rounded-sm" />
         </div>
       ))}
     </div>
@@ -50,15 +50,15 @@ function KpiSkeleton() {
 function ChartSkeleton() {
   return (
     <div
-      className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5 h-64 animate-pulse"
+      className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5 h-64 animate-pulse"
       aria-hidden="true"
     >
-      <div className="h-3 w-32 bg-gray-200 rounded mb-4" />
+      <div className="h-3 w-32 bg-gray-200 rounded-sm mb-4" />
       <div className="flex items-end gap-1 h-40">
         {[60, 80, 45, 90, 55, 70, 40, 85, 65, 75].map((h, i) => (
           <div
             key={i}
-            className="flex-1 bg-gray-200 rounded-sm"
+            className="flex-1 bg-gray-200 rounded-xs"
             style={{ height: `${h}%` }}
           />
         ))}
@@ -142,7 +142,7 @@ export default function OwnerDashboardPage() {
 
       {/* Subscription timeline chart */}
       <section aria-label="Subscription timeline">
-        <div className="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-5">
+        <div className="bg-white rounded-xl shadow-xs ring-1 ring-black/5 p-5">
           <h2 className="text-sm font-semibold text-gray-700 mb-4">
             Weekly Subscriptions
           </h2>

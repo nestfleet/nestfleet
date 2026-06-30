@@ -76,8 +76,8 @@ cd console && npm install && cd ..`}</pre>
         </li>
       </ol>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        The API starts on <code className="bg-gray-100 px-1 rounded text-xs">http://localhost:3000</code> and the console
-        on <code className="bg-gray-100 px-1 rounded text-xs">http://localhost:3001</code> by default.
+        The API starts on <code className="bg-gray-100 px-1 rounded-sm text-xs">http://localhost:3000</code> and the console
+        on <code className="bg-gray-100 px-1 rounded-sm text-xs">http://localhost:3001</code> by default.
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Code conventions</h2>
@@ -94,28 +94,28 @@ cd console && npm install && cd ..`}</pre>
           must be validated with a Zod schema before use.
         </li>
         <li>
-          <strong>Auth on every route</strong> — call <code className="bg-gray-100 px-1 rounded text-xs">requireAuth()</code> on
-          every route handler. The ESLint rule <code className="bg-gray-100 px-1 rounded text-xs">no-unprotected-route</code> will
+          <strong>Auth on every route</strong> — call <code className="bg-gray-100 px-1 rounded-sm text-xs">requireAuth()</code> on
+          every route handler. The ESLint rule <code className="bg-gray-100 px-1 rounded-sm text-xs">no-unprotected-route</code> will
           catch violations.
         </li>
         <li>
-          <strong>Structured logging</strong> — use the <code className="bg-gray-100 px-1 rounded text-xs">logger</code> from
-          <code className="bg-gray-100 px-1 rounded text-xs ml-1">src/shared/logger.ts</code> (pino). Always include
-          <code className="bg-gray-100 px-1 rounded text-xs ml-1">requestId</code>,{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">userId</code>, and{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">caseId</code> (where applicable) in log fields.
-          Never use <code className="bg-gray-100 px-1 rounded text-xs">console.log</code>.
+          <strong>Structured logging</strong> — use the <code className="bg-gray-100 px-1 rounded-sm text-xs">logger</code> from
+          <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">src/shared/logger.ts</code> (pino). Always include
+          <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">requestId</code>,{" "}
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">userId</code>, and{" "}
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">caseId</code> (where applicable) in log fields.
+          Never use <code className="bg-gray-100 px-1 rounded-sm text-xs">console.log</code>.
         </li>
         <li>
           <strong>No liteLLM</strong> — use provider SDKs directly:
-          <code className="bg-gray-100 px-1 rounded text-xs ml-1">@anthropic-ai/sdk</code>,
-          <code className="bg-gray-100 px-1 rounded text-xs ml-1">openai</code>,
-          <code className="bg-gray-100 px-1 rounded text-xs ml-1">@google/generative-ai</code>.
+          <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">@anthropic-ai/sdk</code>,
+          <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">openai</code>,
+          <code className="bg-gray-100 px-1 rounded-sm text-xs ml-1">@google/generative-ai</code>.
           liteLLM is a banned dependency.
         </li>
         <li>
-          <strong>TypeScript strict mode</strong> — no <code className="bg-gray-100 px-1 rounded text-xs">any</code> types
-          without an explicit comment explaining why. Prefer <code className="bg-gray-100 px-1 rounded text-xs">unknown</code> with
+          <strong>TypeScript strict mode</strong> — no <code className="bg-gray-100 px-1 rounded-sm text-xs">any</code> types
+          without an explicit comment explaining why. Prefer <code className="bg-gray-100 px-1 rounded-sm text-xs">unknown</code> with
           a type guard.
         </li>
       </ul>
@@ -150,7 +150,7 @@ cd console && npm install && cd ..`}</pre>
         <li><strong>One feature or fix per PR</strong> — small PRs are reviewed faster and are easier to revert if needed</li>
         <li><strong>Explain the why, not the what</strong> — the code diff shows what changed; the PR description should explain why the change is necessary and what alternatives were considered</li>
         <li><strong>Update docs</strong> — if your change adds a new environment variable, config option, or user-facing feature, update the relevant documentation page. See the <a href="/docs/developer/architecture" className="text-indigo-600 hover:underline">Architecture</a> doc for the key files.</li>
-        <li><strong>Link the issue</strong> — reference the GitHub issue your PR resolves with <code className="bg-gray-100 px-1 rounded text-xs">Closes #123</code> in the PR description</li>
+        <li><strong>Link the issue</strong> — reference the GitHub issue your PR resolves with <code className="bg-gray-100 px-1 rounded-sm text-xs">Closes #123</code> in the PR description</li>
         <li><strong>Keep the diff focused</strong> — avoid bundling unrelated refactors with bug fixes</li>
       </ul>
 
@@ -184,15 +184,15 @@ cd console && npm install && cd ..`}</pre>
         </tbody>
       </table>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Example: <code className="bg-gray-100 px-1 rounded text-xs">feat: add per-product confidence threshold to triage settings</code>
+        Example: <code className="bg-gray-100 px-1 rounded-sm text-xs">feat: add per-product confidence threshold to triage settings</code>
       </p>
 
       <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
         <p className="text-sm text-amber-900 leading-relaxed">
           <strong>Do not install liteLLM.</strong> It is a banned dependency in this project.
-          Use provider SDKs directly: <code className="bg-amber-100 px-1 rounded text-xs">@anthropic-ai/sdk</code>,
-          <code className="bg-amber-100 px-1 rounded text-xs ml-1">openai</code>,
-          <code className="bg-amber-100 px-1 rounded text-xs ml-1">@google/generative-ai</code>.
+          Use provider SDKs directly: <code className="bg-amber-100 px-1 rounded-sm text-xs">@anthropic-ai/sdk</code>,
+          <code className="bg-amber-100 px-1 rounded-sm text-xs ml-1">openai</code>,
+          <code className="bg-amber-100 px-1 rounded-sm text-xs ml-1">@google/generative-ai</code>.
           PRs that add liteLLM as a dependency will be closed.
         </p>
       </div>

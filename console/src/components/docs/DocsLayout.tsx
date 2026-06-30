@@ -31,7 +31,7 @@ export function DocsLayout({ children, prev, next }: DocsLayoutProps) {
         <Link href="/" className="flex items-center gap-2 mr-auto" aria-label="NestFleet home">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-white text-xs">⚡</span>
           <span className="text-[15px] font-bold tracking-tight text-gray-900">NestFleet</span>
-          <span className="text-[11px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 leading-none">
+          <span className="text-[11px] font-semibold uppercase tracking-widest px-1.5 py-0.5 rounded-sm bg-indigo-100 text-indigo-700 leading-none">
             Docs
           </span>
         </Link>
@@ -39,13 +39,13 @@ export function DocsLayout({ children, prev, next }: DocsLayoutProps) {
         <nav className="flex items-center gap-1" aria-label="Header actions">
           <Link
             href="/login"
-            className="text-sm text-gray-500 hover:text-gray-900 font-medium px-3 py-1.5 rounded hover:bg-gray-100 transition-colors"
+            className="text-sm text-gray-500 hover:text-gray-900 font-medium px-3 py-1.5 rounded-sm hover:bg-gray-100 transition-colors"
           >
             Back to console
           </Link>
           <Link
             href="/signup"
-            className="text-sm text-white font-semibold px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-700 transition-colors"
+            className="text-sm text-white font-semibold px-3 py-1.5 rounded-sm bg-indigo-600 hover:bg-indigo-700 transition-colors"
           >
             Get started free
           </Link>

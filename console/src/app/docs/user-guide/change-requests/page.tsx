@@ -73,9 +73,9 @@ export default function ChangeRequestsPage() {
       <ol className="list-decimal pl-6 text-gray-600 space-y-2 mb-4 text-sm leading-relaxed">
         <li>
           <strong>Automatic — novel bug detection</strong>: After triage, if the case is classified as a{" "}
-          <code className="bg-gray-100 px-1 rounded text-xs">bug</code> and the known-issue search returns no close matches
+          <code className="bg-gray-100 px-1 rounded-sm text-xs">bug</code> and the known-issue search returns no close matches
           (no known issue similarity above the novelty threshold), the system automatically creates a draft CR
-          and enqueues the <code className="bg-gray-100 px-1 rounded text-xs">change_prep</code> job.
+          and enqueues the <code className="bg-gray-100 px-1 rounded-sm text-xs">change_prep</code> job.
         </li>
         <li>
           <strong>Manual — team-initiated</strong>: Any team member with the Operator or Support Lead role
@@ -86,7 +86,7 @@ export default function ChangeRequestsPage() {
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">The PR draft</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        When the <code className="bg-gray-100 px-1 rounded text-xs">change_prep</code> job runs, NestFleet uses the complex LLM
+        When the <code className="bg-gray-100 px-1 rounded-sm text-xs">change_prep</code> job runs, NestFleet uses the complex LLM
         tier to generate a structured GitHub PR draft. The draft includes:
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
@@ -128,8 +128,8 @@ export default function ChangeRequestsPage() {
         When a Change Lead rejects a CR:
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
-        <li>The CR state moves to <code className="bg-gray-100 px-1 rounded text-xs">rejected</code></li>
-        <li>The originating support case receives a note with the rejection rationale and moves to <code className="bg-gray-100 px-1 rounded text-xs">awaiting-lead</code></li>
+        <li>The CR state moves to <code className="bg-gray-100 px-1 rounded-sm text-xs">rejected</code></li>
+        <li>The originating support case receives a note with the rejection rationale and moves to <code className="bg-gray-100 px-1 rounded-sm text-xs">awaiting-lead</code></li>
         <li>An audit event is logged</li>
         <li>The team member who created the CR is notified by email</li>
       </ul>
@@ -141,7 +141,7 @@ export default function ChangeRequestsPage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Infrastructure debt CRs</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Not all change requests originate from customer cases. NestFleet supports a sidecar CR type for
-        infrastructure debt, tagged with <code className="bg-gray-100 px-1 rounded text-xs">cr_track: infra_debt</code>. These are
+        infrastructure debt, tagged with <code className="bg-gray-100 px-1 rounded-sm text-xs">cr_track: infra_debt</code>. These are
         created manually by engineers to track security patches, dependency upgrades, or architectural
         improvements that were identified during normal case work but are not tied to a specific customer report.
       </p>
