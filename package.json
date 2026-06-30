@@ -35,7 +35,7 @@
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^9.0.0",
     "ollama-ai-provider": "^1.2.0",
-    "pg-boss": "^12.19.1",
+    "pg-boss": "^12.23.1",
     "pino": "^9.6.0",
     "pino-pretty": "^13.0.0",
     "postgres": "^3.4.5",
