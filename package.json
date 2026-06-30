@@ -33,7 +33,7 @@
     "jose": "^6.2.3",
     "js-yaml": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
-    "nodemailer": "^9.0.0",
+    "nodemailer": "^9.0.3",
     "ollama-ai-provider": "^1.2.0",
     "pg-boss": "^12.19.1",
     "pino": "^9.6.0",
