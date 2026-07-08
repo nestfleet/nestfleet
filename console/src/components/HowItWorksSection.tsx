@@ -34,7 +34,7 @@ function SignalVisual() {
           </div>
         </div>
         <p className="text-xs text-gray-500 leading-relaxed pl-11">
-          "Hi, I've been trying to export 847 documents for 2 hours and it keeps failing with a timeout after ~5 minutes. This is blocking our end-of-quarter report..."
+          &quot;Hi, I&apos;ve been trying to export 847 documents for 2 hours and it keeps failing with a timeout after ~5 minutes. This is blocking our end-of-quarter report...&quot;
         </p>
         <div className="pl-11 flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-medium text-indigo-700 ring-1 ring-indigo-200">
@@ -61,11 +61,11 @@ function TriageVisual() {
       </div>
       <div className="p-4 text-xs leading-6 space-y-0.5">
         <p><span className="text-gray-500">{"{"}</span></p>
-        <p className="pl-4"><span className="text-blue-400">"severity"</span><span className="text-gray-500">: </span><span className="text-amber-300">"high"</span><span className="text-gray-500">,</span></p>
-        <p className="pl-4"><span className="text-blue-400">"type"</span><span className="text-gray-500">: </span><span className="text-green-400">"bug"</span><span className="text-gray-500">,</span></p>
-        <p className="pl-4"><span className="text-blue-400">"labels"</span><span className="text-gray-500">: [</span><span className="text-green-400">"export"</span><span className="text-gray-500">, </span><span className="text-green-400">"timeout"</span><span className="text-gray-500">],</span></p>
-        <p className="pl-4"><span className="text-blue-400">"confidence"</span><span className="text-gray-500">: </span><span className="text-purple-400">0.95</span><span className="text-gray-500">,</span></p>
-        <p className="pl-4"><span className="text-blue-400">"routing"</span><span className="text-gray-500">: </span><span className="text-green-400">"Engineering (ISSUE-441)"</span></p>
+        <p className="pl-4"><span className="text-blue-400">&quot;severity&quot;</span><span className="text-gray-500">: </span><span className="text-amber-300">&quot;high&quot;</span><span className="text-gray-500">,</span></p>
+        <p className="pl-4"><span className="text-blue-400">&quot;type&quot;</span><span className="text-gray-500">: </span><span className="text-green-400">&quot;bug&quot;</span><span className="text-gray-500">,</span></p>
+        <p className="pl-4"><span className="text-blue-400">&quot;labels&quot;</span><span className="text-gray-500">: [</span><span className="text-green-400">&quot;export&quot;</span><span className="text-gray-500">, </span><span className="text-green-400">&quot;timeout&quot;</span><span className="text-gray-500">],</span></p>
+        <p className="pl-4"><span className="text-blue-400">&quot;confidence&quot;</span><span className="text-gray-500">: </span><span className="text-purple-400">0.95</span><span className="text-gray-500">,</span></p>
+        <p className="pl-4"><span className="text-blue-400">&quot;routing&quot;</span><span className="text-gray-500">: </span><span className="text-green-400">&quot;Engineering (ISSUE-441)&quot;</span></p>
         <p><span className="text-gray-500">{"}"}</span></p>
       </div>
     </div>
@@ -87,7 +87,7 @@ function RoutingVisual() {
             </svg>
             <span className="text-sm font-semibold text-emerald-800">Known issue matched</span>
           </div>
-          <p className="text-xs text-emerald-700 font-medium pl-6">"Export timeout on large document sets"</p>
+          <p className="text-xs text-emerald-700 font-medium pl-6">&quot;Export timeout on large document sets&quot;</p>
           <div className="flex items-center gap-2 pl-6">
             <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">Tier 1</span>
             <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">Confidence 94%</span>

@@ -8,6 +8,7 @@ import { use } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import clsx from "clsx";
+import { useNow } from "@/lib/useNow";
 import {
   getOwnerFleetItemApi,
   getLicenseHistoryApi,
@@ -88,8 +89,8 @@ function ReissueStatusBadge({ status }: { status: string | null }) {
 // ── Expiry display ────────────────────────────────────────────────────────────
 
 function ExpiryDisplay({ iso }: { iso: string | null }) {
+  const now = useNow();
   if (!iso) return <span className="text-sm text-gray-400">—</span>;
-  const now  = Date.now();
   const exp  = new Date(iso).getTime();
   const days = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
 

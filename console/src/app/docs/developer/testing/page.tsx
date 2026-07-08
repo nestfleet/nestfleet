@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -126,7 +127,7 @@ export default function TestingPage() {
         login, case creation, triage queue, auto-reply approval, and change request workflow.
       </p>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        Before running E2E tests, start the full development stack (see <a href="/docs/developer/contributing" className="text-indigo-600 hover:underline">Contributing</a>).
+        Before running E2E tests, start the full development stack (see <Link href="/docs/developer/contributing" className="text-indigo-600 hover:underline">Contributing</Link>).
         Then:
       </p>
       <div className="bg-gray-900 rounded-lg p-4 mb-6 overflow-x-auto">

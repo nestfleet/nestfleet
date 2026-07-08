@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -29,7 +30,7 @@ export default function UpgradingPage() {
           <strong>Always back up before upgrading.</strong> Run{" "}
           <code className="bg-amber-100 px-1 rounded-sm text-xs">bash scripts/backup.sh</code> and verify the backup
           file exists in <code className="bg-amber-100 px-1 rounded-sm text-xs">backups/</code> before proceeding.
-          See the <a href="/docs/self-hosting/backup" className="text-amber-800 font-medium hover:underline">Backup & Restore</a> guide.
+          See the <Link href="/docs/self-hosting/backup" className="text-amber-800 font-medium hover:underline">Backup & Restore</Link> guide.
         </p>
       </div>
 
@@ -117,7 +118,7 @@ git checkout v1.5.0`}</pre>
           </div>
         </li>
         <li>Restore the database from your pre-upgrade backup (see{" "}
-          <a href="/docs/self-hosting/backup" className="text-indigo-600 hover:underline">Backup & Restore</a>).
+          <Link href="/docs/self-hosting/backup" className="text-indigo-600 hover:underline">Backup & Restore</Link>).
         </li>
         <li>Check out the previous release tag:
           <div className="bg-gray-900 rounded-lg p-3 mt-2 mb-1 overflow-x-auto">

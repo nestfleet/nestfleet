@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -227,7 +228,7 @@ export default function EnvironmentPage() {
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">GitHub</h2>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         Required to receive GitHub webhooks and create pull requests as part of change requests.
-        See the <a href="/docs/self-hosting/github-app" className="text-indigo-600 hover:underline">GitHub App Setup</a> guide
+        See the <Link href="/docs/self-hosting/github-app" className="text-indigo-600 hover:underline">GitHub App Setup</Link> guide
         for how to obtain these values.
       </p>
       <EnvTable rows={[

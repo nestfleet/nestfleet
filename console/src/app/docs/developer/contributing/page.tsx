@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -142,14 +143,14 @@ cd console && npm install && cd ..`}</pre>
         </li>
       </ul>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        See <a href="/docs/developer/testing" className="text-indigo-600 hover:underline">Running Tests</a> for how to run the test suite.
+        See <Link href="/docs/developer/testing" className="text-indigo-600 hover:underline">Running Tests</Link> for how to run the test suite.
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">PR guidelines</h2>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li><strong>One feature or fix per PR</strong> — small PRs are reviewed faster and are easier to revert if needed</li>
         <li><strong>Explain the why, not the what</strong> — the code diff shows what changed; the PR description should explain why the change is necessary and what alternatives were considered</li>
-        <li><strong>Update docs</strong> — if your change adds a new environment variable, config option, or user-facing feature, update the relevant documentation page. See the <a href="/docs/developer/architecture" className="text-indigo-600 hover:underline">Architecture</a> doc for the key files.</li>
+        <li><strong>Update docs</strong> — if your change adds a new environment variable, config option, or user-facing feature, update the relevant documentation page. See the <Link href="/docs/developer/architecture" className="text-indigo-600 hover:underline">Architecture</Link> doc for the key files.</li>
         <li><strong>Link the issue</strong> — reference the GitHub issue your PR resolves with <code className="bg-gray-100 px-1 rounded-sm text-xs">Closes #123</code> in the PR description</li>
         <li><strong>Keep the diff focused</strong> — avoid bundling unrelated refactors with bug fixes</li>
       </ul>

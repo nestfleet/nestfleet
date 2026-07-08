@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -91,7 +92,7 @@ export default function AutoReplyPage() {
         <p className="text-sm text-indigo-900 leading-relaxed">
           The quality of auto-replies is directly proportional to the quality of your knowledge base.
           A well-maintained knowledge base with detailed runbooks and FAQs will produce significantly
-          better auto-replies. See the <a href="/docs/user-guide/knowledge-base" className="text-indigo-700 font-medium hover:underline">Knowledge Base</a> guide
+          better auto-replies. See the <Link href="/docs/user-guide/knowledge-base" className="text-indigo-700 font-medium hover:underline">Knowledge Base</Link> guide
           for how to build and maintain it.
         </p>
       </div>

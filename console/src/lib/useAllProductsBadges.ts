@@ -37,14 +37,15 @@ export function useAllProductsBadges(): Record<string, ProductBadgeSummary> {
   const [badges, setBadges] = useState<Record<string, ProductBadgeSummary>>({});
   // Stable ref so the interval callback always sees current products
   const productsRef = useRef(products);
-  productsRef.current = products;
+  useEffect(() => {
+    productsRef.current = products;
+  });
 
   useEffect(() => {
-    if (products.length <= 1) {
-      // No switcher shown for 0–1 products — no need to poll
-      setBadges({});
-      return;
-    }
+    // No switcher shown for 0–1 products — no need to poll.
+    // (Badges are derived to {} for this case at the return statement below,
+    // rather than calling setState synchronously in this effect.)
+    if (products.length <= 1) return;
 
     let cancelled = false;
 
@@ -83,5 +84,5 @@ export function useAllProductsBadges(): Record<string, ProductBadgeSummary> {
     };
   }, [products.length]); // re-init only when product count changes, not on every render
 
-  return badges;
+  return products.length <= 1 ? {} : badges;
 }

@@ -119,7 +119,7 @@ export function ComplianceSection() {
           <div>
             <h4 className="text-sm font-bold text-amber-900 mb-1">Business Source License — inspect before you deploy</h4>
             <p className="text-sm text-amber-800 leading-relaxed">
-              NestFleet's full source code is readable for security audit and review.
+              NestFleet&apos;s full source code is readable for security audit and review.
               Production use requires an active subscription.
               The license converts to full open source after 3–4 years.
               No hidden behaviour. No surprise changes. You can see exactly what runs in your infrastructure.

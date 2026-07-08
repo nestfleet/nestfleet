@@ -42,6 +42,7 @@ import {
   type PermissionWithGrant,
 } from "@/lib/api";
 import type { OperatorUser, LicenseStatus } from "@/lib/types";
+import { useNow } from "@/lib/useNow";
 import { useLicense } from "@/lib/useLicense";
 import { Modal } from "@/components/Modal";
 import { useToast } from "@/components/Toast";
@@ -97,10 +98,16 @@ export default function SettingsPage() {
   // Deep-link support: ?section=plan (or any valid section key)
   // Legacy redirects: ci/chat/contact-form → channels hub
   // Also detect Stripe redirect: ?stripe_return=success|cancel
+  //
+  // Kept as an effect (rather than computed during render) because
+  // activeSection is also independently settable via UI section clicks, and
+  // the stripe_return branch performs a router.replace side effect to clean
+  // up the URL — not purely derivable from render.
   useEffect(() => {
     const s = searchParams.get("section");
     const legacyToChannels = ["ci", "chat", "contact-form"];
     if (s && legacyToChannels.includes(s)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveSection("channels");
     } else if (s && SECTIONS.some((sec) => sec.key === s)) {
       setActiveSection(s as SectionKey);
@@ -114,7 +121,7 @@ export default function SettingsPage() {
       const newUrl = `${window.location.pathname}${params.toString() ? "?" + params.toString() : ""}`;
       router.replace(newUrl);
     }
-  }, [searchParams]);
+  }, [searchParams, router]);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
 
   const { data, error, isLoading } = useSWR(
@@ -281,14 +288,17 @@ function ProductSection() {
   const [stage,       setStage]       = useState(product?.stage       ?? "production");
   const [accentColor, setAccentColor] = useState(product?.accentColor ?? "#6366f1");
 
-  // Sync form if product changes (e.g. after refresh)
-  useEffect(() => {
-    if (product) {
-      setName(product.name);
-      setStage(product.stage);
-      setAccentColor(product.accentColor ?? "#6366f1");
-    }
-  }, [product?.productId]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Sync form if product changes (e.g. after refresh). Computed during render
+  // (React's documented "adjusting state when a prop changes" pattern)
+  // instead of an effect — avoids an extra commit/flash and the
+  // set-state-in-effect lint warning.
+  const [prevProductId, setPrevProductId] = useState(product?.productId);
+  if (product && product.productId !== prevProductId) {
+    setPrevProductId(product.productId);
+    setName(product.name);
+    setStage(product.stage);
+    setAccentColor(product.accentColor ?? "#6366f1");
+  }
 
   if (!product) return null;
 
@@ -555,23 +565,30 @@ function LlmSection({
     "self-hosted":  "nomic-embed-text",
   };
 
-  // When the provider changes: lock if switching back to saved provider (key exists), unlock otherwise.
-  // Also reset embedding model to the new provider's default.
-  useEffect(() => {
-    if (provider === savedProvider && settings.llm.apiKeyLast4) {
+  // Applies all the side effects of switching provider (lock state, embedding
+  // model default, etc). Called directly from the provider-card onClick
+  // instead of via a useEffect keyed on `provider` state, since the only
+  // place `provider` changes is this one user action — no derived-from-prop
+  // sync is needed.
+  function applyProviderChange(next: string) {
+    setProvider(next);
+    setModels([]);
+    setModel("");
+    setConnectionState("idle");
+    setConnectionMsg("");
+    if (next === savedProvider && settings.llm.apiKeyLast4) {
       setKeyLocked(true);
       setApiKey("");
-      setEmbeddingModel(settings.llm.embeddingModel ?? EMBEDDING_DEFAULTS[provider] ?? "");
+      setEmbeddingModel(settings.llm.embeddingModel ?? EMBEDDING_DEFAULTS[next] ?? "");
       setEmbeddingKeyLocked(!!(settings.llm.embeddingApiKeyLast4));
       setEmbeddingApiKey("");
     } else {
       setKeyLocked(false);
-      setEmbeddingModel(EMBEDDING_DEFAULTS[provider] ?? "");
+      setEmbeddingModel(EMBEDDING_DEFAULTS[next] ?? "");
       setEmbeddingKeyLocked(false);
       setEmbeddingApiKey("");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [provider]);
+  }
 
   // On mount, silently fetch the full model list when a key is already saved.
   // This populates the dropdown without requiring a manual "Test Connection" click.
@@ -651,13 +668,7 @@ function LlmSection({
             return (
               <button
                 key={p.value}
-                onClick={() => {
-                  setProvider(p.value);
-                  setModels([]);
-                  setModel("");
-                  setConnectionState("idle");
-                  setConnectionMsg("");
-                }}
+                onClick={() => applyProviderChange(p.value)}
                 className={`flex items-start gap-2.5 rounded-lg border p-2.5 text-left transition-all ${
                   isActive
                     ? "border-indigo-300 bg-indigo-50/60 ring-1 ring-indigo-200"
@@ -1918,6 +1929,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
   const [portalLoading, setPortalLoading] = useState(false);
   const [billingInterval, setBillingInterval] = useState<PlanInterval>("monthly");
   const stripeReturnHandledRef = useRef(false);
+  const nowMs = useNow();
 
   const { data: billingData, mutate: mutateBilling, error: billingError } = useSWR(
     "billing-status",
@@ -1968,6 +1980,9 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
         success_url: `${base}?section=plan&stripe_return=success`,
         cancel_url:  `${base}?section=plan&stripe_return=cancel`,
       });
+      // Navigation side effect inside an event handler (not render); compiler flags this
+      // global `window` mutation conservatively even though it is safe here.
+      // eslint-disable-next-line react-hooks/immutability
       if (res.data?.checkout_url) window.location.href = res.data.checkout_url;
     } catch (err) {
       toast(`Checkout failed: ${(err as Error).message}`, "error");
@@ -2002,7 +2017,7 @@ function LicenseSection({ stripeReturn, onStripeReturnHandled }: LicenseSectionP
 
       {/* Trial countdown */}
       {billing?.trialEndsAt && (() => {
-        const days = Math.max(0, Math.ceil((new Date(billing.trialEndsAt!).getTime() - Date.now()) / 86_400_000));
+        const days = Math.max(0, Math.ceil((new Date(billing.trialEndsAt!).getTime() - nowMs) / 86_400_000));
         return (
           <div className={`rounded-lg border p-3 ${days <= 3 ? "border-red-200 bg-red-50" : "border-amber-200 bg-amber-50"}`}>
             <p className={`text-sm font-medium ${days <= 3 ? "text-red-700" : "text-amber-700"}`}>

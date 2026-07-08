@@ -205,7 +205,7 @@ export default function CRDetailPage({ params }: PageProps) {
               <p className="text-xs text-indigo-700 leading-relaxed">
                 <span className="font-semibold">After you approve:</span>{" "}
                 NestFleet will generate a draft PR in GitHub based on this scope.
-                You'll review and refine the actual code there, then return to <span className="font-medium">PR Drafts</span> and click <span className="font-medium">Accept &amp; Complete</span> when satisfied.
+                You&apos;ll review and refine the actual code there, then return to <span className="font-medium">PR Drafts</span> and click <span className="font-medium">Accept &amp; Complete</span> when satisfied.
                 GitHub is your code editor — NestFleet handles the loop.
               </p>
             </div>

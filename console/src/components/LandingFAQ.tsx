@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 
 interface FAQItem {
   q: string;
@@ -105,6 +105,13 @@ function AccordionItem({ item, open, onToggle }: {
   onToggle: () => void;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(500);
+
+  useLayoutEffect(() => {
+    if (open && contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [open, item.a]);
 
   return (
     <div className="border-b border-gray-100 last:border-0">
@@ -135,7 +142,7 @@ function AccordionItem({ item, open, onToggle }: {
       <div
         ref={contentRef}
         className="overflow-hidden transition-all duration-300 ease-in-out"
-        style={{ maxHeight: open ? `${contentRef.current?.scrollHeight ?? 500}px` : "0px", opacity: open ? 1 : 0 }}
+        style={{ maxHeight: open ? `${contentHeight}px` : "0px", opacity: open ? 1 : 0 }}
       >
         <p className="pb-5 pr-8 text-sm text-gray-500 leading-relaxed">{item.a}</p>
       </div>
@@ -158,7 +165,7 @@ export function LandingFAQ() {
             Common questions
           </h2>
           <p className="mt-4 text-gray-500 text-lg">
-            Can't find what you're looking for?{" "}
+            Can&apos;t find what you&apos;re looking for?{" "}
             <a href="mailto:hello@nestfleet.dev" className="text-indigo-600 hover:underline">
               Reach out directly.
             </a>

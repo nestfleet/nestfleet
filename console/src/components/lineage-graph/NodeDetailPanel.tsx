@@ -274,6 +274,14 @@ export function NodeDetailPanel({
   const [submitting, setSubmitting] = useState(false);
   const [copiedRunId, setCopiedRunId] = useState(false);
 
+  const copyRunId = useCallback(() => {
+    if (!node?.agentRun?.runId) return;
+    navigator.clipboard.writeText(node.agentRun.runId).then(() => {
+      setCopiedRunId(true);
+      setTimeout(() => setCopiedRunId(false), 2000);
+    });
+  }, [node]);
+
   if (!node) return null;
 
   const iconCls = nodeIconClasses(node.type, node.actorType);
@@ -292,14 +300,6 @@ export function NodeDetailPanel({
     if (typeof metaUrl === "string" && metaUrl) return metaUrl;
     return null;
   };
-
-  const copyRunId = useCallback(() => {
-    if (!node.agentRun?.runId) return;
-    navigator.clipboard.writeText(node.agentRun.runId).then(() => {
-      setCopiedRunId(true);
-      setTimeout(() => setCopiedRunId(false), 2000);
-    });
-  }, [node.agentRun?.runId]);
 
   const handleAction = async (action: string) => {
     if (action === "approve" || action === "reject") {

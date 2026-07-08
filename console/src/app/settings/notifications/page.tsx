@@ -219,11 +219,14 @@ export default function NotificationPreferencesPage() {
   // Pending disabled list to save (latest value)
   const pendingDisabledRef = useRef<string[]>([]);
 
-  // Load current prefs on mount / product change
+  // Load current prefs on mount / product change. setLoading(true) here
+  // synchronizes UI loading state with an async fetch's lifecycle (not
+  // derivable from props/render) — intentional data-fetching pattern.
   useEffect(() => {
     if (!productId) return;
 
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
 
     getNotificationPrefsApi(productId)

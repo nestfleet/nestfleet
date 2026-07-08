@@ -71,8 +71,10 @@ export function useNavBadges(): { badges: NavBadges; markSeen: (tab: NavTab) => 
   const productId = useProductIdWithFallback();
   const [lastSeenMap, setLastSeenMap] = useState<Partial<Record<NavTab, string>>>({});
 
-  // Hydrate from localStorage after mount (avoids SSR mismatch)
+  // Hydrate from localStorage after mount (avoids SSR mismatch). Intentional
+  // one-time client-only read with no SSR equivalent — not derivable during render.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLastSeenMap(readStorage(productId));
   }, [productId]);
 

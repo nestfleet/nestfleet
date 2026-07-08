@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -56,7 +57,7 @@ export default function SettingsPage() {
       </p>
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li><strong>Provider</strong> — openai, anthropic, ollama, or google</li>
-        <li><strong>API key</strong> — stored encrypted at rest using AES-256-GCM (see <a href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">ENCRYPTION_KEY</a>)</li>
+        <li><strong>API key</strong> — stored encrypted at rest using AES-256-GCM (see <Link href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">ENCRYPTION_KEY</Link>)</li>
         <li><strong>Model</strong> — the model name for standard tasks (auto-reply, knowledge capture)</li>
         <li><strong>Fast model</strong> — override for triage and known-issue matching (optional)</li>
         <li><strong>Complex model</strong> — override for change preparation and PR drafting (optional)</li>
@@ -104,7 +105,7 @@ export default function SettingsPage() {
       <ul className="list-disc pl-6 text-gray-600 space-y-1 mb-4 text-sm leading-relaxed">
         <li>
           <strong>Confidence threshold</strong> — the minimum confidence score (0.0–1.0) required for
-          auto-reply to trigger. Default: 0.80. See <a href="/docs/user-guide/auto-reply" className="text-indigo-600 hover:underline">AI Auto-Reply</a> for guidance on tuning this.
+          auto-reply to trigger. Default: 0.80. See <Link href="/docs/user-guide/auto-reply" className="text-indigo-600 hover:underline">AI Auto-Reply</Link> for guidance on tuning this.
         </li>
         <li>
           <strong>Auto-reply mode</strong> — Auto-send or Send for approval. Default: Send for approval.
@@ -135,7 +136,7 @@ export default function SettingsPage() {
         <li><strong>Reset a user&apos;s password</strong> — triggers a password reset email</li>
       </ul>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
-        See <a href="/docs/user-guide/roles" className="text-indigo-600 hover:underline">Roles & Permissions</a> for
+        See <Link href="/docs/user-guide/roles" className="text-indigo-600 hover:underline">Roles & Permissions</Link> for
         a full description of what each role can do.
       </p>
 

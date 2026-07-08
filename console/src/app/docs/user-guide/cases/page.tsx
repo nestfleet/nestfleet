@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -105,7 +106,7 @@ export default function CasesPage() {
       </table>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         P0 and P1 cases trigger immediate Telegram and/or Slack alerts to the configured team channels
-        (see <a href="/docs/user-guide/notifications" className="text-indigo-600 hover:underline">Notifications</a>).
+        (see <Link href="/docs/user-guide/notifications" className="text-indigo-600 hover:underline">Notifications</Link>).
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">Case types</h2>
@@ -147,7 +148,7 @@ export default function CasesPage() {
       </ul>
       <p className="text-gray-600 leading-relaxed mb-4 text-sm">
         You can adjust the auto-reply confidence threshold per product in Settings → Triage.
-        See <a href="/docs/user-guide/auto-reply" className="text-indigo-600 hover:underline">AI Auto-Reply</a> for details.
+        See <Link href="/docs/user-guide/auto-reply" className="text-indigo-600 hover:underline">AI Auto-Reply</Link> for details.
       </p>
 
       <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">The triage agent</h2>

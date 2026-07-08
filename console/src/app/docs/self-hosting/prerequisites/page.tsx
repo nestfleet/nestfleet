@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = { title: "Prerequisites — NestFleet Self-Hosting" }
@@ -68,7 +69,7 @@ export default function PrerequisitesPage() {
           <h3 className="text-sm font-bold text-gray-800 mb-1">GitHub App credentials</h3>
           <p className="text-sm text-gray-500 leading-relaxed">
             Required only if you want NestFleet to draft pull requests and ingest GitHub issues.
-            See <a href="/docs/self-hosting/github-app" className="text-indigo-600 hover:underline">GitHub App Setup</a>.
+            See <Link href="/docs/self-hosting/github-app" className="text-indigo-600 hover:underline">GitHub App Setup</Link>.
           </p>
         </div>
 

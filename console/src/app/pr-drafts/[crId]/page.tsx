@@ -279,7 +279,7 @@ export default function PrDraftDetailPage({ params }: PageProps) {
                   <li className="flex items-start gap-3">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-bold text-white mt-0.5">3</span>
                     <div>
-                      <p className="text-sm font-medium text-indigo-900">Return here and click <span className="font-bold">"Accept &amp; Complete"</span></p>
+                      <p className="text-sm font-medium text-indigo-900">Return here and click <span className="font-bold">&quot;Accept &amp; Complete&quot;</span></p>
                       <p className="text-xs text-indigo-600 mt-0.5">
                         Once you are satisfied with the code, confirm here. This closes the case and records the outcome in the audit log.
                       </p>

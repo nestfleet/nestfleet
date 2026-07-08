@@ -188,7 +188,7 @@ export function AddProductWizard({ isOpen, onClose }: AddProductWizardProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [form, refreshProducts, handleClose, router]);
+  }, [form, refreshProducts]);
 
   // ── Render ──────────────────────────────────────────────────────────────────
 

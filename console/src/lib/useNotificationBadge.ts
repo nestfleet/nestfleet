@@ -36,8 +36,10 @@ export function useNotificationBadge() {
   const productId = useProductIdWithFallback();
   const [lastSeenAt, setLastSeenAt] = useState<Date | null>(null);
 
-  // Hydrate from localStorage after mount
+  // Hydrate from localStorage after mount. Intentional one-time client-only
+  // read with no SSR equivalent — not derivable during render.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLastSeenAt(getLastSeenAt(productId));
   }, [productId]);
 

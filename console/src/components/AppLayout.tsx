@@ -26,6 +26,14 @@ export function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Close mobile menu on route change. Computed during render (React's
+  // documented "adjusting state when a prop changes" pattern) instead of an
+  // effect, to avoid an extra commit/flash and the set-state-in-effect warning.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsMobileMenuOpen(false);
+  }
 
   // N-04: cross-tab SWR cache invalidation via BroadcastChannel
   useSWRBroadcastListener();
@@ -36,11 +44,6 @@ export function AppLayout({ children }: AppLayoutProps) {
       router.replace("/login");
     }
   }, [isLoading, user, pathname, router]);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
 
   if (isLoading) {
     return (

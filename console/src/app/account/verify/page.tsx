@@ -16,16 +16,15 @@ import { useRouter, useSearchParams }    from "next/navigation";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 function VerifyContent() {
-  const router      = useRouter();
-  const params      = useSearchParams();
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const params = useSearchParams();
+  // Derived directly from the URL during render — no state/effect needed for
+  // the "missing token" case.
+  const token = params.get("token");
+  const [asyncError, setAsyncError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = params.get("token");
-    if (!token) {
-      setError("No magic link token found. Please request a new link.");
-      return;
-    }
+    if (!token) return;
 
     let cancelled = false;
 
@@ -42,7 +41,7 @@ function VerifyContent() {
         const body = await res.json() as { ok: boolean; sessionToken?: string; error?: string };
 
         if (!body.ok || !body.sessionToken) {
-          setError(body.error ?? "Your link has expired or is invalid. Please request a new one.");
+          setAsyncError(body.error ?? "Your link has expired or is invalid. Please request a new one.");
           return;
         }
 
@@ -50,12 +49,16 @@ function VerifyContent() {
         sessionStorage.setItem("nestfleet_account_token", body.sessionToken);
         router.replace("/account");
       } catch {
-        if (!cancelled) setError("Something went wrong. Please try again.");
+        if (!cancelled) setAsyncError("Something went wrong. Please try again.");
       }
     })();
 
     return () => { cancelled = true; };
-  }, [params, router]);
+  }, [token, router]);
+
+  const error = token
+    ? asyncError
+    : "No magic link token found. Please request a new link.";
 
   if (error) {
     return (

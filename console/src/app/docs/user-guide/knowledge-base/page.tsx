@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -65,7 +66,7 @@ export default function KnowledgeBasePage() {
         <li>The accuracy and completeness of your articles</li>
         <li>The granularity of known issues (one issue per article, not dozens per article)</li>
         <li>The freshness of resolved case summaries</li>
-        <li>The quality of the embedding model (see <a href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">Environment Variables</a> for embedding config)</li>
+        <li>The quality of the embedding model (see <Link href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">Environment Variables</Link> for embedding config)</li>
       </ul>
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">

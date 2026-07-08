@@ -7,6 +7,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import clsx from "clsx";
+import { useNow } from "@/lib/useNow";
 import {
   getOwnerFleetApi,
   postOwnerFleetResetApi,
@@ -74,9 +75,9 @@ function TierBadge({ tier, reissueStatus }: { tier: string | null; reissueStatus
 // ── Expiry cell ───────────────────────────────────────────────────────────────
 
 function ExpiryCell({ isoDate }: { isoDate: string | null }) {
+  const now = useNow();
   if (!isoDate) return <span className="text-gray-400">—</span>;
 
-  const now   = Date.now();
   const exp   = new Date(isoDate).getTime();
   const days  = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
 

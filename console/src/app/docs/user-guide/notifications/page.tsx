@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -62,7 +63,7 @@ export default function NotificationsPage() {
         <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">SMTP_HOST</code>,
         <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">POSTMARK_API_KEY</code>, or
         <code className="bg-gray-100 px-1 rounded-sm text-xs ml-2">RESEND_API_KEY</code>.
-        See the <a href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">Environment Variables</a> reference.
+        See the <Link href="/docs/self-hosting/environment" className="text-indigo-600 hover:underline">Environment Variables</Link> reference.
         Without an email backend, no notifications are sent and a warning is logged at startup.
       </p>
 

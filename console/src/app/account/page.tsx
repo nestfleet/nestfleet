@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useState, type FormEvent } from "react";
+import { useNow } from "@/lib/useNow";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
 
@@ -121,6 +122,7 @@ function MagicLinkForm() {
 
 function AccountView({ info, sessionToken }: { info: AccountInfo; sessionToken: string }) {
   const [portalLoading, setPortalLoading] = useState(false);
+  const nowMs = useNow();
   const [portalError,   setPortalError]   = useState<string | null>(null);
 
   const openPortal = async () => {
@@ -153,7 +155,7 @@ function AccountView({ info, sessionToken }: { info: AccountInfo; sessionToken: 
   // Reactivation countdown
   const reactivationDeadline = info.reactivationDeadline ? new Date(info.reactivationDeadline) : null;
   const reactivationDaysLeft = reactivationDeadline
-    ? Math.max(0, Math.ceil((reactivationDeadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, Math.ceil((reactivationDeadline.getTime() - nowMs) / (1000 * 60 * 60 * 24)))
     : null;
 
   return (
@@ -261,9 +263,12 @@ export default function AccountPage() {
   const [loading,      setLoading]      = useState(true);
   const [authError,    setAuthError]    = useState(false);
 
+  // Reads sessionStorage on mount (client-only, no SSR equivalent) then
+  // kicks off an async fetch — not derivable during render.
   useEffect(() => {
     const token = getAccountToken();
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }

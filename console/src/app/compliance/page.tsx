@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/AppLayout";
 import {
@@ -238,7 +238,7 @@ function DsarSection({ productId, token }: { productId: string; token: string })
   const [searching, setSearching] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [openIds, setOpenIds] = useState<Set<number>>(new Set());
-  const nextId = useState(0);
+  const nextId = useRef(0);
 
   const handleSearch = async () => {
     if (!email) return;
@@ -256,7 +256,7 @@ function DsarSection({ productId, token }: { productId: string; token: string })
         setSearching(false);
         return;
       }
-      const id = ++nextId[0];
+      const id = ++nextId.current;
       setHistory((prev) => [{ id, result: res.data }, ...prev]);
       setOpenIds((prev) => new Set([id, ...prev]));  // auto-expand new entry
       setEmail("");

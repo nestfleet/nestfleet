@@ -44,11 +44,23 @@ export function ProductCommandPalette() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // ── Auto-focus input on open ─────────────────────────────────────────────────
-  useEffect(() => {
+  // Reset query/activeIndex when the palette opens. Computed during render
+  // (React's documented "adjusting state when a prop changes" pattern)
+  // instead of an effect, to avoid the set-state-in-effect warning.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setQuery("");
       setActiveIndex(0);
+    }
+  }
+
+  // ── Auto-focus input on open ─────────────────────────────────────────────────
+  // Kept as an effect: focusing a DOM node is a genuine imperative side
+  // effect, not a state derivation.
+  useEffect(() => {
+    if (open) {
       // Defer to next tick so the element is mounted
       requestAnimationFrame(() => inputRef.current?.focus());
     }
@@ -80,10 +92,14 @@ export function ProductCommandPalette() {
     }
   }
 
-  // Reset active index when filter changes
-  useEffect(() => {
+  // Reset active index when filter changes. Computed during render (React's
+  // documented "adjusting state when a prop changes" pattern) instead of an
+  // effect, to avoid the set-state-in-effect warning.
+  const [prevQuery, setPrevQuery] = useState(query);
+  if (query !== prevQuery) {
+    setPrevQuery(query);
     setActiveIndex(0);
-  }, [query]);
+  }
 
   // Render nothing outside ProductProvider
   if (!ctx) return null;

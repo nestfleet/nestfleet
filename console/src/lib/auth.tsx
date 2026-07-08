@@ -44,10 +44,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Rehydrate from localStorage on mount
+  // Rehydrate from localStorage on mount. Intentional one-time client-only
+  // read (JWT lives in localStorage, no SSR equivalent) followed by an async
+  // API call — not derivable during render.
   useEffect(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
     if (!stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsLoading(false);
       return;
     }

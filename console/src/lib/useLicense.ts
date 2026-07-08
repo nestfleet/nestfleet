@@ -12,6 +12,7 @@
 
 import useSWR from "swr";
 import { getLicenseStatusApi } from "./api";
+import { useNow } from "./useNow";
 import type { LicenseStatus } from "./types";
 
 export type ProductTier = "community" | "starter" | "growth" | "scale";
@@ -52,6 +53,7 @@ export function useLicense(): UseLicenseResult {
     () => getLicenseStatusApi(),
     { refreshInterval: 5 * 60 * 1_000 }, // re-check every 5 min
   );
+  const nowMs = useNow();
 
   const license = data?.data ?? null;
   const tier = license?.tier ?? null;
@@ -60,7 +62,7 @@ export function useLicense(): UseLicenseResult {
   const trialDaysRemaining =
     tier === "trial" && license?.expiresAt
       ? Math.max(0, Math.ceil(
-          (new Date(license.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+          (new Date(license.expiresAt).getTime() - nowMs) / (1000 * 60 * 60 * 24)
         ))
       : null;
 

@@ -92,7 +92,11 @@ export function HeroDemoCard() {
 
   const current = DEMO_CASES[caseIdx];
 
+  // Restarts the timed demo-step animation sequence whenever the case index
+  // changes. Intentional: this seeds a chain of setTimeouts that drive the
+  // animation over several seconds — not a value derivable during render.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(0);
     setDone(false);
     setFading(false);

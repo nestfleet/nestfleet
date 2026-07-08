@@ -78,7 +78,7 @@ export default function QuickStartPage() {
         </p>
       </div>
 
-      <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">What's included in the free tier</h2>
+      <h2 className="text-xl font-bold text-gray-900 mt-8 mb-3">What&apos;s included in the free tier</h2>
       <table className="w-full text-sm border-collapse mb-4">
         <tbody>
           {[

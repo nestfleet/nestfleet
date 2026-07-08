@@ -2,6 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 import type { Metadata } from "next"
+import Link from "next/link"
 import { DocsLayout } from "@/components/docs/DocsLayout"
 
 export const metadata: Metadata = {
@@ -93,7 +94,7 @@ nano .env`}</pre>
 
       <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-5 py-4 mb-6">
         <p className="text-sm text-indigo-900 leading-relaxed">
-          See the <a href="/docs/self-hosting/environment" className="text-indigo-700 font-medium hover:underline">Environment Variables</a> reference
+          See the <Link href="/docs/self-hosting/environment" className="text-indigo-700 font-medium hover:underline">Environment Variables</Link> reference
           for the full list of options including email, Telegram, Slack, and Sentry configuration.
         </p>
       </div>
