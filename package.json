@@ -25,7 +25,7 @@
     "@hono/node-server": "^2.0.8",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/auto-instrumentations-node": "^0.77.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.219.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
     "@opentelemetry/sdk-node": "^0.220.0",
     "ai": "^6.0.206",
     "bcryptjs": "^3.0.3",
