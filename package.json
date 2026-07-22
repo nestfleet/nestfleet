@@ -29,7 +29,7 @@
     "@opentelemetry/sdk-node": "^0.220.0",
     "ai": "^6.0.206",
     "bcryptjs": "^3.0.3",
-    "hono": "^4.12.25",
+    "hono": "^4.12.31",
     "jose": "^6.2.3",
     "js-yaml": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
