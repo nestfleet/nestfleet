@@ -64,7 +64,7 @@
     "esbuild": "^0.28.1",
     "@opentelemetry/core": "^2.8.0",
     "undici": "^8.5.0",
-    "protobufjs": "^7.6.3"
+    "protobufjs": "^7.6.5"
   },
   "notes": {
     "otel-audit": "GHSA-q7rr-3cgh-j5r3 (Prometheus exporter crash) affects @opentelemetry/sdk-node <=0.216.0. NestFleet does not start a Prometheus metrics endpoint so this path is not reachable. Fix requires OTel ecosystem upgrade 0.57→0.217 (breaks @opentelemetry/core peer deps). Track in v0.2.0 backlog.",
