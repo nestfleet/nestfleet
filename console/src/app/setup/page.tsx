@@ -588,7 +588,7 @@ export default function SetupPage() {
   const [productSlug, setProductSlug] = useState("");
 
   // Gate 1: wait for auth to resolve, then require login before setup.
-  // On a fresh install the middleware sends everyone to /setup before any account
+  // On a fresh install the proxy sends everyone to /setup before any account
   // exists — redirect to /register so the first user can create an admin account.
   useEffect(() => {
     if (authLoading) return;

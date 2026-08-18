@@ -5,7 +5,7 @@ import Link from "next/link";
 
 /**
  * Global 404 page.
- * Also shown by middleware when a /p/[slug]/... URL fails format validation.
+ * Also shown by the proxy when a /p/[slug]/... URL fails format validation.
  */
 export default function NotFound() {
   return (
