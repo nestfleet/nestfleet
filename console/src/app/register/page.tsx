@@ -58,6 +58,7 @@ export default function RegisterPage() {
       // Store token and hard-navigate to setup so AuthProvider remounts and
       // picks up the new token from localStorage (soft nav keeps stale context).
       localStorage.setItem(TOKEN_KEY, res.data.token);
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/setup";
     } catch (err) {
       if (err instanceof ApiError) {

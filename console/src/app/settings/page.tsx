@@ -1046,6 +1046,7 @@ function NotificationsSection({
   onSave: (section: string, body: Record<string, unknown>) => Promise<void>;
   saving: boolean;
 }) {
+  const router = useRouter();
   const productId = useProductIdWithFallback();
   const { toast: showToast } = useToast();
   const [start, setStart] = useState(settings.notifications.quietHoursStart ?? "20:00");
@@ -1109,7 +1110,7 @@ function NotificationsSection({
               </span>
             </div>
             <button
-              onClick={() => { window.location.href = "/settings/notifications"; }}
+              onClick={() => { router.push("/settings/notifications"); }}
               className="w-full flex items-center justify-between rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 text-xs text-gray-600 hover:bg-gray-100 transition-colors"
             >
               <span>Configure per-event email preferences</span>

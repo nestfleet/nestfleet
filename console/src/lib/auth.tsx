@@ -78,7 +78,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
     setUser(null);
-    // Hard navigate to login to clear any SWR caches
+    // Hard navigate to login to clear any SWR caches. A soft router.push()
+    // keeps the SWR cache alive, leaking the previous user's data into the
+    // next session — so the full reload is load-bearing, not an oversight.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.href = "/login";
   }, []);
 

@@ -14,6 +14,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { AppLayout } from "@/components/AppLayout";
 import {
   getNotificationPrefsApi,
@@ -205,6 +206,7 @@ function EventGroup({ title, description, events, disabledSet, onToggle, saving 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function NotificationPreferencesPage() {
+  const router = useRouter();
   const productId = useProductIdWithFallback();
   const { toast } = useToast();
 
@@ -301,7 +303,7 @@ export default function NotificationPreferencesPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Back link */}
         <button
-          onClick={() => { window.location.href = "/settings?section=notifications"; }}
+          onClick={() => { router.push("/settings?section=notifications"); }}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
