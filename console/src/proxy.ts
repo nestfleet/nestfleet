@@ -2,7 +2,7 @@
 // Copyright (C) 2024-2026 NestFleet contributors
 
 /**
- * Next.js Edge Middleware — SLICE-12 + DEFERRED-21.
+ * Next.js Proxy (formerly Edge Middleware) — SLICE-12 + DEFERRED-21.
  *
  * 1. Setup guard: if needsSetup is true, redirect to /setup.
  * 2. Root redirect: if / and nf_last_product cookie is set, redirect to that
@@ -40,7 +40,7 @@ const BYPASS_EXACT    = ["/setup", "/login", "/register", "/signup", "/terms", "
 // Matches /p/<slug> and /p/<slug>/anything
 const PRODUCT_ROUTE_PATTERN = /^\/p\/([^/]+)(\/.*)?$/;
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip non-page paths
@@ -124,7 +124,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Run middleware on all routes except:
+     * Run the proxy on all routes except:
      * - _next/static  (static files)
      * - _next/image   (image optimization)
      * - favicon.ico
