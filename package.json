@@ -51,12 +51,12 @@
     "@types/node": "^26.4.0",
     "@types/nodemailer": "^8.0.1",
     "@types/ssh2": "^1.15.5",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "msw": "^2.15.0",
     "testcontainers": "^12.0.4",
     "tsx": "^4.23.12",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   },
   "overrides": {
     "postcss": "^8.5.10",
