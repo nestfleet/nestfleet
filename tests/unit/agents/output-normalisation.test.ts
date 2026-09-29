@@ -9,7 +9,7 @@
  * NF-UNIT-NORM-02: slight overshoot (≤ 1.2) → clamped to 1
  * NF-UNIT-NORM-03: negative / far above range / non-finite → 0 (low confidence → human review; never guess a percent)
  * NF-UNIT-NORM-04: sourceTiers — only integer tiers 1–4 survive (dropping can never add tier 1)
- * NF-UNIT-NORM-05: all six agent schemas use the shared schema and send NO min/max to the model
+ * NF-UNIT-NORM-05: all six agent schemas use the shared schema; the JSON schema sent to providers is UNCHANGED (min/max kept)
  * NF-UNIT-NORM-06: out-of-range values are logged (so frequency is visible in prod)
  */
 
@@ -86,19 +86,23 @@ describe("agent schemas", () => {
     expect(field.safeParse("0.9").success).toBe(false) // still must be a number
   })
 
-  it.each(Object.entries(schemas))("NF-UNIT-NORM-05: %s — the JSON schema sent to the model has no numeric range", (_name, schema) => {
+  it.each(Object.entries(schemas))("NF-UNIT-NORM-05: %s — wire schema for confidenceScore is unchanged (0–1 range still sent)", (_name, schema) => {
     const prop = (asSchema(schema).jsonSchema as { properties: Record<string, Record<string, unknown>> }).properties["confidenceScore"]
-    expect(prop?.["type"]).toBe("number")
-    expect(prop).not.toHaveProperty("minimum")
-    expect(prop).not.toHaveProperty("maximum")
-    expect(String(prop?.["description"])).toMatch(/0-1/) // the range stays in the description as a hint
+    expect(prop).toMatchObject({ type: "number", minimum: 0, maximum: 1 })
+    expect(String(prop?.["description"])).toMatch(/0-1/)
   })
 
-  it("NF-UNIT-NORM-05: autoReply sourceTiers normalises and sends no range/int constraint", () => {
+  it("NF-UNIT-NORM-05: autoReply sourceTiers — wire schema unchanged (integer items 1–4) and normalises on parse", () => {
     expect(autoReplyOutputSchema.shape.sourceTiers.parse([1, 5, 2.5, 3])).toEqual([1, 3])
     const props = (asSchema(autoReplyOutputSchema).jsonSchema as { properties: Record<string, { items?: Record<string, unknown> }> }).properties
-    expect(props["sourceTiers"]?.items).not.toHaveProperty("minimum")
-    expect(props["sourceTiers"]?.items).not.toHaveProperty("maximum")
+    expect(props["sourceTiers"]?.items).toMatchObject({ type: "integer", minimum: 1, maximum: 4 })
+  })
+
+  it("NF-UNIT-NORM-05: whole-object validation via the SDK accepts an out-of-range value and returns the normalised one", async () => {
+    const r = await asSchema(triageOutputSchema).validate?.({
+      severity: "high", confidenceScore: 84.19, category: "auth", labels: [], reasoning: "r", evidenceRefs: [],
+    })
+    expect(r).toMatchObject({ success: true, value: { confidenceScore: 0 } })
   })
 
   it("NF-UNIT-NORM-06: an out-of-range value is logged; an in-range one is not", () => {

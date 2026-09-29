@@ -82,7 +82,10 @@ route, do one of:
 
 > **Implemented (2026-09-29, `src/agents/output-normalisation.ts`) — option 2, with one deliberate deviation.**
 > All six agent schemas (triage, known-issue-match, outage-routing, change-prep, pr-draft-prep, auto-reply)
-> now send a plain `number` and enforce the range on the parsed value; `auto-reply.sourceTiers` likewise.
+> normalise the value with `z.preprocess` BEFORE the range check, so validation never rejects an out-of-range
+> number; `auto-reply.sourceTiers` likewise. The JSON schema sent to providers is deliberately **unchanged**
+> (`minimum: 0` / `maximum: 1` kept — byte-identical to before for all six agents), so cloud providers that honour
+> those keywords behave exactly as before; only the failure path for Ollama changes.
 > Rule: in-range unchanged; `(1, 1.2]` → 1; negative / `> 1.2` / non-finite → **0** (low confidence → human review).
 > **Why not `raw > 1 ? raw/100 : raw` as sketched above:** guessing the scale can push a wrong severity past the
 > triage gates (critical ≥ 0.75, high ≥ 0.60) or the known-issue match threshold (≥ 0.80); an unusable value
