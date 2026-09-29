@@ -34,6 +34,7 @@ import { prepareUserContent } from "../sanitize.js"
 import { buildEvidencePack } from "../evidence.js"
 import { PolicyViolationError } from "../types.js"
 import type { AgentResult } from "../types.js"
+import { confidenceScoreSchema } from "../output-normalisation.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -41,11 +42,7 @@ export const KNOWN_ISSUE_MATCH_SCHEMA_VERSION = "1.0"
 
 export const knownIssueMatchOutputSchema = z.object({
   matched: z.boolean().describe("Whether a known issue was found that matches this case"),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe("Confidence that the match is correct (0-1). Match written only if ≥ 0.80."),
+  confidenceScore: confidenceScoreSchema("Confidence that the match is correct (0-1). Match written only if ≥ 0.80."),
   knownIssueId: z
     .string()
     .optional()

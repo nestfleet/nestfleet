@@ -34,6 +34,7 @@ import { getToolSet } from "../tool-sets.js"
 import { prepareUserContent } from "../sanitize.js"
 import { buildEvidencePack } from "../evidence.js"
 import { PolicyViolationError, type AgentResult } from "../types.js"
+import { confidenceScoreSchema } from "../output-normalisation.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -59,11 +60,7 @@ export const outageRoutingOutputSchema = z.object({
   estimatedImpact: z
     .string()
     .describe("Brief description of user/business impact"),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe("Agent confidence in the routing decision (0-1)"),
+  confidenceScore: confidenceScoreSchema("Agent confidence in the routing decision (0-1)"),
   evidenceRefs: z
     .array(z.string())
     .describe("IDs or URIs of evidence chunks used in this routing decision"),
