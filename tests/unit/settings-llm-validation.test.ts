@@ -105,6 +105,28 @@ describe("testLlmConnection", () => {
     })
   })
 
+  describe("self-hosted provider — URL forms (all must reach <host>/v1/chat/completions)", () => {
+    it.each([
+      ["http://ollama:11434",      "http://ollama:11434/v1/chat/completions"],
+      ["http://ollama:11434/",     "http://ollama:11434/v1/chat/completions"],
+      ["http://ollama:11434/api",  "http://ollama:11434/v1/chat/completions"],
+      ["http://ollama:11434/v1",   "http://ollama:11434/v1/chat/completions"],
+      ["http://ollama:11434/v1/",  "http://ollama:11434/v1/chat/completions"],
+      ["https://gw.example.com/custom", "https://gw.example.com/custom/chat/completions"],
+    ])("NF-UNIT-SHU-10: %s → POST %s", async (input, expectedUrl) => {
+      mockFetch(true, { choices: [{ message: { content: "OK" } }] })
+      const result = await testLlmConnection("self-hosted", "llama3", "", input)
+      expect(result.success).toBe(true)
+      expect(vi.mocked(fetch).mock.calls[0]?.[0]).toBe(expectedUrl)
+    })
+
+    it("NF-UNIT-SHU-11: no baseUrl → local Ollama default", async () => {
+      mockFetch(true, { choices: [{ message: { content: "OK" } }] })
+      await testLlmConnection("self-hosted", "llama3", "")
+      expect(vi.mocked(fetch).mock.calls[0]?.[0]).toBe("http://127.0.0.1:11434/v1/chat/completions")
+    })
+  })
+
   describe("self-hosted provider", () => {
     it("returns success=true when the self-hosted endpoint responds OK", async () => {
       mockFetch(true, { choices: [{ message: { content: "OK" } }] })
@@ -255,5 +277,35 @@ describe("testEmbeddingConnection", () => {
     const calledUrl = (fetchMock.mock.calls[0] as [string])[0]
     expect(calledUrl).toContain("custom.endpoint.example.com")
     expect(calledUrl).toContain("/v1/embeddings")
+  })
+})
+
+describe("testEmbeddingConnection — self-hosted URL forms (all must reach <host>/api/embed)", () => {
+  afterEach(() => { vi.unstubAllGlobals() })
+
+  it.each([
+    ["http://ollama:11434",     "http://ollama:11434/api/embed"],
+    ["http://ollama:11434/",    "http://ollama:11434/api/embed"],
+    ["http://ollama:11434/v1",  "http://ollama:11434/api/embed"],
+    ["http://ollama:11434/api", "http://ollama:11434/api/embed"],
+  ])("NF-UNIT-SHU-12: %s → POST %s", async (input, expectedUrl) => {
+    mockFetch(true, { embeddings: [[0.1]] })
+    const result = await testEmbeddingConnection({
+      provider: "self-hosted",
+      apiKey: "",
+      embeddingModel: "nomic-embed-text",
+      embeddingDimensions: 768,
+      baseUrl: input,
+    })
+    expect(result.success).toBe(true)
+    expect(vi.mocked(fetch).mock.calls[0]?.[0]).toBe(expectedUrl)
+  })
+
+  it("NF-UNIT-SHU-13: no baseUrl → local Ollama default", async () => {
+    mockFetch(true, { embeddings: [[0.1]] })
+    await testEmbeddingConnection({
+      provider: "self-hosted", apiKey: "", embeddingModel: "nomic-embed-text", embeddingDimensions: 768, baseUrl: undefined,
+    })
+    expect(vi.mocked(fetch).mock.calls[0]?.[0]).toBe("http://127.0.0.1:11434/api/embed")
   })
 })
