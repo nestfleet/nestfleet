@@ -34,7 +34,8 @@ LLM_MODEL_COMPLEX=claude-opus-4-7-20260201
 ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
 OPENAI_API_KEY=sk-xxxxxxxxxxxxx
 GOOGLE_GENERATIVE_AI_API_KEY=xxxxxxxxxxxxx
-OLLAMA_BASE_URL=http://ollama:11434
+# Ollama / self-hosted: set LLM_PROVIDER=ollama and point LLM_BASE_URL at the server ("/v1" is appended for a bare host)
+LLM_BASE_URL=http://ollama:11434
 ```
 
 **Tier meanings:**

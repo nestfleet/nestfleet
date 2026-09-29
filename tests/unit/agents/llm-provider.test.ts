@@ -6,7 +6,8 @@
  * NF-UNIT-322: anthropic provider — createAnthropic called
  * NF-UNIT-323: google provider — createGoogleGenerativeAI called (native SDK, not OpenAI compat)
  * NF-UNIT-324: google provider — respects LLM_BASE_URL when set (for Vertex AI / custom proxies)
- * NF-UNIT-325: ollama/self-hosted provider — createOllama called
+ * NF-UNIT-325: ollama/self-hosted provider — createOpenAI(...).chat() against the OpenAI-compatible /v1 endpoint
+ *   (a–h: base-URL default + normalisation, apiKey placeholder, no cast/legacy-dep regression, other providers unchanged)
  * NF-UNIT-326: unsupported provider — throws Error
  * NF-UNIT-327: getLlmProviderForProduct loads from DB when product has llm_config
  * NF-UNIT-328: getLlmProviderForProduct falls back to env when product not found
@@ -43,8 +44,6 @@ const {
   mockCreateAnthropic,
   mockGoogleFactory,
   mockCreateGoogle,
-  mockOllamaFactory,
-  mockCreateOllama,
 } = vi.hoisted(() => {
   const mockOpenAIChat    = vi.fn().mockReturnValue("openai-chat-model-instance")
   const mockOpenAIFactory = Object.assign(
@@ -56,8 +55,6 @@ const {
   const mockCreateAnthropic  = vi.fn().mockReturnValue(mockAnthropicFactory)
   const mockGoogleFactory    = vi.fn().mockReturnValue("google-model-instance")
   const mockCreateGoogle     = vi.fn().mockReturnValue(mockGoogleFactory)
-  const mockOllamaFactory    = vi.fn().mockReturnValue("ollama-model-instance")
-  const mockCreateOllama     = vi.fn().mockReturnValue(mockOllamaFactory)
   return {
     mockOpenAIChat,
     mockOpenAIFactory,
@@ -66,8 +63,6 @@ const {
     mockCreateAnthropic,
     mockGoogleFactory,
     mockCreateGoogle,
-    mockOllamaFactory,
-    mockCreateOllama,
   }
 })
 
@@ -83,10 +78,6 @@ vi.mock("@ai-sdk/anthropic", () => ({
 
 vi.mock("@ai-sdk/google", () => ({
   createGoogleGenerativeAI: mockCreateGoogle,
-}))
-
-vi.mock("ollama-ai-provider", () => ({
-  createOllama: mockCreateOllama,
 }))
 
 vi.mock("../../../src/infra/db/repositories/products.js", () => ({
@@ -109,6 +100,8 @@ vi.mock("../../../src/shared/config.js", () => ({
 // ── Imports (after mocks) ─────────────────────────────────────────────────────
 
 import { describe, it, expect, beforeEach } from "vitest"
+import { readFileSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 import {
   getLlmProvider,
   getLlmProviderForProduct,
@@ -118,7 +111,6 @@ import {
 import { createOpenAI } from "@ai-sdk/openai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { createOllama } from "ollama-ai-provider"
 import { findProductById } from "../../../src/infra/db/repositories/products.js"
 import { logger } from "../../../src/shared/logger.js"
 import { config } from "../../../src/shared/config.js"
@@ -129,7 +121,6 @@ import type { ProductRow } from "../../../src/infra/db/repositories/products.js"
 const mockCreateOpenAIFn    = vi.mocked(createOpenAI)
 const mockCreateAnthropicFn = vi.mocked(createAnthropic)
 const mockCreateGoogleFn    = vi.mocked(createGoogleGenerativeAI)
-const mockCreateOllamaFn    = vi.mocked(createOllama)
 const mockFindProductById   = vi.mocked(findProductById)
 const mockLoggerWarn        = vi.mocked(logger.warn)
 
@@ -164,8 +155,6 @@ function resetMocks() {
   mockCreateAnthropicFn.mockReturnValue(mockAnthropicFactory as any)
   mockGoogleFactory.mockReturnValue("google-model-instance")
   mockCreateGoogleFn.mockReturnValue(mockGoogleFactory as any)
-  mockOllamaFactory.mockReturnValue("ollama-model-instance")
-  mockCreateOllamaFn.mockReturnValue(mockOllamaFactory as any)
 }
 
 // ── getLlmProvider() — env-based provider selection ───────────────────────────
@@ -285,30 +274,93 @@ describe("getLlmProvider() — env-based provider selection", () => {
 
   // NF-UNIT-325 ───────────────────────────────────────────────────────────────
 
-  it("NF-UNIT-325: ollama provider — createOllama called", () => {
-    getLlmProvider({
-      ...config,
-      LLM_PROVIDER: "ollama",
-      LLM_MODEL:    "llama3.2",
-      LLM_BASE_URL: "http://localhost:11434",
-    })
+  const ollamaCfg = (over: Record<string, unknown> = {}) =>
+    ({ ...config, LLM_PROVIDER: "ollama", LLM_MODEL: "llama3.2", LLM_API_KEY: undefined, LLM_BASE_URL: undefined, ...over }) as any
 
-    expect(mockCreateOllamaFn).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: "http://localhost:11434" }),
-    )
-    expect(mockOllamaFactory).toHaveBeenCalledWith("llama3.2")
+  it("NF-UNIT-325a: ollama provider — createOpenAI(...).chat() against <host>/v1 with placeholder apiKey", () => {
+    getLlmProvider(ollamaCfg({ LLM_BASE_URL: "http://localhost:11434" }))
+
+    expect(mockCreateOpenAIFn).toHaveBeenCalledWith({ baseURL: "http://localhost:11434/v1", apiKey: "ollama" })
+    expect(mockOpenAIChat).toHaveBeenCalledWith("llama3.2")
+    // Must use chat-completions, never the Responses-API default factory
+    expect(mockOpenAIFactory).not.toHaveBeenCalled()
   })
 
-  it("NF-UNIT-325 (self-hosted alias): self-hosted provider also uses createOllama", () => {
-    getLlmProvider({
-      ...config,
-      LLM_PROVIDER: "self-hosted",
-      LLM_MODEL:    "mistral-7b",
-      LLM_BASE_URL: "http://my-server:11434",
-    })
+  it("NF-UNIT-325b: self-hosted alias — same OpenAI-compatible path; an explicit /v1 URL is kept as-is", () => {
+    getLlmProvider(ollamaCfg({ LLM_PROVIDER: "self-hosted", LLM_MODEL: "mistral-7b", LLM_BASE_URL: "http://my-server:8000/v1" }))
 
-    expect(mockCreateOllamaFn).toHaveBeenCalled()
-    expect(mockOllamaFactory).toHaveBeenCalledWith("mistral-7b")
+    expect(mockCreateOpenAIFn).toHaveBeenCalledWith({ baseURL: "http://my-server:8000/v1", apiKey: "ollama" })
+    expect(mockOpenAIChat).toHaveBeenCalledWith("mistral-7b")
+  })
+
+  it("NF-UNIT-325c: no baseUrl → local default, never OpenAI's real endpoint", () => {
+    getLlmProvider(ollamaCfg())
+
+    const opts = mockCreateOpenAIFn.mock.calls[0]?.[0]
+    expect(opts?.baseURL).toBe("http://127.0.0.1:11434/v1")
+  })
+
+  it.each([
+    ["http://ollama:11434",              "http://ollama:11434/v1"],
+    ["http://ollama:11434/",             "http://ollama:11434/v1"],
+    ["http://ollama:11434/api",          "http://ollama:11434/v1"],   // legacy ollama-ai-provider convention
+    ["http://ollama:11434/api/",         "http://ollama:11434/v1"],
+    ["http://ollama:11434/v1/",          "http://ollama:11434/v1"],
+    ["https://gw.example.com/openai/v1", "https://gw.example.com/openai/v1"],
+    ["https://gw.example.com/custom",    "https://gw.example.com/custom"], // custom path: never rewritten
+  ])("NF-UNIT-325d: baseUrl %s → %s", (input, expected) => {
+    getLlmProvider(ollamaCfg({ LLM_BASE_URL: input }))
+
+    expect(mockCreateOpenAIFn.mock.calls[0]?.[0]?.baseURL).toBe(expected)
+  })
+
+  it("NF-UNIT-325e: apiKey — configured key is passed through; empty/undefined → non-empty placeholder", () => {
+    getLlmProvider(ollamaCfg({ LLM_API_KEY: "sk-local-proxy" }))
+    expect(mockCreateOpenAIFn.mock.calls[0]?.[0]?.apiKey).toBe("sk-local-proxy")
+
+    for (const key of [undefined, ""]) {
+      mockCreateOpenAIFn.mockClear()
+      getLlmProvider(ollamaCfg({ LLM_API_KEY: key }))
+      // createOpenAI falls back to process.env.OPENAI_API_KEY when apiKey is undefined —
+      // the ollama branch must never leave it unset (would leak a real OpenAI key to the local host).
+      expect(mockCreateOpenAIFn.mock.calls[0]?.[0]?.apiKey).toBe("ollama")
+    }
+  })
+
+  it("NF-UNIT-325f: DB product (ollama) — builds via createOpenAI with the product's baseUrl", async () => {
+    mockFindProductById.mockResolvedValue(
+      makeProductRow({ llm_config: { provider: "ollama", model: "qwen2.5:7b", apiKey: "", baseUrl: "http://gpu-box:11434" } }),
+    )
+
+    const result = await getLlmProviderForProduct("prod_ollama", "triage")
+
+    expect(mockCreateOpenAIFn).toHaveBeenCalledWith({ baseURL: "http://gpu-box:11434/v1", apiKey: "ollama" })
+    expect(mockOpenAIChat).toHaveBeenCalledWith("qwen2.5:7b")
+    expect(result.source).toBe("db")
+  })
+
+  it("NF-UNIT-325g: regression — llm-provider.ts has no `as unknown as` casts and no ollama-ai-provider import", () => {
+    // The cast + a fully-mocked ollama-ai-provider hid a spec-v1 model that ai>=5 rejects
+    // at runtime (broken since v0.1.0). Neither may return.
+    const src = readFileSync(fileURLToPath(new URL("../../../src/agents/llm-provider.ts", import.meta.url)), "utf8")
+    expect(src).not.toMatch(/as unknown as/)
+    expect(src).not.toMatch(/from\s+["']ollama-ai-provider/)
+  })
+
+  it("NF-UNIT-325h: other providers' SDK constructor options are unchanged (non-interference)", () => {
+    getLlmProvider({ ...config, LLM_PROVIDER: "openai", LLM_MODEL: "gpt-4", LLM_API_KEY: "k1", LLM_BASE_URL: undefined } as any)
+    expect(mockCreateOpenAIFn).toHaveBeenLastCalledWith({ apiKey: "k1" })
+    expect(mockOpenAIFactory).toHaveBeenCalledWith("gpt-4")
+
+    getLlmProvider({ ...config, LLM_PROVIDER: "anthropic", LLM_MODEL: "claude-x", LLM_API_KEY: "k2", LLM_BASE_URL: undefined } as any)
+    expect(mockCreateAnthropicFn).toHaveBeenLastCalledWith({ apiKey: "k2" })
+
+    getLlmProvider({ ...config, LLM_PROVIDER: "google", LLM_MODEL: "gemini-x", LLM_API_KEY: "k3", LLM_BASE_URL: "https://proxy.example.com" } as any)
+    expect(mockCreateGoogleFn).toHaveBeenLastCalledWith({ apiKey: "k3", baseURL: "https://proxy.example.com" })
+
+    getLlmProvider({ ...config, LLM_PROVIDER: "azure-openai", LLM_MODEL: "dep", LLM_API_KEY: "k4", LLM_BASE_URL: "https://x.openai.azure.com/v1" } as any)
+    expect(mockCreateOpenAIFn).toHaveBeenLastCalledWith({ apiKey: "k4", baseURL: "https://x.openai.azure.com/v1" })
+    expect(mockOpenAIChat).toHaveBeenLastCalledWith("dep")
   })
 
   // NF-UNIT-326 ───────────────────────────────────────────────────────────────
