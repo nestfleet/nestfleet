@@ -22,6 +22,7 @@ import { listProducts, createProduct } from "../../infra/db/repositories/product
 import { findOperatorUserById, updateOperatorUser } from "../../infra/db/repositories/operator-users.js"
 import { encryptSecret } from "../../shared/crypto.js"
 import { verifyJwt } from "../../auth/jwt.js"
+import { resolveSelfHostedUrls } from "../../shared/self-hosted-url.js"
 
 export const setupRouter = new Hono()
 
@@ -282,12 +283,13 @@ setupRouter.post("/setup/list-models", async (c) => {
       if (models.length === 0) models = ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]
 
     } else if (provider === "self-hosted") {
-      const base = (baseUrl ?? "http://localhost:11434").replace(/\/+$/, "")
+      const { openaiBase, nativeBase } = resolveSelfHostedUrls(baseUrl)
+      const base = nativeBase // shown in error messages
       let candidates: string[] = []
       let isOllama = false
 
       try {
-        const tagsRes = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(5_000) })
+        const tagsRes = await fetch(`${nativeBase}/api/tags`, { signal: AbortSignal.timeout(5_000) })
         if (tagsRes.ok) {
           isOllama = true
           const tagsData = await tagsRes.json() as { models?: { name?: string; model?: string }[] }
@@ -296,7 +298,7 @@ setupRouter.post("/setup/list-models", async (c) => {
       } catch { /* not Ollama */ }
 
       if (candidates.length === 0) {
-        const endpoint = `${base}${base.includes("/v1") ? "" : "/v1"}/models`
+        const endpoint = `${openaiBase}/models`
         const headers: Record<string, string> = {}
         if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
         try {
@@ -320,8 +322,8 @@ setupRouter.post("/setup/list-models", async (c) => {
       const probeResults = await Promise.allSettled(
         candidates.map(async (modelName) => {
           const probeUrl = isOllama
-            ? `${base}/api/generate`
-            : `${base}${base.includes("/v1") ? "" : "/v1"}/chat/completions`
+            ? `${nativeBase}/api/generate`
+            : `${openaiBase}/chat/completions`
           const probeBody = isOllama
             ? JSON.stringify({ model: modelName, prompt: "hi", stream: false, options: { num_predict: 1 } })
             : JSON.stringify({ model: modelName, messages: [{ role: "user", content: "hi" }], max_tokens: 1 })

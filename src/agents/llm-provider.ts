@@ -27,6 +27,7 @@ import type { Config } from "../shared/config.js"
 import { config as envConfig } from "../shared/config.js"
 import { findProductById } from "../infra/db/repositories/products.js"
 import { decryptSecret } from "../shared/crypto.js"
+import { resolveSelfHostedUrls } from "../shared/self-hosted-url.js"
 import { logger } from "../shared/logger.js"
 import type { ActionType } from "./types.js"
 
@@ -127,28 +128,6 @@ function resolveEnvModel(actionType: ActionType): string {
   return envConfig.LLM_MODEL
 }
 
-const OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434/v1"
-
-/**
- * Base URL for the ollama/self-hosted provider. Unset → local Ollama.
- * A bare host (or the legacy Ollama-native "/api" suffix) is mapped to "/v1";
- * any URL with its own path (".../v1", gateways, proxies) is used as given.
- */
-function resolveOpenAICompatBaseUrl(baseUrl: string | undefined): string {
-  const raw = baseUrl?.trim()
-  if (!raw) return OLLAMA_DEFAULT_BASE_URL
-  const trimmed = raw.replace(/\/+$/, "")
-  try {
-    const { pathname } = new URL(trimmed)
-    if (pathname === "" || pathname === "/" || pathname === "/api") {
-      return `${trimmed.replace(/\/api$/, "")}/v1`
-    }
-  } catch {
-    // Not a parseable URL — pass through and let the request fail visibly.
-  }
-  return trimmed
-}
-
 /**
  * Build a LanguageModel from explicit params (provider, model, apiKey, baseUrl).
  */
@@ -195,7 +174,7 @@ function buildModel(
       // to https://api.openai.com/v1. .chat() = /chat/completions, the endpoint every
       // OpenAI-compatible server implements (the default factory uses /responses).
       return createOpenAI({
-        baseURL: resolveOpenAICompatBaseUrl(baseUrl),
+        baseURL: resolveSelfHostedUrls(baseUrl).openaiBase,
         apiKey: apiKey || "ollama",
       }).chat(modelName)
     }

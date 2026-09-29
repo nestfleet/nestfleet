@@ -26,6 +26,7 @@ import { findProductById, updateProduct } from "../../infra/db/repositories/prod
 import { getDb } from "../../infra/db/client.js"
 import { config } from "../../shared/config.js"
 import { encryptSecret, decryptSecret } from "../../shared/crypto.js"
+import { resolveSelfHostedUrls } from "../../shared/self-hosted-url.js"
 
 export const settingsRouter = new Hono<{ Variables: AuthVariables }>()
 
@@ -243,7 +244,7 @@ export async function testLlmConnection(
   let errorMessage = ""
 
   if (provider === "self-hosted") {
-    const endpoint = `${(baseUrl ?? "http://localhost:11434/v1").replace(/\/+$/, "")}/chat/completions`
+    const endpoint = `${resolveSelfHostedUrls(baseUrl).openaiBase}/chat/completions`
     const headers: Record<string, string> = { "Content-Type": "application/json" }
     if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
     const res = await fetch(endpoint, {
@@ -387,7 +388,7 @@ export async function testEmbeddingConnection(cfg: EmbeddingTestConfig): Promise
   const isOllama = cfg.provider === "self-hosted"
 
   if (isOllama) {
-    const baseUrl = (cfg.baseUrl ?? "http://localhost:11434").replace(/\/+$/, "")
+    const baseUrl = resolveSelfHostedUrls(cfg.baseUrl).nativeBase
     try {
       const res = await fetch(`${baseUrl}/api/embed`, {
         method: "POST",
@@ -973,20 +974,21 @@ settingsRouter.post("/products/:productId/settings/list-models", requireAuth(), 
       }
 
     } else if (provider === "self-hosted") {
-      const base = (baseUrl ?? "http://localhost:11434").replace(/\/+$/, "")
+      const { openaiBase, nativeBase } = resolveSelfHostedUrls(baseUrl)
+      const base = nativeBase // shown in error messages
 
       // 1. Get candidate model names from Ollama /api/tags or OpenAI-compat /v1/models
       let candidates: string[] = []
       let isOllama = false
 
       try {
-        const tagsRes = await fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(5_000) })
+        const tagsRes = await fetch(`${nativeBase}/api/tags`, { signal: AbortSignal.timeout(5_000) })
         if (tagsRes.ok) {
           isOllama = true
           const data = await tagsRes.json() as { models?: { name: string }[] }
           candidates = (data.models ?? []).map((m) => m.name)
         } else {
-          const endpoint = `${base}${base.includes("/v1") ? "" : "/v1"}/models`
+          const endpoint = `${openaiBase}/models`
           const headers: Record<string, string> = {}
           if (apiKey) headers["Authorization"] = `Bearer ${apiKey}`
           const res = await fetch(endpoint, { headers, signal: AbortSignal.timeout(5_000) })
@@ -1010,8 +1012,8 @@ settingsRouter.post("/products/:productId/settings/list-models", requireAuth(), 
       const probeResults = await Promise.allSettled(
         candidates.map(async (modelName) => {
           const probeUrl = isOllama
-            ? `${base}/api/generate`
-            : `${base}${base.includes("/v1") ? "" : "/v1"}/chat/completions`
+            ? `${nativeBase}/api/generate`
+            : `${openaiBase}/chat/completions`
 
           const probeBody = isOllama
             ? JSON.stringify({ model: modelName, prompt: "hi", stream: false, options: { num_predict: 1 } })
