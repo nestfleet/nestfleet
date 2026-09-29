@@ -35,6 +35,7 @@ import { getToolSet } from "../tool-sets.js"
 import { prepareUserContent } from "../sanitize.js"
 import { buildEvidencePack } from "../evidence.js"
 import type { AgentResult } from "../types.js"
+import { confidenceScoreSchema, sourceTiersSchema } from "../output-normalisation.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -42,14 +43,8 @@ export const AUTO_REPLY_SCHEMA_VERSION = "1.0"
 
 export const autoReplyOutputSchema = z.object({
   replyText: z.string().describe("The complete reply text to send to the user"),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe("Confidence this reply is correct and grounded (0-1)"),
-  sourceTiers: z
-    .array(z.number().int().min(1).max(4))
-    .describe("Source tiers used (must include tier 1 to auto-send)"),
+  confidenceScore: confidenceScoreSchema("Confidence this reply is correct and grounded (0-1)"),
+  sourceTiers: sourceTiersSchema("Source tiers used (must include tier 1 to auto-send)"),
   evidenceRefs: z.array(z.string()).describe("IDs/URIs of evidence chunks used"),
   reasoning: z.string().describe("Brief explanation of why this reply is appropriate"),
   requiresHumanReview: z

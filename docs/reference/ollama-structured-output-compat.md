@@ -80,6 +80,16 @@ route, do one of:
    model-facing schema, then **clamp/normalize in code** (e.g. `confidence = min(1, max(0, raw > 1 ? raw/100 : raw))`).
 3. **Both** — friendliest for self-hosters.
 
+> **Implemented (2026-09-29, `src/agents/output-normalisation.ts`) — option 2, with one deliberate deviation.**
+> All six agent schemas (triage, known-issue-match, outage-routing, change-prep, pr-draft-prep, auto-reply)
+> now send a plain `number` and enforce the range on the parsed value; `auto-reply.sourceTiers` likewise.
+> Rule: in-range unchanged; `(1, 1.2]` → 1; negative / `> 1.2` / non-finite → **0** (low confidence → human review).
+> **Why not `raw > 1 ? raw/100 : raw` as sketched above:** guessing the scale can push a wrong severity past the
+> triage gates (critical ≥ 0.75, high ≥ 0.60) or the known-issue match threshold (≥ 0.80); an unusable value
+> should fail toward human review, never toward auto-action. Out-of-range values are logged
+> (`rawConfidence` / `normalisedConfidence`) so frequency is visible. Measured on qwen2.5:0.5b with no range hint:
+> before ≈ 6/8 valid, after 20/20.
+
 The historical "OpenAI-compat doesn't work for Ollama" is now **mostly resolved**
 for structured output; the residual issue is the grammar constraint gap above,
 which is inherent to Ollama and independent of the provider choice.

@@ -29,6 +29,7 @@ import { runAgent } from "../run-agent.js"
 import { getToolSet } from "../tool-sets.js"
 import { prepareUserContent } from "../sanitize.js"
 import { PolicyViolationError, type AgentResult } from "../types.js"
+import { confidenceScoreSchema } from "../output-normalisation.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -63,11 +64,7 @@ export const changePrepOutputSchema = z.object({
     .describe(
       "Which lead role should approve: change_lead for engineering changes, product_lead for behavior/roadmap changes",
     ),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe("Agent confidence in the analysis (0-1)"),
+  confidenceScore: confidenceScoreSchema("Agent confidence in the analysis (0-1)"),
   evidenceRefs: z
     .array(z.string())
     .describe("IDs or URIs of evidence chunks used"),

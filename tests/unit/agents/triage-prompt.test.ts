@@ -76,7 +76,7 @@ describe("triage schema contract", () => {
     expect(result.success).toBe(false)
   })
 
-  it("NF-UNIT-TRIAGE-04: confidenceScore must be between 0 and 1", () => {
+  it("NF-UNIT-TRIAGE-04: confidenceScore is normalised into 0-1", () => {
     const base = {
       severity: "high",
       category: "test",
@@ -84,8 +84,12 @@ describe("triage schema contract", () => {
       reasoning: "test reasoning",
       evidenceRefs: [],
     }
-    expect(triageOutputSchema.safeParse({ ...base, confidenceScore: -0.1 }).success).toBe(false)
-    expect(triageOutputSchema.safeParse({ ...base, confidenceScore: 1.1 }).success).toBe(false)
+    // Out-of-range values are normalised in code, not rejected (see output-normalisation.test.ts):
+    // Ollama can't enforce numeric ranges. Negative / far-out values → 0 (low confidence → human review).
+    expect(triageOutputSchema.parse({ ...base, confidenceScore: -0.1 }).confidenceScore).toBe(0)
+    expect(triageOutputSchema.parse({ ...base, confidenceScore: 1.1 }).confidenceScore).toBe(1)
+    expect(triageOutputSchema.parse({ ...base, confidenceScore: 84.19 }).confidenceScore).toBe(0)
+    expect(triageOutputSchema.safeParse({ ...base, confidenceScore: "high" }).success).toBe(false)
     expect(triageOutputSchema.safeParse({ ...base, confidenceScore: 0 }).success).toBe(true)
     expect(triageOutputSchema.safeParse({ ...base, confidenceScore: 1 }).success).toBe(true)
   })

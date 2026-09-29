@@ -29,6 +29,7 @@ import { runAgent } from "../run-agent.js"
 import { getToolSet } from "../tool-sets.js"
 import { prepareUserContent } from "../sanitize.js"
 import { PolicyViolationError, type AgentResult } from "../types.js"
+import { confidenceScoreSchema } from "../output-normalisation.js"
 
 // ── Output schema ─────────────────────────────────────────────────────────────
 
@@ -68,11 +69,7 @@ export const prDraftPrepOutputSchema = z.object({
   riskAssessment: z
     .string()
     .describe("Brief risk assessment: what could go wrong, rollback plan"),
-  confidenceScore: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe("Agent confidence in the completeness of this PR draft (0-1)"),
+  confidenceScore: confidenceScoreSchema("Agent confidence in the completeness of this PR draft (0-1)"),
   evidenceRefs: z.array(z.string()).describe("Evidence chunk IDs/URIs used"),
 })
 
