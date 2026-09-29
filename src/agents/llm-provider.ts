@@ -22,7 +22,6 @@
 import { createOpenAI } from "@ai-sdk/openai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { createGoogleGenerativeAI } from "@ai-sdk/google"
-import { createOllama } from "ollama-ai-provider"
 import type { LanguageModel } from "ai"
 import type { Config } from "../shared/config.js"
 import { config as envConfig } from "../shared/config.js"
@@ -128,6 +127,28 @@ function resolveEnvModel(actionType: ActionType): string {
   return envConfig.LLM_MODEL
 }
 
+const OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434/v1"
+
+/**
+ * Base URL for the ollama/self-hosted provider. Unset → local Ollama.
+ * A bare host (or the legacy Ollama-native "/api" suffix) is mapped to "/v1";
+ * any URL with its own path (".../v1", gateways, proxies) is used as given.
+ */
+function resolveOpenAICompatBaseUrl(baseUrl: string | undefined): string {
+  const raw = baseUrl?.trim()
+  if (!raw) return OLLAMA_DEFAULT_BASE_URL
+  const trimmed = raw.replace(/\/+$/, "")
+  try {
+    const { pathname } = new URL(trimmed)
+    if (pathname === "" || pathname === "/" || pathname === "/api") {
+      return `${trimmed.replace(/\/api$/, "")}/v1`
+    }
+  } catch {
+    // Not a parseable URL — pass through and let the request fail visibly.
+  }
+  return trimmed
+}
+
 /**
  * Build a LanguageModel from explicit params (provider, model, apiKey, baseUrl).
  */
@@ -167,9 +188,16 @@ function buildModel(
 
     case "self-hosted":
     case "ollama": {
-      const opts: Parameters<typeof createOllama>[0] = {}
-      if (baseUrl) opts.baseURL = baseUrl
-      return createOllama(opts)(modelName) as unknown as LanguageModel
+      // Ollama / self-hosted via the OpenAI-compatible /v1 endpoint (OPS-M-08).
+      // ollama-ai-provider was spec-v1, which ai>=5 rejects at runtime — dropped.
+      // Both options are always set explicitly: createOpenAI would otherwise read
+      // process.env.OPENAI_API_KEY (leaking a real key to the local host) and default
+      // to https://api.openai.com/v1. .chat() = /chat/completions, the endpoint every
+      // OpenAI-compatible server implements (the default factory uses /responses).
+      return createOpenAI({
+        baseURL: resolveOpenAICompatBaseUrl(baseUrl),
+        apiKey: apiKey || "ollama",
+      }).chat(modelName)
     }
 
     default:

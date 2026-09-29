@@ -122,7 +122,7 @@ Pick a provider and paste a key:
 | Anthropic | \`ANTHROPIC_API_KEY\` | Recommended default |
 | OpenAI | \`OPENAI_API_KEY\` | Works for all three tiers |
 | Google | \`GOOGLE_GENERATIVE_AI_API_KEY\` | Gemini family |
-| Ollama | \`OLLAMA_BASE_URL\` | Local / self-hosted, no key |
+| Ollama | \`LLM_PROVIDER=ollama\` + \`LLM_BASE_URL\` | Local / self-hosted, no key; \`/v1\` is appended to a bare host URL automatically |
 
 NestFleet uses three model tiers: \`LLM_MODEL\` (default), \`LLM_MODEL_FAST\` (cheap triage), \`LLM_MODEL_COMPLEX\` (PR drafting, hard reasoning). The wizard fills sensible defaults; tune later in [Settings](./settings.md).
 
@@ -861,7 +861,8 @@ LLM_MODEL_COMPLEX=claude-opus-4-7-20260201
 ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxx
 OPENAI_API_KEY=sk-xxxxxxxxxxxxx
 GOOGLE_GENERATIVE_AI_API_KEY=xxxxxxxxxxxxx
-OLLAMA_BASE_URL=http://ollama:11434
+# Ollama / self-hosted: set LLM_PROVIDER=ollama and point LLM_BASE_URL at the server ("/v1" is appended for a bare host)
+LLM_BASE_URL=http://ollama:11434
 \`\`\`
 
 **Tier meanings:**
