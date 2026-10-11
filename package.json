@@ -19,7 +19,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.125",
+    "@ai-sdk/anthropic": "^4.0.77",
     "@ai-sdk/google": "^3.0.129",
     "@ai-sdk/openai": "^3.0.120",
     "@hono/node-server": "^2.1.4",
