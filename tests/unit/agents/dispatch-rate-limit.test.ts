@@ -86,42 +86,8 @@ describe("Per-user dispatch rate limit (SEC-JQ1)", () => {
   beforeEach(async () => {
     vi.resetModules()
 
-    // Re-mock after resetModules so the fresh dispatcher module picks them up
-    vi.mock("../../../src/shared/config.js", () => ({
-      config: {
-        JWT_SECRET:            "test-secret-32-chars-minimum-ok!",
-        SECRET_ENCRYPTION_KEY: "a".repeat(64),
-        DATABASE_URL:          "postgres://localhost/nestfleet_test",
-        LLM_PROVIDER:          "anthropic",
-        LLM_API_KEY:           "sk-ant-test",
-        NODE_ENV:              "test",
-        PORT:                  3001,
-        BCRYPT_ROUNDS:         12,
-        REGISTRATION_ENABLED:  false,
-        BILLING_ENABLED:       false,
-        PROVISIONING_ENABLED:  false,
-      },
-    }))
-    vi.mock("../../../src/infra/queue/boss.js", () => ({
-      getBoss:  vi.fn().mockResolvedValue({
-        send:        vi.fn().mockResolvedValue("pg-boss-id"),
-        createQueue: vi.fn().mockResolvedValue(undefined),
-      }),
-      initBoss: vi.fn(),
-    }))
-    vi.mock("../../../src/agents/budget.js", () => ({
-      checkBudget: vi.fn().mockResolvedValue({ hardLimitExceeded: false, softLimitExceeded: false }),
-    }))
-    vi.mock("../../../src/license/validator.js", () => ({
-      getLicenseTier: vi.fn().mockReturnValue("growth"),
-    }))
-    vi.mock("../../../src/rbac/permission-engine.js", () => ({
-      licenseToProductTier: vi.fn().mockReturnValue("growth"),
-      meetsMinTier: vi.fn().mockReturnValue(true),
-    }))
-    vi.mock("../../../src/shared/logger.js", () => ({
-      logger: { info: vi.fn(), warn: vi.fn(), debug: vi.fn(), error: vi.fn() },
-    }))
+    // The top-level vi.mock() factories above are hoisted and re-applied to the
+    // fresh module graph after resetModules(); vitest 5 rejects nested vi.mock().
 
     const mod = await import("../../../src/agents/dispatcher.js")
     dispatch         = mod.dispatch as typeof dispatch
