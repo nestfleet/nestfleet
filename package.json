@@ -34,7 +34,7 @@
     "js-yaml": "^5.4.2",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^10.0.12",
-    "pg-boss": "^12.30.0",
+    "pg-boss": "^12.37.1",
     "pino": "^10.4.0",
     "pino-pretty": "^13.0.0",
     "postgres": "^3.4.9",
