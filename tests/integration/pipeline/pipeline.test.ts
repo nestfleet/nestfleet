@@ -143,6 +143,28 @@ async function waitForCaseStatus(
   )
 }
 
+/**
+ * Wait until FrontlineWorker has triaged the case, whatever state it has moved on to since.
+ *
+ * "triaged" is transient: the same transaction dispatches known_issue_match, and the Steward can
+ * advance the case within milliseconds (measured 18ms) — well inside a 200ms poll, so waiting for
+ * status === "triaged" is a race. triage_output is written in that same transaction
+ * (transitionAndDispatch), so it is the race-free signal that triage happened.
+ */
+async function waitForTriaged(caseId: string, timeoutMs = 12_000) {
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    const c = await findCaseById(caseId)
+    if (c && c.status !== "enriching" && c.triage_output !== null) return c
+    await new Promise((r) => setTimeout(r, 200))
+  }
+  const c = await findCaseById(caseId)
+  throw new Error(
+    `waitForTriaged: case ${caseId} was not triaged within ${timeoutMs}ms. ` +
+      `Current status: "${c?.status ?? "not found"}", triage_output: ${c?.triage_output ? "set" : "null"}`,
+  )
+}
+
 beforeAll(async () => {
   // 1. Start real Testcontainers Postgres + run migrations
   dbCtx = await setupTestDb()
@@ -262,12 +284,11 @@ describe("QE-03 Pipeline Integration", () => {
       { singletonKey: `triage:${caseId}` },
     )
 
-    await waitForCaseStatus(caseId, "triaged", 12_000)
+    const updatedCase = await waitForTriaged(caseId, 12_000)
 
-    const updatedCase = await findCaseById(caseId)
-    expect(updatedCase!.status).toBe("triaged")
-    expect(updatedCase!.triage_output).not.toBeNull()
-    expect((updatedCase!.triage_output as Record<string, unknown>)["severity"]).toBe("low")
+    expect(updatedCase.status).not.toBe("enriching")
+    expect(updatedCase.triage_output).not.toBeNull()
+    expect((updatedCase.triage_output as Record<string, unknown>)["severity"]).toBe("low")
   }, 30_000)
 
   /**
@@ -327,10 +348,9 @@ describe("QE-03 Pipeline Integration", () => {
       { singletonKey: `triage:${caseId}` },
     )
 
-    // FrontlineWorker: enriching → triaged (dispatches known_issue_match atomically)
-    await waitForCaseStatus(caseId, "triaged", 12_000)
-
-    // StewardWorker: triaged → in-change (bug_report with no known issue match)
+    // FrontlineWorker: enriching → triaged (dispatches known_issue_match atomically), then
+    // StewardWorker: triaged → in-change (bug_report with no known issue match).
+    // Only the end state is awaited — "triaged" is transient (see waitForTriaged).
     await waitForCaseStatus(caseId, "in-change", 20_000)
 
     const changeRequests = await findChangeRequestsByCase(caseId)
@@ -474,13 +494,12 @@ describe("QE-03 Pipeline Integration", () => {
     )
 
     // Pipeline should complete successfully despite empty knowledge base
-    await waitForCaseStatus(caseId, "triaged", 12_000)
+    const finalCase = await waitForTriaged(caseId, 12_000)
 
-    const finalCase = await findCaseById(caseId)
-    expect(finalCase!.status).toBe("triaged")
-    expect(finalCase!.triage_output).not.toBeNull()
+    expect(finalCase.status).not.toBe("enriching")
+    expect(finalCase.triage_output).not.toBeNull()
     // Verify the agent output is stored — no stuck or errored state
-    const output = finalCase!.triage_output as Record<string, unknown>
+    const output = finalCase.triage_output as Record<string, unknown>
     expect(output["severity"]).toBeDefined()
   }, 30_000)
 
