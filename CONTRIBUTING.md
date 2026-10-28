@@ -6,7 +6,7 @@ Thank you for your interest in contributing.
 
 ### Prerequisites
 
-- Node.js 22+
+- Node.js **22.19+** (prod image runs 26.x). undici 8.12 (via the AI SDK) calls `zlib.createZstdDecompress`, which older 22.x lacks. Below 22.19 the API and integration tests crash at import with `Cannot read properties of undefined (reading 'bind')` in `undici/lib/interceptor/decompress.js`.
 - Docker + Docker Compose (for integration tests and local PostgreSQL)
 - Colima or Docker Desktop (macOS)
 

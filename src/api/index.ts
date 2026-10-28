@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Copyright (C) 2024-2026 NestFleet contributors
 import { Hono } from "hono"
+import { bodyLimit } from "hono/body-limit"
 import { cors } from "hono/cors"
 import { secureHeaders } from "hono/secure-headers"
 import { pingDb } from "../infra/db/client.js"
@@ -167,6 +168,24 @@ app.use("/api/*", cors({
   allowHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }))
+
+// ── Request body size limits (OPS-M-09) ──────────────────────────────────────
+// Bounds the zod 3 memory-exhaustion path (GHSA-mrhx-c7xc-m3w5: every failing
+// array element allocates an issue, uncapped) until the zod 4 migration
+// (OPS-M-10). Only these authenticated routes parse array schemas from request
+// bodies; the webhook schemas have none. Registered after CORS so 413s keep
+// CORS headers. The /api/* cap sits far above the largest legitimate body
+// (product-memory `content`, max 500k chars).
+
+const limitBody = (maxSize: number) => bodyLimit({
+  maxSize,
+  onError: (c) => c.json({ error: "PAYLOAD_TOO_LARGE", message: "Request body too large" }, 413),
+})
+
+app.use("/api/*", limitBody(5 * 1024 * 1024))
+app.use("/api/v1/users/*", limitBody(64 * 1024))
+app.use("/api/v1/products/:productId/notification-preferences", limitBody(64 * 1024))
+app.use("/api/v1/products/:productId/knowledge-assets", limitBody(1024 * 1024))
 
 // ── CORS — public contact form endpoint (any origin, no credentials) ──────────
 // DEFERRED-13: The JS widget is embedded on customer websites with unknown origins.
