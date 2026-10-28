@@ -1,0 +1,8 @@
+{
+  "GHSA-mrhx-c7xc-m3w5": {
+    "package": "zod",
+    "expires": "2026-12-31",
+    "reason": "zod 3 memory exhaustion on large failing arrays. No zod 3.x fix (patched in 4.6.6). Bounded by request body limits in src/api/index.ts; only authenticated /api/v1 routes parse array schemas.",
+    "tracking": "OPS-M-09 (exception + mitigation), OPS-M-10 (zod 4 migration removes this entry)"
+  }
+}

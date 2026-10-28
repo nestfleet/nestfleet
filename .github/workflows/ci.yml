@@ -48,6 +48,8 @@ jobs:
               - 'Dockerfile'
               - 'tsconfig*.json'
               - 'vitest*.config.ts'
+              - '.github/audit-allowlist.json'
+              - 'scripts/audit-gate.mjs'
             console:
               - 'console/**'
 
@@ -81,7 +83,9 @@ jobs:
         run: npm run build
 
       - name: Security audit
-        run: npm audit --audit-level=high --omit=dev
+        # Same bar as `npm audit --audit-level=high --omit=dev`, plus time-boxed
+        # exceptions from .github/audit-allowlist.json (OPS-M-09).
+        run: node scripts/audit-gate.mjs .github/audit-allowlist.json
 
   # ── Console: type-check, security audit ────────────────────────────────────
 
