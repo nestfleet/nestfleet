@@ -12,7 +12,7 @@
 import { NodeSDK } from "@opentelemetry/sdk-node"
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node"
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http"
-import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node"
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace"
 import { config } from "./config.js"
 
 let sdk: NodeSDK | null = null
@@ -37,7 +37,8 @@ export function initTelemetry(): void {
     const exporter = new OTLPTraceExporter({
       url: `${config.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`,
     })
-    sdkConfig.spanProcessors = [new SimpleSpanProcessor(exporter)]
+    // OTel 3.0: SimpleSpanProcessor takes an options object, not the exporter itself
+    sdkConfig.spanProcessors = [new SimpleSpanProcessor({ exporter })]
   }
 
   sdk = new NodeSDK(sdkConfig)
