@@ -34,7 +34,7 @@
     "jose": "^6.2.13",
     "js-yaml": "^5.5.0",
     "jsonwebtoken": "^9.0.3",
-    "nodemailer": "^10.1.7",
+    "nodemailer": "^10.3.1",
     "pg-boss": "^12.38.0",
     "pino": "^10.4.0",
     "pino-pretty": "^13.2.0",
